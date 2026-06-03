@@ -19,6 +19,12 @@ export interface BugReportFormValues {
   additionalNotes: string
 }
 
+/** Form values after required fields pass validation. */
+export interface ValidatedBugReportFormValues
+  extends Omit<BugReportFormValues, 'category'> {
+  category: BugCategory
+}
+
 export interface GeneratedTicket {
   title: string
   issueSummary: string

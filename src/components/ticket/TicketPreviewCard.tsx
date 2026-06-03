@@ -5,7 +5,7 @@ import { TicketSection } from './TicketSection'
 
 interface TicketPreviewCardProps {
   ticket: GeneratedTicket
-  showPreviewBadge?: boolean
+  isGenerated?: boolean
 }
 
 function severityVariant(
@@ -25,16 +25,16 @@ function severityVariant(
 
 export function TicketPreviewCard({
   ticket,
-  showPreviewBadge = true,
+  isGenerated = false,
 }: TicketPreviewCardProps) {
   return (
     <Card id="ticket-preview" className="h-full">
       <CardHeader
         title="Ticket Preview"
-        description="Jira-ready format — mock data for Phase 1"
+        description="Jira-ready format generated from your report"
         action={
-          showPreviewBadge ? (
-            <Badge variant="brand">Sample preview</Badge>
+          isGenerated ? (
+            <Badge variant="success">Generated</Badge>
           ) : undefined
         }
       />

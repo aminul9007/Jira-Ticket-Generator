@@ -21,9 +21,9 @@ src/
 │   └── ui/         # Reusable UI primitives
 ├── pages/          # DashboardPage
 ├── types/          # TypeScript domain types
-├── data/           # Constants and mock ticket
-├── hooks/          # Form state hook
-├── utils/          # Utilities (cn)
+├── data/           # App constants
+├── hooks/          # Form, ticket generation, and assistant orchestration
+├── utils/          # Ticket generation, validation, cn
 ├── assets/
 └── App.tsx
 ```
@@ -51,7 +51,7 @@ Open the URL shown in the terminal (typically `http://localhost:5173`).
 - Single-page responsive dashboard
 - Bug category, environment multi-select, title, and notes fields
 - Generate Ticket button with loading state (scrolls to preview)
-- Jira-style ticket preview with mock data
+- Dynamic Jira-style ticket preview generated from form input
 
 ## Out of scope (Phase 1)
 

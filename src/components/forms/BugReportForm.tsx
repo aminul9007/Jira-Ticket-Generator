@@ -37,7 +37,7 @@ export function BugReportForm({
     <Card id="bug-report-form" className="h-full">
       <CardHeader
         title="New Bug Report"
-        description="Describe the issue. Ticket preview uses sample data until AI is connected."
+        description="Describe the issue. Fields below drive the generated ticket preview."
       />
       <form onSubmit={handleSubmit} className="space-y-5">
         <CategorySelect value={values.category} onChange={onCategoryChange} />

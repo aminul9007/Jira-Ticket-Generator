@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import type { BugCategory, BugReportFormValues, Environment } from '../types/bugReport'
+import { isBugReportFormComplete } from '../utils/validateForm'
 
 const initialValues: BugReportFormValues = {
   category: '',
@@ -10,7 +11,6 @@ const initialValues: BugReportFormValues = {
 
 export function useBugReportForm() {
   const [values, setValues] = useState<BugReportFormValues>(initialValues)
-  const [isGenerating, setIsGenerating] = useState(false)
 
   const setCategory = useCallback((category: BugCategory | '') => {
     setValues((prev) => ({ ...prev, category }))
@@ -38,30 +38,17 @@ export function useBugReportForm() {
 
   const reset = useCallback(() => {
     setValues(initialValues)
-    setIsGenerating(false)
   }, [])
 
-  const handleGenerate = useCallback(async () => {
-    setIsGenerating(true)
-    await new Promise((resolve) => setTimeout(resolve, 600))
-    setIsGenerating(false)
-    return true
-  }, [])
-
-  const isValid =
-    values.category !== '' &&
-    values.environments.length > 0 &&
-    values.title.trim().length > 0
+  const isValid = isBugReportFormComplete(values)
 
   return {
     values,
-    isGenerating,
     isValid,
     setCategory,
     toggleEnvironment,
     setTitle,
     setAdditionalNotes,
     reset,
-    handleGenerate,
   }
 }
