@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { generateTicket } from '../services/ticketGeneration'
-import type { BugReportFormValues } from '../types/bugReport'
+import type { BugReportFormValues, GeneratedTicket } from '../types/bugReport'
 import {
   INITIAL_TICKET_STATE,
   type TicketGenerationState,
@@ -15,9 +15,9 @@ export function useGeneratedTicket() {
   const [usedAi, setUsedAi] = useState(false)
 
   const generateFromForm = useCallback(
-    async (formValues: BugReportFormValues): Promise<boolean> => {
+    async (formValues: BugReportFormValues): Promise<GeneratedTicket | null> => {
       if (!isBugReportFormComplete(formValues)) {
-        return false
+        return null
       }
 
       setIsGenerating(true)
@@ -33,7 +33,7 @@ export function useGeneratedTicket() {
       })
       setUsedAi(result.usedAi)
       setIsGenerating(false)
-      return true
+      return result.ticket
     },
     [],
   )

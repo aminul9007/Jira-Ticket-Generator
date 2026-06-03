@@ -4,12 +4,14 @@ import { BugReportForm } from '../components/forms/BugReportForm'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { TicketPreviewPanel } from '../components/ticket/TicketPreviewPanel'
+import { Toast } from '../components/ui/Toast'
+import { useToast } from '../hooks/useToast'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
 
 export function DashboardPage() {
-  const { form, inputQuality, ticket } = useBugReportAssistant()
-  const { generate: generateTicket, isGenerating, data, hasGenerated, usedAi } =
-    ticket
+  const { form, inputQuality, ticket, editor } = useBugReportAssistant()
+  const { generate: generateTicket, isGenerating, hasGenerated, usedAi } = ticket
+  const { toast, showToast } = useToast()
 
   const onGenerate = useCallback(async () => {
     const success = await generateTicket()
@@ -20,11 +22,15 @@ export function DashboardPage() {
     }
   }, [generateTicket])
 
+  const onCopySuccess = useCallback(() => {
+    showToast('Jira ticket copied to clipboard')
+  }, [showToast])
+
   return (
     <DashboardLayout>
       <PageHeader
         title="Create a bug report"
-        description="Enter minimal details and get a Senior QA–quality Jira ticket with title options, confidence score, and developer-ready root-cause hints."
+        description="Generate a ticket, then preview or inline-edit any section before copying to Jira."
       />
 
       <div className="grid gap-6 xl:grid-cols-2 xl:gap-8 xl:items-start">
@@ -44,14 +50,16 @@ export function DashboardPage() {
         </div>
 
         <TicketPreviewPanel
-          ticket={data}
+          editor={editor}
           hasGenerated={hasGenerated}
           isGenerating={isGenerating}
           usedAi={usedAi}
+          onCopySuccess={onCopySuccess}
         />
       </div>
 
       <TicketHistoryPanel />
+      <Toast toast={toast} />
     </DashboardLayout>
   )
 }

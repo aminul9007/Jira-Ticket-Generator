@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { analyzeInputQuality } from '../services/ticketGeneration'
 import { useBugReportForm } from './useBugReportForm'
 import { useGeneratedTicket } from './useGeneratedTicket'
+import { useTicketEditor } from './useTicketEditor'
 
 export function useBugReportAssistant() {
   const {
@@ -16,7 +17,6 @@ export function useBugReportAssistant() {
   } = useBugReportForm()
 
   const {
-    ticket,
     hasGenerated,
     isGenerating,
     usedAi,
@@ -24,19 +24,27 @@ export function useBugReportAssistant() {
     clearTicket,
   } = useGeneratedTicket()
 
+  const editor = useTicketEditor()
+  const { loadTicket, clearTicket: clearEditor } = editor
+
   const inputQuality = useMemo(
     () => analyzeInputQuality(values),
     [values],
   )
 
   const generateTicket = useCallback(async () => {
-    return generateFromForm(values)
-  }, [generateFromForm, values])
+    const generated = await generateFromForm(values)
+    if (generated) {
+      loadTicket(generated)
+    }
+    return generated !== null
+  }, [generateFromForm, values, loadTicket])
 
   const resetAll = useCallback(() => {
     resetForm()
     clearTicket()
-  }, [resetForm, clearTicket])
+    clearEditor()
+  }, [resetForm, clearTicket, clearEditor])
 
   return {
     form: {
@@ -51,13 +59,13 @@ export function useBugReportAssistant() {
     },
     inputQuality,
     ticket: {
-      data: ticket,
       hasGenerated,
       isGenerating,
       usedAi,
       generate: generateTicket,
       clear: clearTicket,
     },
+    editor,
     resetAll,
   }
 }

@@ -1,15 +1,16 @@
-import type { GeneratedTicket } from '../../types/bugReport'
+import type { TicketEditor } from '../../hooks/useTicketEditor'
 import { Card, CardHeader } from '../ui/Card'
 import { LoadingOverlay } from '../ui/LoadingOverlay'
-import { TicketPreviewCard } from './TicketPreviewCard'
+import { TicketEditorCard } from './TicketEditorCard'
 import { TicketPreviewEmpty } from './TicketPreviewEmpty'
 import { TicketPreviewSkeleton } from './TicketPreviewSkeleton'
 
 interface TicketPreviewPanelProps {
-  ticket: GeneratedTicket | null
+  editor: TicketEditor
   hasGenerated: boolean
   isGenerating: boolean
   usedAi?: boolean
+  onCopySuccess: () => void
 }
 
 const PreviewIcon = (
@@ -35,16 +36,17 @@ const PreviewIcon = (
 )
 
 export function TicketPreviewPanel({
-  ticket,
+  editor,
   hasGenerated,
   isGenerating,
   usedAi = false,
+  onCopySuccess,
 }: TicketPreviewPanelProps) {
   if (isGenerating && !hasGenerated) {
     return (
       <Card id="ticket-preview" variant="elevated" className="min-h-[420px] lg:min-h-[520px]">
         <CardHeader
-          title="Ticket Preview"
+          title="Ticket Editor"
           description="Senior QA Lead is drafting your ticket…"
           icon={PreviewIcon}
         />
@@ -55,7 +57,7 @@ export function TicketPreviewPanel({
     )
   }
 
-  if (!hasGenerated || !ticket) {
+  if (!hasGenerated || !editor.editedTicket) {
     return (
       <LoadingOverlay
         isLoading={isGenerating}
@@ -73,7 +75,11 @@ export function TicketPreviewPanel({
       label="Regenerating ticket…"
       className="h-full"
     >
-      <TicketPreviewCard ticket={ticket} isGenerated usedAi={usedAi} />
+      <TicketEditorCard
+        editor={editor}
+        usedAi={usedAi}
+        onCopySuccess={onCopySuccess}
+      />
     </LoadingOverlay>
   )
 }
