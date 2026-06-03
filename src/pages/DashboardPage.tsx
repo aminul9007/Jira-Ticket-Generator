@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { BugReportForm } from '../components/forms/BugReportForm'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
+import { PageHeader } from '../components/layout/PageHeader'
 import { TicketPreviewPanel } from '../components/ticket/TicketPreviewPanel'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
 
@@ -19,26 +20,30 @@ export function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="mb-6">
-        <p className="max-w-2xl text-sm text-text-secondary">
-          Capture bug details in under a minute. Fill in the form on the left and
-          generate a Jira-style preview on the right from your input. AI
-          enhancement is planned for a later phase.
-        </p>
-      </div>
+      <PageHeader
+        title="Create a bug report"
+        description="Capture bug details in under a minute. Fill in the form and generate a Jira-style preview from your input—AI enhancement is planned for a later phase."
+      />
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <BugReportForm
-          values={form.values}
+      <div className="grid gap-6 xl:grid-cols-2 xl:gap-8 xl:items-start">
+        <div className="xl:sticky xl:top-24">
+          <BugReportForm
+            values={form.values}
+            isGenerating={isGenerating}
+            isValid={form.isValid}
+            onCategoryChange={form.setCategory}
+            onEnvironmentToggle={form.toggleEnvironment}
+            onTitleChange={form.setTitle}
+            onNotesChange={form.setAdditionalNotes}
+            onGenerate={onGenerate}
+          />
+        </div>
+
+        <TicketPreviewPanel
+          ticket={data}
+          hasGenerated={hasGenerated}
           isGenerating={isGenerating}
-          isValid={form.isValid}
-          onCategoryChange={form.setCategory}
-          onEnvironmentToggle={form.toggleEnvironment}
-          onTitleChange={form.setTitle}
-          onNotesChange={form.setAdditionalNotes}
-          onGenerate={onGenerate}
         />
-        <TicketPreviewPanel ticket={data} hasGenerated={hasGenerated} />
       </div>
     </DashboardLayout>
   )

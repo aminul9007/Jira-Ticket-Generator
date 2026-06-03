@@ -23,23 +23,40 @@ function severityVariant(
   }
 }
 
+const PreviewIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
 export function TicketPreviewCard({
   ticket,
   isGenerated = false,
 }: TicketPreviewCardProps) {
   return (
-    <Card id="ticket-preview" className="h-full">
+    <Card
+      id="ticket-preview"
+      variant="elevated"
+      className="h-full animate-fade-in"
+    >
       <CardHeader
         title="Ticket Preview"
         description="Jira-ready format generated from your report"
+        icon={PreviewIcon}
         action={
           isGenerated ? (
-            <Badge variant="success">Generated</Badge>
+            <Badge variant="success">Ready to copy</Badge>
           ) : undefined
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-5 flex flex-wrap gap-2">
         <Badge variant="brand">{ticket.category}</Badge>
         {ticket.environments.map((env) => (
           <Badge key={env} variant="neutral">
@@ -52,9 +69,9 @@ export function TicketPreviewCard({
         <Badge variant="default">Priority {ticket.priority}</Badge>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <TicketSection title="Title">
-          <p className="font-semibold">{ticket.title}</p>
+          <p className="font-semibold tracking-tight">{ticket.title}</p>
         </TicketSection>
 
         <TicketSection title="Issue Summary">
@@ -62,9 +79,11 @@ export function TicketPreviewCard({
         </TicketSection>
 
         <TicketSection title="Steps to Reproduce">
-          <ol className="list-decimal space-y-1.5 pl-5">
+          <ol className="list-decimal space-y-2 pl-5 marker:text-text-muted">
             {ticket.stepsToReproduce.map((step, index) => (
-              <li key={index}>{step}</li>
+              <li key={index} className="pl-1">
+                {step}
+              </li>
             ))}
           </ol>
         </TicketSection>
@@ -77,7 +96,7 @@ export function TicketPreviewCard({
           <p>{ticket.actualResult}</p>
         </TicketSection>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <TicketSection title="Severity">
             <Badge variant={severityVariant(ticket.severity)}>
               {ticket.severity}

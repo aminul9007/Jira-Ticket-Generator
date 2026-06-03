@@ -2,16 +2,16 @@ import { APP_NAME, APP_TAGLINE } from '../../data/constants'
 
 export function Header() {
   return (
-    <header className="border-b border-border bg-surface-elevated/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <div className="flex items-start gap-3">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-surface-elevated/90 backdrop-blur-md backdrop-saturate-150">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-3">
           <div
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand text-white shadow-sm"
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-indigo-600 text-white shadow-md shadow-brand/25"
             aria-hidden="true"
           >
             <svg
-              width="22"
-              height="22"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -31,16 +31,23 @@ export function Header() {
               />
             </svg>
           </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight text-text-primary sm:text-xl">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold tracking-tight text-text-primary">
               {APP_NAME}
-            </h1>
-            <p className="text-sm text-text-secondary">{APP_TAGLINE}</p>
+            </p>
+            <p className="hidden truncate text-xs text-text-muted sm:block">
+              {APP_TAGLINE}
+            </p>
           </div>
         </div>
-        <p className="text-xs font-medium uppercase tracking-wider text-text-muted sm:text-right">
-          Phase 1 · Frontend MVP
-        </p>
+        <div className="flex items-center gap-2">
+          <span className="hidden rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-brand sm:inline-flex">
+            Beta
+          </span>
+          <span className="rounded-full border border-border bg-surface-subtle px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-muted sm:px-3 sm:text-xs">
+            Phase 1
+          </span>
+        </div>
       </div>
     </header>
   )

@@ -10,12 +10,12 @@ export function Select({ className, hasError, children, ...props }: SelectProps)
     <div className="relative">
       <select
         className={cn(
-          'w-full appearance-none rounded-lg border bg-surface-elevated px-3 py-2.5 pr-10 text-sm text-text-primary',
-          'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1',
-          'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60',
+          'w-full appearance-none rounded-xl border bg-surface-subtle/50 px-3.5 py-3 pr-11 text-sm text-text-primary',
+          'transition-all duration-150 focus-visible:outline-none focus-visible:border-brand focus-visible:bg-surface-elevated focus-visible:ring-[3px] focus-visible:ring-brand/15',
+          'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60',
           hasError
-            ? 'border-danger focus-visible:ring-danger'
-            : 'border-border-strong hover:border-slate-400',
+            ? 'border-danger focus-visible:ring-danger/15'
+            : 'border-border-strong hover:border-slate-300 hover:bg-surface-elevated',
           className,
         )}
         {...props}
@@ -23,7 +23,7 @@ export function Select({ className, hasError, children, ...props }: SelectProps)
         {children}
       </select>
       <span
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+        className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted"
         aria-hidden="true"
       >
         <svg

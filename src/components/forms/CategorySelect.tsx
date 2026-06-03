@@ -1,5 +1,6 @@
 import { BUG_CATEGORIES } from '../../data/constants'
 import type { BugCategory } from '../../types/bugReport'
+import { FormField } from '../ui/FormField'
 import { Label } from '../ui/Label'
 import { Select } from '../ui/Select'
 
@@ -10,7 +11,7 @@ interface CategorySelectProps {
 
 export function CategorySelect({ value, onChange }: CategorySelectProps) {
   return (
-    <div>
+    <FormField>
       <Label htmlFor="bug-category" required>
         Bug Category
       </Label>
@@ -28,6 +29,6 @@ export function CategorySelect({ value, onChange }: CategorySelectProps) {
           </option>
         ))}
       </Select>
-    </div>
+    </FormField>
   )
 }
