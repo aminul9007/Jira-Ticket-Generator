@@ -9,7 +9,11 @@ import { useToast } from '../hooks/useToast'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
 import type { RecentTicketRecord } from '../types/recentTicket'
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  onOpenSettings: () => void
+}
+
+export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
   const { form, inputQuality, ticket, editor, recentTickets, reopenRecentTicket } =
     useBugReportAssistant()
   const { generate: generateTicket, isGenerating, hasGenerated, usedAi } = ticket
@@ -39,7 +43,12 @@ export function DashboardPage() {
   )
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      activePage="dashboard"
+      onNavigate={(page) => {
+        if (page === 'settings') onOpenSettings()
+      }}
+    >
       <PageHeader
         title="Create a bug report"
         description="Generate a ticket, edit inline, copy to Jira, and revisit recent tickets saved on this device."

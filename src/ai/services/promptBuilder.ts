@@ -1,4 +1,5 @@
 import type { ValidatedBugReportFormValues } from '../../types/bugReport'
+import type { QaContextSettings } from '../../types/qaContext'
 import type { PromptBundle, ReportContext } from '../types/promptTypes'
 import { AI_TICKET_JSON_SCHEMA } from '../schemas/ticketJsonSchema'
 import { buildBaseSystemPrompt } from '../prompts/baseSeniorQaPrompt'
@@ -6,6 +7,7 @@ import {
   formatCategoryPromptSection,
   getCategoryPromptGuide,
 } from '../prompts/categoryPrompts'
+import { formatQaContextForPrompt } from '../prompts/qaContextSection'
 
 function buildReportContext(values: ValidatedBugReportFormValues): ReportContext {
   return {
@@ -63,23 +65,31 @@ function buildQualityChecklist(): string {
  */
 export function buildTicketGenerationPrompt(
   values: ValidatedBugReportFormValues,
+  qaContext?: QaContextSettings,
 ): PromptBundle {
   const guide = getCategoryPromptGuide(values.category)
   const ctx = buildReportContext(values)
+  const qaContextSection = qaContext ? formatQaContextForPrompt(qaContext) : ''
 
   const systemPrompt = [
     buildBaseSystemPrompt(),
+    qaContextSection,
     formatCategoryPromptSection(guide),
     buildJsonSchemaSection(),
-  ].join('\n\n')
+  ]
+    .filter(Boolean)
+    .join('\n\n')
 
   const userPrompt = [
     'Generate a Jira-ready bug ticket JSON from the report below.',
+    qaContextSection ? 'Apply team QA context above when consistent with the report.' : '',
     buildInputSection(ctx),
     buildQualityChecklist(),
     '',
     'Return JSON only.',
-  ].join('\n\n')
+  ]
+    .filter(Boolean)
+    .join('\n\n')
 
   return {
     systemPrompt,

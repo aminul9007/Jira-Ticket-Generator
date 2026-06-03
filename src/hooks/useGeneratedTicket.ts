@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { generateTicket } from '../services/ticketGeneration'
 import type { BugReportFormValues, GeneratedTicket } from '../types/bugReport'
+import type { QaContextSettings } from '../types/qaContext'
 import {
   INITIAL_TICKET_STATE,
   type TicketGenerationState,
@@ -22,6 +23,7 @@ export function useGeneratedTicket() {
   const generateFromForm = useCallback(
     async (
       formValues: BugReportFormValues,
+      qaContext: QaContextSettings,
     ): Promise<TicketGenerationOutput | null> => {
       if (!isBugReportFormComplete(formValues)) {
         return null
@@ -30,7 +32,7 @@ export function useGeneratedTicket() {
       setIsGenerating(true)
 
       const [result] = await Promise.all([
-        generateTicket(formValues),
+        generateTicket(formValues, qaContext),
         new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS)),
       ])
 

@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react'
 import { analyzeInputQuality } from '../services/ticketGeneration'
+import type { RecentTicketRecord } from '../types/recentTicket'
 import { useBugReportForm } from './useBugReportForm'
 import { useGeneratedTicket } from './useGeneratedTicket'
+import { useQaContext } from './useQaContext'
 import { useRecentTickets } from './useRecentTickets'
 import { useTicketEditor } from './useTicketEditor'
-import type { RecentTicketRecord } from '../types/recentTicket'
 
 export function useBugReportAssistant() {
   const {
@@ -31,6 +32,7 @@ export function useBugReportAssistant() {
   const { loadTicket, clearTicket: clearEditor } = editor
   const recent = useRecentTickets()
   const { saveTicket, markActive } = recent
+  const { settings: qaContext } = useQaContext()
 
   const inputQuality = useMemo(
     () => analyzeInputQuality(values),
@@ -38,13 +40,13 @@ export function useBugReportAssistant() {
   )
 
   const generateTicket = useCallback(async () => {
-    const result = await generateFromForm(values)
+    const result = await generateFromForm(values, qaContext)
     if (result) {
       loadTicket(result.ticket)
       saveTicket(result.ticket, result.usedAi)
     }
     return result !== null
-  }, [generateFromForm, values, loadTicket, saveTicket])
+  }, [generateFromForm, values, qaContext, loadTicket, saveTicket])
 
   const reopenRecentTicket = useCallback(
     (record: RecentTicketRecord) => {
