@@ -1,11 +1,21 @@
 import type { GeneratedTicket } from '../../types/bugReport'
+import { formatJiraTicket } from '../../utils/formatJiraTicket'
 import { Badge } from '../ui/Badge'
 import { Card, CardHeader } from '../ui/Card'
+import { Collapsible } from '../ui/Collapsible'
+import { ConfidenceScore } from '../ui/ConfidenceScore'
+import {
+  FormattedTicketBlock,
+  FormattedTicketList,
+  FormattedTicketText,
+} from './FormattedTicketText'
 import { TicketSection } from './TicketSection'
+import { TitleSuggestions } from './TitleSuggestions'
 
 interface TicketPreviewCardProps {
   ticket: GeneratedTicket
   isGenerated?: boolean
+  usedAi?: boolean
 }
 
 function severityVariant(
@@ -38,6 +48,7 @@ const PreviewIcon = (
 export function TicketPreviewCard({
   ticket,
   isGenerated = false,
+  usedAi = false,
 }: TicketPreviewCardProps) {
   return (
     <Card
@@ -47,14 +58,21 @@ export function TicketPreviewCard({
     >
       <CardHeader
         title="Ticket Preview"
-        description="Jira-ready format generated from your report"
+        description="Jira-ready format — Senior QA Lead output"
         icon={PreviewIcon}
         action={
           isGenerated ? (
-            <Badge variant="success">Ready to copy</Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              {usedAi && <Badge variant="brand">AI enhanced</Badge>}
+              <Badge variant="success">Ready to copy</Badge>
+            </div>
           ) : undefined
         }
       />
+
+      <div className="mb-5 rounded-xl border border-border/70 bg-surface-subtle/40 p-4">
+        <ConfidenceScore score={ticket.confidenceScore} />
+      </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
         <Badge variant="brand">{ticket.category}</Badge>
@@ -63,6 +81,9 @@ export function TicketPreviewCard({
             {env}
           </Badge>
         ))}
+        {ticket.affectedFeaturePage && (
+          <Badge variant="default">{ticket.affectedFeaturePage}</Badge>
+        )}
         <Badge variant={severityVariant(ticket.severity)}>
           {ticket.severity}
         </Badge>
@@ -70,30 +91,31 @@ export function TicketPreviewCard({
       </div>
 
       <div className="space-y-3">
-        <TicketSection title="Title">
+        <TicketSection title="Title suggestions">
+          <TitleSuggestions
+            suggestions={ticket.titleSuggestions}
+            recommendedTitle={ticket.title}
+          />
+        </TicketSection>
+
+        <TicketSection title="Recommended title">
           <p className="font-semibold tracking-tight">{ticket.title}</p>
         </TicketSection>
 
         <TicketSection title="Issue Summary">
-          <p>{ticket.issueSummary}</p>
+          <FormattedTicketBlock text={ticket.issueSummary} />
         </TicketSection>
 
         <TicketSection title="Steps to Reproduce">
-          <ol className="list-decimal space-y-2 pl-5 marker:text-text-muted">
-            {ticket.stepsToReproduce.map((step, index) => (
-              <li key={index} className="pl-1">
-                {step}
-              </li>
-            ))}
-          </ol>
+          <FormattedTicketList items={ticket.stepsToReproduce} />
         </TicketSection>
 
         <TicketSection title="Expected Result">
-          <p>{ticket.expectedResult}</p>
+          <FormattedTicketBlock text={ticket.expectedResult} />
         </TicketSection>
 
         <TicketSection title="Actual Result">
-          <p>{ticket.actualResult}</p>
+          <FormattedTicketBlock text={ticket.actualResult} />
         </TicketSection>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -106,6 +128,31 @@ export function TicketPreviewCard({
             <Badge variant="default">{ticket.priority}</Badge>
           </TicketSection>
         </div>
+
+        <TicketSection title="Severity reasoning">
+          <FormattedTicketBlock text={ticket.severityReasoning} />
+        </TicketSection>
+
+        <Collapsible
+          title="Possible root causes"
+          badge={
+            <Badge variant="neutral">{ticket.possibleRootCauses.length}</Badge>
+          }
+        >
+          <ul className="list-disc space-y-2 pl-5 marker:text-text-muted">
+            {ticket.possibleRootCauses.map((cause, index) => (
+              <li key={index}>
+                <FormattedTicketText text={cause} />
+              </li>
+            ))}
+          </ul>
+        </Collapsible>
+
+        <Collapsible title="Jira wiki export" defaultOpen={false}>
+          <pre className="max-h-48 overflow-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
+            {formatJiraTicket(ticket)}
+          </pre>
+        </Collapsible>
       </div>
     </Card>
   )

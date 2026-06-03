@@ -82,7 +82,11 @@ export function TicketPreviewEmpty() {
         </p>
 
         <ul className="mt-8 flex flex-col gap-2 text-left text-xs text-text-muted sm:items-center">
-          {['Category & environment', 'Bug title', 'Optional notes'].map(
+          {[
+            'Category & environment',
+            'Affected feature (recommended)',
+            'Bug title & repro notes',
+          ].map(
             (step, i) => (
               <li key={step} className="flex items-center gap-2">
                 <span className="flex size-5 items-center justify-center rounded-full bg-brand-muted text-[10px] font-semibold text-brand">

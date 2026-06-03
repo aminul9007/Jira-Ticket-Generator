@@ -1,20 +1,25 @@
 import type { FormEvent } from 'react'
 import type { BugCategory, BugReportFormValues, Environment } from '../../types/bugReport'
+import type { InputQualityReport } from '../../types/inputQuality'
 import { Button } from '../ui/Button'
 import { Card, CardHeader } from '../ui/Card'
 import { FormField, FormSection } from '../ui/FormField'
 import { Label } from '../ui/Label'
 import { Textarea } from '../ui/Textarea'
+import { AffectedFeatureField } from './AffectedFeatureField'
 import { CategorySelect } from './CategorySelect'
 import { EnvironmentMultiSelect } from './EnvironmentMultiSelect'
+import { InputQualityAlerts } from './InputQualityAlerts'
 
 interface BugReportFormProps {
   values: BugReportFormValues
+  inputQuality: InputQualityReport
   isGenerating: boolean
   isValid: boolean
   onCategoryChange: (category: BugCategory | '') => void
   onEnvironmentToggle: (env: Environment) => void
   onTitleChange: (title: string) => void
+  onAffectedFeatureChange: (value: string) => void
   onNotesChange: (notes: string) => void
   onGenerate: () => void
 }
@@ -33,11 +38,13 @@ const FormIcon = (
 
 export function BugReportForm({
   values,
+  inputQuality,
   isGenerating,
   isValid,
   onCategoryChange,
   onEnvironmentToggle,
   onTitleChange,
+  onAffectedFeatureChange,
   onNotesChange,
   onGenerate,
 }: BugReportFormProps) {
@@ -46,11 +53,14 @@ export function BugReportForm({
     if (isValid) onGenerate()
   }
 
+  const showQualityHints =
+    values.title.trim().length > 0 || values.category !== ''
+
   return (
     <Card id="bug-report-form" variant="elevated" className="h-full">
       <CardHeader
         title="New Bug Report"
-        description="Describe the issue. Fields below drive the generated ticket preview."
+        description="Minimal input → Senior QA–quality Jira ticket. Fill gaps below for higher confidence."
         icon={FormIcon}
       />
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -63,11 +73,15 @@ export function BugReportForm({
             selected={values.environments}
             onToggle={onEnvironmentToggle}
           />
+          <AffectedFeatureField
+            value={values.affectedFeaturePage}
+            onChange={onAffectedFeatureChange}
+          />
         </FormSection>
 
         <FormSection
           title="Details"
-          description="What happened and any extra context."
+          description="What happened and how to reproduce it."
         >
           <FormField>
             <Label htmlFor="bug-title" required>
@@ -89,20 +103,24 @@ export function BugReportForm({
           <FormField>
             <Label
               htmlFor="additional-notes"
-              hint="Optional context for the report"
+              hint="Steps, browser/device, expected vs actual behavior"
             >
               Additional Notes
             </Label>
             <Textarea
               id="additional-notes"
               rows={3}
-              placeholder="Browser version, device, screenshots links, related tickets..."
+              placeholder="1. Open checkout on iOS Safari 17… 2. Enter address… 3. Button stays disabled"
               value={values.additionalNotes}
               onChange={(e) => onNotesChange(e.target.value)}
               maxLength={1000}
             />
           </FormField>
         </FormSection>
+
+        {showQualityHints && (
+          <InputQualityAlerts report={inputQuality} />
+        )}
 
         <div className="space-y-3 border-t border-border pt-6">
           <Button
@@ -112,7 +130,7 @@ export function BugReportForm({
             isLoading={isGenerating}
             disabled={!isValid}
           >
-            {isGenerating ? 'Generating preview…' : 'Generate Ticket'}
+            {isGenerating ? 'Generating ticket…' : 'Generate Ticket'}
           </Button>
 
           {!isValid && (

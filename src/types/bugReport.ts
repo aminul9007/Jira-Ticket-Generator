@@ -16,6 +16,7 @@ export interface BugReportFormValues {
   category: BugCategory | ''
   environments: Environment[]
   title: string
+  affectedFeaturePage: string
   additionalNotes: string
 }
 
@@ -26,13 +27,19 @@ export interface ValidatedBugReportFormValues
 }
 
 export interface GeneratedTicket {
+  /** Recommended primary title (best of titleSuggestions). */
   title: string
+  titleSuggestions: [string, string, string]
   issueSummary: string
   stepsToReproduce: string[]
   expectedResult: string
   actualResult: string
   severity: TicketSeverity
   priority: TicketPriority
+  severityReasoning: string
+  possibleRootCauses: string[]
+  confidenceScore: number
   category: BugCategory
   environments: Environment[]
+  affectedFeaturePage?: string
 }

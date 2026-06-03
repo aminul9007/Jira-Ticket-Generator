@@ -2,29 +2,29 @@
 
 A modern web app to help QA engineers create Jira-ready bug tickets in under one minute.
 
-**Phase 1** delivers the frontend foundation only: responsive dashboard, bug report form, and ticket preview with mock data. AI, backend APIs, authentication, and Jira integration are planned for later phases.
-
 ## Tech stack
 
 - React 19 + TypeScript
 - Vite
 - Tailwind CSS v4
+- Senior QA Lead rules engine (default)
+- Optional OpenAI (`VITE_OPENAI_API_KEY`)
 
 ## Project structure
 
 ```
 src/
+├── ai/                    # Senior QA prompts + optional OpenAI provider
 ├── components/
-│   ├── layout/     # Header, Footer, DashboardLayout
-│   ├── forms/      # Bug report form fields
-│   ├── ticket/     # Ticket preview card
-│   └── ui/         # Reusable UI primitives
-├── pages/          # DashboardPage
-├── types/          # TypeScript domain types
-├── data/           # App constants
-├── hooks/          # Form, ticket generation, and assistant orchestration
-├── utils/          # Ticket generation, validation, cn
-├── assets/
+│   ├── layout/
+│   ├── forms/
+│   ├── ticket/
+│   └── ui/
+├── pages/
+├── services/ticketGeneration/  # Input quality, confidence, ticket builder
+├── types/
+├── hooks/
+├── utils/
 └── App.tsx
 ```
 
@@ -35,27 +35,33 @@ npm install
 npm run dev
 ```
 
-Open the URL shown in the terminal (typically `http://localhost:5173`).
+Optional AI (copy `.env.example` → `.env.local`):
+
+```bash
+VITE_OPENAI_API_KEY=sk-...
+VITE_OPENAI_MODEL=gpt-4o-mini
+```
+
+## Ticket generation features
+
+- **3 Jira title suggestions** + recommended primary title
+- **Confidence score** (0–100) from input completeness
+- **Pre-generation hints** for missing environment, feature/page, or reproduction details
+- **Affected Feature/Page** optional form field
+- **Senior QA output:** summary, steps, expected/actual, severity, priority, severity reasoning
+- **Collapsible root causes** for developers
+- **Jira wiki export** block in preview
 
 ## Scripts
 
-| Command        | Description              |
-| -------------- | ------------------------ |
-| `npm run dev`  | Start development server |
-| `npm run build`| Production build         |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint               |
+| Command | Description |
+| ------- | ----------- |
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run lint` | Run ESLint |
 
-## Phase 1 scope
+## Out of scope
 
-- Single-page responsive dashboard
-- Bug category, environment multi-select, title, and notes fields
-- Generate Ticket button with loading state (scrolls to preview)
-- Dynamic Jira-style ticket preview generated from form input
-
-## Out of scope (Phase 1)
-
-- AI ticket generation
 - Backend / REST APIs
 - Authentication
 - Jira API integration

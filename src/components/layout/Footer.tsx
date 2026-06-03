@@ -10,7 +10,7 @@ export function Footer() {
           © {year} {APP_NAME}
         </p>
         <p className="text-xs text-text-muted">
-          AI & Jira integration — coming soon
+          Optional OpenAI via VITE_OPENAI_API_KEY · Jira API coming soon
         </p>
       </div>
     </footer>

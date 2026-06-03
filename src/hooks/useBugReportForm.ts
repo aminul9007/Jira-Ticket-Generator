@@ -6,6 +6,7 @@ const initialValues: BugReportFormValues = {
   category: '',
   environments: [],
   title: '',
+  affectedFeaturePage: '',
   additionalNotes: '',
 }
 
@@ -32,6 +33,10 @@ export function useBugReportForm() {
     setValues((prev) => ({ ...prev, title }))
   }, [])
 
+  const setAffectedFeaturePage = useCallback((affectedFeaturePage: string) => {
+    setValues((prev) => ({ ...prev, affectedFeaturePage }))
+  }, [])
+
   const setAdditionalNotes = useCallback((additionalNotes: string) => {
     setValues((prev) => ({ ...prev, additionalNotes }))
   }, [])
@@ -48,6 +53,7 @@ export function useBugReportForm() {
     setCategory,
     toggleEnvironment,
     setTitle,
+    setAffectedFeaturePage,
     setAdditionalNotes,
     reset,
   }

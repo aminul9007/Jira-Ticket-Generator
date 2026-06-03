@@ -1,4 +1,5 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { analyzeInputQuality } from '../services/ticketGeneration'
 import { useBugReportForm } from './useBugReportForm'
 import { useGeneratedTicket } from './useGeneratedTicket'
 
@@ -9,6 +10,7 @@ export function useBugReportAssistant() {
     setCategory,
     toggleEnvironment,
     setTitle,
+    setAffectedFeaturePage,
     setAdditionalNotes,
     reset: resetForm,
   } = useBugReportForm()
@@ -17,9 +19,15 @@ export function useBugReportAssistant() {
     ticket,
     hasGenerated,
     isGenerating,
+    usedAi,
     generateFromForm,
     clearTicket,
   } = useGeneratedTicket()
+
+  const inputQuality = useMemo(
+    () => analyzeInputQuality(values),
+    [values],
+  )
 
   const generateTicket = useCallback(async () => {
     return generateFromForm(values)
@@ -37,13 +45,16 @@ export function useBugReportAssistant() {
       setCategory,
       toggleEnvironment,
       setTitle,
+      setAffectedFeaturePage,
       setAdditionalNotes,
       reset: resetForm,
     },
+    inputQuality,
     ticket: {
       data: ticket,
       hasGenerated,
       isGenerating,
+      usedAi,
       generate: generateTicket,
       clear: clearTicket,
     },

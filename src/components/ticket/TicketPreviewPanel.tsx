@@ -9,6 +9,7 @@ interface TicketPreviewPanelProps {
   ticket: GeneratedTicket | null
   hasGenerated: boolean
   isGenerating: boolean
+  usedAi?: boolean
 }
 
 const PreviewIcon = (
@@ -37,16 +38,17 @@ export function TicketPreviewPanel({
   ticket,
   hasGenerated,
   isGenerating,
+  usedAi = false,
 }: TicketPreviewPanelProps) {
   if (isGenerating && !hasGenerated) {
     return (
       <Card id="ticket-preview" variant="elevated" className="min-h-[420px] lg:min-h-[520px]">
         <CardHeader
           title="Ticket Preview"
-          description="Building your Jira-ready ticket…"
+          description="Senior QA Lead is drafting your ticket…"
           icon={PreviewIcon}
         />
-        <LoadingOverlay isLoading label="Generating ticket preview…">
+        <LoadingOverlay isLoading label="Analyzing input and generating ticket…">
           <TicketPreviewSkeleton />
         </LoadingOverlay>
       </Card>
@@ -57,7 +59,7 @@ export function TicketPreviewPanel({
     return (
       <LoadingOverlay
         isLoading={isGenerating}
-        label="Updating preview…"
+        label="Regenerating ticket…"
         className="h-full"
       >
         <TicketPreviewEmpty />
@@ -68,10 +70,10 @@ export function TicketPreviewPanel({
   return (
     <LoadingOverlay
       isLoading={isGenerating}
-      label="Regenerating preview…"
+      label="Regenerating ticket…"
       className="h-full"
     >
-      <TicketPreviewCard ticket={ticket} isGenerated />
+      <TicketPreviewCard ticket={ticket} isGenerated usedAi={usedAi} />
     </LoadingOverlay>
   )
 }
