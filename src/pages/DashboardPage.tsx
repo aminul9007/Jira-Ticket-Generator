@@ -1,15 +1,17 @@
 import { useCallback } from 'react'
-import { TicketHistoryPanel } from '../components/history/TicketHistoryPanel'
 import { BugReportForm } from '../components/forms/BugReportForm'
+import { RecentTicketsPanel } from '../components/history/RecentTicketsPanel'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { TicketPreviewPanel } from '../components/ticket/TicketPreviewPanel'
 import { Toast } from '../components/ui/Toast'
 import { useToast } from '../hooks/useToast'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
+import type { RecentTicketRecord } from '../types/recentTicket'
 
 export function DashboardPage() {
-  const { form, inputQuality, ticket, editor } = useBugReportAssistant()
+  const { form, inputQuality, ticket, editor, recentTickets, reopenRecentTicket } =
+    useBugReportAssistant()
   const { generate: generateTicket, isGenerating, hasGenerated, usedAi } = ticket
   const { toast, showToast } = useToast()
 
@@ -26,11 +28,21 @@ export function DashboardPage() {
     showToast('Jira ticket copied to clipboard')
   }, [showToast])
 
+  const onOpenRecentTicket = useCallback(
+    (record: RecentTicketRecord) => {
+      reopenRecentTicket(record)
+      document
+        .getElementById('ticket-preview')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    },
+    [reopenRecentTicket],
+  )
+
   return (
     <DashboardLayout>
       <PageHeader
         title="Create a bug report"
-        description="Generate a ticket, then preview or inline-edit any section before copying to Jira."
+        description="Generate a ticket, edit inline, copy to Jira, and revisit recent tickets saved on this device."
       />
 
       <div className="grid gap-6 xl:grid-cols-2 xl:gap-8 xl:items-start">
@@ -58,7 +70,10 @@ export function DashboardPage() {
         />
       </div>
 
-      <TicketHistoryPanel />
+      <RecentTicketsPanel
+        recentTickets={recentTickets}
+        onOpen={onOpenRecentTicket}
+      />
       <Toast toast={toast} />
     </DashboardLayout>
   )

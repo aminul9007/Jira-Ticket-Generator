@@ -9,13 +9,20 @@ import { isBugReportFormComplete } from '../utils/validateForm'
 
 const GENERATION_DELAY_MS = 450
 
+export interface TicketGenerationOutput {
+  ticket: GeneratedTicket
+  usedAi: boolean
+}
+
 export function useGeneratedTicket() {
   const [state, setState] = useState<TicketGenerationState>(INITIAL_TICKET_STATE)
   const [isGenerating, setIsGenerating] = useState(false)
   const [usedAi, setUsedAi] = useState(false)
 
   const generateFromForm = useCallback(
-    async (formValues: BugReportFormValues): Promise<GeneratedTicket | null> => {
+    async (
+      formValues: BugReportFormValues,
+    ): Promise<TicketGenerationOutput | null> => {
       if (!isBugReportFormComplete(formValues)) {
         return null
       }
@@ -33,7 +40,16 @@ export function useGeneratedTicket() {
       })
       setUsedAi(result.usedAi)
       setIsGenerating(false)
-      return result.ticket
+      return result
+    },
+    [],
+  )
+
+  const restoreTicket = useCallback(
+    (ticket: GeneratedTicket, wasAiGenerated = false) => {
+      setState({ ticket, hasGenerated: true })
+      setUsedAi(wasAiGenerated)
+      setIsGenerating(false)
     },
     [],
   )
@@ -50,6 +66,7 @@ export function useGeneratedTicket() {
     isGenerating,
     usedAi,
     generateFromForm,
+    restoreTicket,
     clearTicket,
   }
 }

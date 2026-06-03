@@ -2,7 +2,9 @@ import { useCallback, useMemo } from 'react'
 import { analyzeInputQuality } from '../services/ticketGeneration'
 import { useBugReportForm } from './useBugReportForm'
 import { useGeneratedTicket } from './useGeneratedTicket'
+import { useRecentTickets } from './useRecentTickets'
 import { useTicketEditor } from './useTicketEditor'
+import type { RecentTicketRecord } from '../types/recentTicket'
 
 export function useBugReportAssistant() {
   const {
@@ -21,11 +23,14 @@ export function useBugReportAssistant() {
     isGenerating,
     usedAi,
     generateFromForm,
+    restoreTicket,
     clearTicket,
   } = useGeneratedTicket()
 
   const editor = useTicketEditor()
   const { loadTicket, clearTicket: clearEditor } = editor
+  const recent = useRecentTickets()
+  const { saveTicket, markActive } = recent
 
   const inputQuality = useMemo(
     () => analyzeInputQuality(values),
@@ -33,18 +38,29 @@ export function useBugReportAssistant() {
   )
 
   const generateTicket = useCallback(async () => {
-    const generated = await generateFromForm(values)
-    if (generated) {
-      loadTicket(generated)
+    const result = await generateFromForm(values)
+    if (result) {
+      loadTicket(result.ticket)
+      saveTicket(result.ticket, result.usedAi)
     }
-    return generated !== null
-  }, [generateFromForm, values, loadTicket])
+    return result !== null
+  }, [generateFromForm, values, loadTicket, saveTicket])
+
+  const reopenRecentTicket = useCallback(
+    (record: RecentTicketRecord) => {
+      restoreTicket(record.ticket, record.usedAi)
+      loadTicket(record.ticket)
+      markActive(record.id)
+    },
+    [restoreTicket, loadTicket, markActive],
+  )
 
   const resetAll = useCallback(() => {
     resetForm()
     clearTicket()
     clearEditor()
-  }, [resetForm, clearTicket, clearEditor])
+    markActive(null)
+  }, [resetForm, clearTicket, clearEditor, markActive])
 
   return {
     form: {
@@ -66,6 +82,8 @@ export function useBugReportAssistant() {
       clear: clearTicket,
     },
     editor,
+    recentTickets: recent,
+    reopenRecentTicket,
     resetAll,
   }
 }

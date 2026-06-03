@@ -10,6 +10,7 @@ A modern web app to help QA engineers create Jira-ready bug tickets in under one
 - Senior QA Lead rules engine (default)
 - Optional OpenAI (`VITE_OPENAI_API_KEY`)
 - Light / Dark / System theme with localStorage persistence
+- Recent tickets (last 20) saved in localStorage with search and filters
 
 ## Project structure
 
