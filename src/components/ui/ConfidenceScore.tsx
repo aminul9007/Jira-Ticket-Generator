@@ -12,9 +12,9 @@ function scoreVariant(score: number): 'success' | 'warning' | 'danger' {
 }
 
 const barColors = {
-  success: 'bg-emerald-500',
-  warning: 'bg-amber-500',
-  danger: 'bg-red-500',
+  success: 'bg-confidence-success',
+  warning: 'bg-confidence-warning',
+  danger: 'bg-confidence-danger',
 }
 
 export function ConfidenceScore({ score, className }: ConfidenceScoreProps) {
@@ -30,7 +30,7 @@ export function ConfidenceScore({ score, className }: ConfidenceScoreProps) {
         <span className="text-xs text-text-muted">%</span>
       </div>
       <div className="flex-1">
-        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+        <div className="h-2 overflow-hidden rounded-full bg-confidence-track">
           <div
             className={cn('h-full rounded-full transition-all duration-500', barColors[variant])}
             style={{ width: `${clamped}%` }}

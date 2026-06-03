@@ -1,4 +1,5 @@
 import { APP_NAME, APP_TAGLINE } from '../../data/constants'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 export function Header() {
   return (
@@ -6,7 +7,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-indigo-600 text-white shadow-md shadow-brand/25"
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-md shadow-brand/25"
             aria-hidden="true"
           >
             <svg
@@ -41,6 +42,7 @@ export function Header() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <span className="hidden rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-brand sm:inline-flex">
             Beta
           </span>

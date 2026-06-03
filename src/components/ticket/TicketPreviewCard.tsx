@@ -149,7 +149,7 @@ export function TicketPreviewCard({
         </Collapsible>
 
         <Collapsible title="Jira wiki export" defaultOpen={false}>
-          <pre className="max-h-48 overflow-auto rounded-lg bg-slate-900 p-3 text-xs leading-relaxed text-slate-100">
+          <pre className="max-h-48 overflow-auto rounded-lg bg-code-bg p-3 text-xs leading-relaxed text-code-text">
             {formatJiraTicket(ticket)}
           </pre>
         </Collapsible>

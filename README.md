@@ -9,6 +9,7 @@ A modern web app to help QA engineers create Jira-ready bug tickets in under one
 - Tailwind CSS v4
 - Senior QA Lead rules engine (default)
 - Optional OpenAI (`VITE_OPENAI_API_KEY`)
+- Light / Dark / System theme with localStorage persistence
 
 ## Project structure
 

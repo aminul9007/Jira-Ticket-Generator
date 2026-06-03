@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { TicketHistoryPanel } from '../components/history/TicketHistoryPanel'
 import { BugReportForm } from '../components/forms/BugReportForm'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
@@ -49,6 +50,8 @@ export function DashboardPage() {
           usedAi={usedAi}
         />
       </div>
+
+      <TicketHistoryPanel />
     </DashboardLayout>
   )
 }

@@ -34,7 +34,7 @@ export function EnvironmentMultiSelect({
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
                   isSelected
                     ? 'border-brand bg-brand-muted text-brand shadow-sm shadow-brand/10'
-                    : 'border-border-strong bg-surface-subtle/40 text-text-secondary hover:border-slate-300 hover:bg-surface-elevated hover:text-text-primary',
+                    : 'border-border-strong bg-surface-subtle/40 text-text-secondary hover:border-hover-border hover:bg-surface-elevated hover:text-text-primary',
                 )}
               >
                 <span
@@ -42,7 +42,7 @@ export function EnvironmentMultiSelect({
                     'flex size-4 shrink-0 items-center justify-center rounded-md border transition-colors',
                     isSelected
                       ? 'border-brand bg-brand text-white'
-                      : 'border-border-strong bg-surface-elevated group-hover:border-slate-300',
+                      : 'border-border-strong bg-surface-elevated group-hover:border-hover-border',
                   )}
                   aria-hidden="true"
                 >

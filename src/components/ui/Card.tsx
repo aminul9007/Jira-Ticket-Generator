@@ -17,10 +17,9 @@ const paddingStyles = {
 }
 
 const variantStyles: Record<CardVariant, string> = {
-  default:
-    'border border-border bg-surface-elevated shadow-[var(--shadow-card)] ring-1 ring-black/[0.03]',
+  default: 'border border-border bg-surface-elevated shadow-card ring-card',
   elevated:
-    'border border-border/80 bg-surface-elevated shadow-[var(--shadow-card-hover)] ring-1 ring-black/[0.04]',
+    'border border-border/80 bg-surface-elevated shadow-card-hover ring-card',
   outline:
     'border border-dashed border-border-strong bg-brand-subtle/40 shadow-none',
 }

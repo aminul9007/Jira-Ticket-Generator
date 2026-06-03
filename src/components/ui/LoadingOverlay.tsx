@@ -20,7 +20,7 @@ export function LoadingOverlay({
       {children}
       {isLoading && (
         <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-surface-elevated/85 backdrop-blur-[2px]"
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-overlay backdrop-blur-[2px]"
           aria-busy="true"
           aria-live="polite"
         >

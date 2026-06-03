@@ -15,11 +15,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-brand text-white shadow-md shadow-brand/20 hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25 active:scale-[0.99] focus-visible:ring-brand',
+    'bg-brand text-white shadow-md shadow-brand/20 hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/25 active:scale-[0.99] focus-visible:ring-brand focus-visible:ring-offset-surface-elevated',
   secondary:
-    'border border-border-strong bg-surface-elevated text-text-primary shadow-sm hover:border-slate-300 hover:bg-slate-50 focus-visible:ring-slate-400',
+    'border border-border-strong bg-surface-elevated text-text-primary shadow-sm hover:border-hover-border hover:bg-hover-surface focus-visible:ring-brand/40 focus-visible:ring-offset-surface-elevated',
   ghost:
-    'text-text-secondary hover:bg-slate-100/80 hover:text-text-primary focus-visible:ring-slate-400',
+    'text-text-secondary hover:bg-hover-surface hover:text-text-primary focus-visible:ring-brand/40 focus-visible:ring-offset-surface-elevated',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {

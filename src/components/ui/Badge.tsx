@@ -10,12 +10,17 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: 'bg-slate-100/90 text-slate-700 ring-1 ring-inset ring-slate-200/80',
-  brand: 'bg-brand-muted text-brand ring-1 ring-inset ring-brand/10',
-  success: 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200/60',
-  warning: 'bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200/60',
-  danger: 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-200/60',
-  neutral: 'bg-slate-50 text-text-secondary ring-1 ring-inset ring-slate-200/70',
+  default:
+    'bg-badge-default-bg text-badge-default-text ring-1 ring-inset ring-badge-default-ring',
+  brand: 'bg-brand-muted text-brand ring-1 ring-inset ring-brand/20',
+  success:
+    'bg-badge-success-bg text-badge-success-text ring-1 ring-inset ring-badge-success-ring',
+  warning:
+    'bg-badge-warning-bg text-badge-warning-text ring-1 ring-inset ring-badge-warning-ring',
+  danger:
+    'bg-badge-danger-bg text-badge-danger-text ring-1 ring-inset ring-badge-danger-ring',
+  neutral:
+    'bg-badge-neutral-bg text-text-secondary ring-1 ring-inset ring-badge-neutral-ring',
 }
 
 export function Badge({

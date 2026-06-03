@@ -1,25 +1,183 @@
 @import 'tailwindcss';
 
-@theme {
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Light theme (default) ── */
+:root {
+  --app-surface: #f4f6fb;
+  --app-surface-subtle: #eef1f8;
+  --app-surface-elevated: #ffffff;
+  --app-border: #e4e8f1;
+  --app-border-strong: #cdd5e4;
+  --app-text-primary: #0c1222;
+  --app-text-secondary: #4a5568;
+  --app-text-muted: #6b7280;
+  --app-brand: #5b4fe8;
+  --app-brand-hover: #4a3ed4;
+  --app-brand-muted: #eeecfd;
+  --app-brand-subtle: #f7f6ff;
+  --app-accent: #0ea5e9;
+  --app-success: #059669;
+  --app-warning: #d97706;
+  --app-danger: #dc2626;
+  --app-hover-border: #b8c0d4;
+  --app-hover-surface: #f8fafc;
+  --app-disabled-surface: #f1f5f9;
+  --app-ring: rgb(91 79 232 / 0.35);
+  --app-ring-offset: #ffffff;
+  --app-overlay: rgb(255 255 255 / 0.88);
+  --app-code-bg: #0f172a;
+  --app-code-text: #e2e8f0;
+  --app-shimmer-mid: #f8f9fc;
+  --app-gradient-brand-end: #4338ca;
+  --app-gradient-glow-1: rgb(91 79 232 / 0.08);
+  --app-gradient-glow-2: rgb(14 165 233 / 0.05);
+  --app-card-ring: rgb(12 18 34 / 0.03);
+  --app-shadow-card: 0 1px 2px rgb(12 18 34 / 0.04), 0 4px 16px rgb(12 18 34 / 0.06);
+  --app-shadow-card-hover: 0 2px 4px rgb(12 18 34 / 0.05), 0 8px 24px rgb(12 18 34 / 0.08);
+  --app-warning-bg: rgb(255 251 235 / 0.85);
+  --app-warning-border: rgb(252 211 77 / 0.75);
+  --app-warning-text: #78350f;
+  --app-warning-text-muted: rgb(120 53 15 / 0.82);
+  --app-warning-badge-bg: #fef3c7;
+  --app-warning-badge-text: #92400e;
+  --app-badge-default-bg: rgb(241 245 249 / 0.95);
+  --app-badge-default-text: #334155;
+  --app-badge-default-ring: rgb(226 232 240 / 0.85);
+  --app-badge-neutral-bg: #f8fafc;
+  --app-badge-neutral-ring: rgb(226 232 240 / 0.75);
+  --app-badge-success-bg: #ecfdf5;
+  --app-badge-success-text: #047857;
+  --app-badge-success-ring: rgb(167 243 208 / 0.65);
+  --app-badge-warning-bg: #fffbeb;
+  --app-badge-warning-text: #92400e;
+  --app-badge-warning-ring: rgb(253 230 138 / 0.65);
+  --app-badge-danger-bg: #fef2f2;
+  --app-badge-danger-text: #b91c1c;
+  --app-badge-danger-ring: rgb(254 202 202 / 0.65);
+  --app-confidence-track: #f1f5f9;
+  --app-confidence-success: #10b981;
+  --app-confidence-warning: #f59e0b;
+  --app-confidence-danger: #ef4444;
+  --app-dropdown-bg: #ffffff;
+  --app-dropdown-shadow: 0 8px 30px rgb(12 18 34 / 0.12);
+  --app-modal-overlay: rgb(12 18 34 / 0.45);
+}
+
+/* ── Dark theme ── */
+.dark {
+  --app-surface: #0b0d12;
+  --app-surface-subtle: #12151d;
+  --app-surface-elevated: #181c27;
+  --app-border: #2a3144;
+  --app-border-strong: #3a4358;
+  --app-text-primary: #eef1f6;
+  --app-text-secondary: #a8b0c0;
+  --app-text-muted: #7b849a;
+  --app-brand: #7c72f0;
+  --app-brand-hover: #9289f4;
+  --app-brand-muted: rgb(124 114 240 / 0.15);
+  --app-brand-subtle: rgb(124 114 240 / 0.08);
+  --app-accent: #38bdf8;
+  --app-success: #34d399;
+  --app-warning: #fbbf24;
+  --app-danger: #f87171;
+  --app-hover-border: #4a556d;
+  --app-hover-surface: #1f2433;
+  --app-disabled-surface: #141821;
+  --app-ring: rgb(124 114 240 / 0.45);
+  --app-ring-offset: #181c27;
+  --app-overlay: rgb(11 13 18 / 0.92);
+  --app-code-bg: #0a0c10;
+  --app-code-text: #cbd5e1;
+  --app-shimmer-mid: #1c2130;
+  --app-gradient-brand-end: #6366f1;
+  --app-gradient-glow-1: rgb(124 114 240 / 0.12);
+  --app-gradient-glow-2: rgb(56 189 248 / 0.06);
+  --app-card-ring: rgb(255 255 255 / 0.06);
+  --app-shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 20px rgb(0 0 0 / 0.25);
+  --app-shadow-card-hover: 0 2px 6px rgb(0 0 0 / 0.4), 0 10px 28px rgb(0 0 0 / 0.35);
+  --app-warning-bg: rgb(120 53 15 / 0.22);
+  --app-warning-border: rgb(180 83 9 / 0.45);
+  --app-warning-text: #fcd34d;
+  --app-warning-text-muted: rgb(252 211 77 / 0.85);
+  --app-warning-badge-bg: rgb(180 83 9 / 0.35);
+  --app-warning-badge-text: #fde68a;
+  --app-badge-default-bg: rgb(30 41 59 / 0.85);
+  --app-badge-default-text: #cbd5e1;
+  --app-badge-default-ring: rgb(51 65 85 / 0.75);
+  --app-badge-neutral-bg: rgb(30 41 59 / 0.55);
+  --app-badge-neutral-ring: rgb(51 65 85 / 0.65);
+  --app-badge-success-bg: rgb(6 78 59 / 0.35);
+  --app-badge-success-text: #6ee7b7;
+  --app-badge-success-ring: rgb(16 185 129 / 0.35);
+  --app-badge-warning-bg: rgb(120 53 15 / 0.35);
+  --app-badge-warning-text: #fcd34d;
+  --app-badge-warning-ring: rgb(245 158 11 / 0.35);
+  --app-badge-danger-bg: rgb(127 29 29 / 0.35);
+  --app-badge-danger-text: #fca5a5;
+  --app-badge-danger-ring: rgb(239 68 68 / 0.35);
+  --app-confidence-track: #1e293b;
+  --app-confidence-success: #34d399;
+  --app-confidence-warning: #fbbf24;
+  --app-confidence-danger: #f87171;
+  --app-dropdown-bg: #181c27;
+  --app-dropdown-shadow: 0 8px 30px rgb(0 0 0 / 0.45);
+  --app-modal-overlay: rgb(0 0 0 / 0.65);
+}
+
+@theme inline {
   --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --color-surface: #f4f6fb;
-  --color-surface-subtle: #eef1f8;
-  --color-surface-elevated: #ffffff;
-  --color-border: #e4e8f1;
-  --color-border-strong: #cdd5e4;
-  --color-text-primary: #0c1222;
-  --color-text-secondary: #4a5568;
-  --color-text-muted: #6b7280;
-  --color-brand: #5b4fe8;
-  --color-brand-hover: #4a3ed4;
-  --color-brand-muted: #eeecfd;
-  --color-brand-subtle: #f7f6ff;
-  --color-accent: #0ea5e9;
-  --color-success: #059669;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
-  --shadow-card: 0 1px 2px rgb(12 18 34 / 0.04), 0 4px 16px rgb(12 18 34 / 0.06);
-  --shadow-card-hover: 0 2px 4px rgb(12 18 34 / 0.05), 0 8px 24px rgb(12 18 34 / 0.08);
+  --color-surface: var(--app-surface);
+  --color-surface-subtle: var(--app-surface-subtle);
+  --color-surface-elevated: var(--app-surface-elevated);
+  --color-border: var(--app-border);
+  --color-border-strong: var(--app-border-strong);
+  --color-text-primary: var(--app-text-primary);
+  --color-text-secondary: var(--app-text-secondary);
+  --color-text-muted: var(--app-text-muted);
+  --color-brand: var(--app-brand);
+  --color-brand-hover: var(--app-brand-hover);
+  --color-brand-muted: var(--app-brand-muted);
+  --color-brand-subtle: var(--app-brand-subtle);
+  --color-accent: var(--app-accent);
+  --color-success: var(--app-success);
+  --color-warning: var(--app-warning);
+  --color-danger: var(--app-danger);
+  --color-hover-border: var(--app-hover-border);
+  --color-hover-surface: var(--app-hover-surface);
+  --color-disabled-surface: var(--app-disabled-surface);
+  --color-code-bg: var(--app-code-bg);
+  --color-code-text: var(--app-code-text);
+  --color-warning-surface: var(--app-warning-bg);
+  --color-warning-border: var(--app-warning-border);
+  --color-warning-text: var(--app-warning-text);
+  --color-warning-text-muted: var(--app-warning-text-muted);
+  --color-warning-badge-bg: var(--app-warning-badge-bg);
+  --color-warning-badge-text: var(--app-warning-badge-text);
+  --color-badge-default-bg: var(--app-badge-default-bg);
+  --color-badge-default-text: var(--app-badge-default-text);
+  --color-badge-default-ring: var(--app-badge-default-ring);
+  --color-badge-neutral-bg: var(--app-badge-neutral-bg);
+  --color-badge-neutral-ring: var(--app-badge-neutral-ring);
+  --color-badge-success-bg: var(--app-badge-success-bg);
+  --color-badge-success-text: var(--app-badge-success-text);
+  --color-badge-success-ring: var(--app-badge-success-ring);
+  --color-badge-warning-bg: var(--app-badge-warning-bg);
+  --color-badge-warning-text: var(--app-badge-warning-text);
+  --color-badge-warning-ring: var(--app-badge-warning-ring);
+  --color-badge-danger-bg: var(--app-badge-danger-bg);
+  --color-badge-danger-text: var(--app-badge-danger-text);
+  --color-badge-danger-ring: var(--app-badge-danger-ring);
+  --color-confidence-track: var(--app-confidence-track);
+  --color-confidence-success: var(--app-confidence-success);
+  --color-confidence-warning: var(--app-confidence-warning);
+  --color-confidence-danger: var(--app-confidence-danger);
+  --color-dropdown-bg: var(--app-dropdown-bg);
+  --color-modal-overlay: var(--app-modal-overlay);
+  --color-overlay: var(--app-overlay);
+  --shadow-card: var(--app-shadow-card);
+  --shadow-card-hover: var(--app-shadow-card-hover);
 }
 
 @layer base {
@@ -30,12 +188,16 @@
   body {
     @apply min-h-screen bg-surface font-sans text-text-primary;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgb(91 79 232 / 0.08), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(14 165 233 / 0.05), transparent);
+      radial-gradient(ellipse 80% 50% at 50% -20%, var(--app-gradient-glow-1), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 0%, var(--app-gradient-glow-2), transparent);
   }
 
   #root {
     @apply min-h-screen flex flex-col;
+  }
+
+  :focus-visible {
+    outline-color: var(--app-brand);
   }
 }
 
@@ -50,6 +212,30 @@
 
   .animate-pulse-soft {
     animation: pulse-soft 1.8s ease-in-out infinite;
+  }
+
+  .shadow-card {
+    box-shadow: var(--app-shadow-card);
+  }
+
+  .shadow-card-hover {
+    box-shadow: var(--app-shadow-card-hover);
+  }
+
+  .ring-card {
+    box-shadow: 0 0 0 1px var(--app-card-ring);
+  }
+
+  .shadow-dropdown {
+    box-shadow: var(--app-dropdown-shadow);
+  }
+
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      to bottom right,
+      var(--app-brand),
+      var(--app-gradient-brand-end)
+    );
   }
 }
 
@@ -86,9 +272,9 @@
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    var(--color-surface-subtle) 25%,
-    #f8f9fc 50%,
-    var(--color-surface-subtle) 75%
+    var(--app-surface-subtle) 25%,
+    var(--app-shimmer-mid) 50%,
+    var(--app-surface-subtle) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
