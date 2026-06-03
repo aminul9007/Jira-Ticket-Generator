@@ -15,7 +15,7 @@ A modern web app to help QA engineers create Jira-ready bug tickets in under one
 
 ```
 src/
-├── ai/                    # Senior QA prompts + optional OpenAI provider
+├── ai/                    # Prompt builder, category guides, OpenAI provider, JSON schema
 ├── components/
 │   ├── layout/
 │   ├── forms/

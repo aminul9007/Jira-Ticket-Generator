@@ -1,39 +1,11 @@
+import { buildTicketGenerationPrompt } from '../services/promptBuilder'
 import {
-  buildSeniorQaUserPrompt,
-  SENIOR_QA_SYSTEM_PROMPT,
-} from '../prompts/seniorQaLeadPrompt'
-import type { AiTicketResponse } from '../types/aiTicketResponse'
+  normalizeAiResponse,
+  validateAiTicketResponse,
+} from '../utils/validateAiResponse'
 import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
-
-function normalizeAiResponse(
-  raw: AiTicketResponse,
-  values: ValidatedBugReportFormValues,
-): GeneratedTicket {
-  const suggestions = raw.titleSuggestions?.filter(Boolean) ?? []
-  const padded = [...suggestions]
-  while (padded.length < 3) {
-    padded.push(raw.title || values.title)
-  }
-
-  return {
-    title: raw.title || padded[0],
-    titleSuggestions: [padded[0], padded[1], padded[2]] as [string, string, string],
-    issueSummary: raw.issueSummary,
-    stepsToReproduce: raw.stepsToReproduce,
-    expectedResult: raw.expectedResult,
-    actualResult: raw.actualResult,
-    severity: raw.severity,
-    priority: raw.priority,
-    severityReasoning: raw.severityReasoning,
-    possibleRootCauses: raw.possibleRootCauses ?? [],
-    confidenceScore: Math.min(100, Math.max(0, Math.round(raw.confidenceScore))),
-    category: values.category,
-    environments: [...values.environments],
-    affectedFeaturePage: values.affectedFeaturePage.trim() || undefined,
-  }
-}
 
 export function isAiProviderConfigured(): boolean {
   const key = import.meta.env.VITE_OPENAI_API_KEY
@@ -47,6 +19,7 @@ export async function generateTicketWithOpenAi(
   if (!apiKey) return null
 
   const model = import.meta.env.VITE_OPENAI_MODEL ?? 'gpt-4o-mini'
+  const { systemPrompt, userPrompt } = buildTicketGenerationPrompt(values)
 
   const response = await fetch(OPENAI_API_URL, {
     method: 'POST',
@@ -56,11 +29,11 @@ export async function generateTicketWithOpenAi(
     },
     body: JSON.stringify({
       model,
-      temperature: 0.3,
+      temperature: 0.15,
       response_format: { type: 'json_object' },
       messages: [
-        { role: 'system', content: SENIOR_QA_SYSTEM_PROMPT },
-        { role: 'user', content: buildSeniorQaUserPrompt(values) },
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
       ],
     }),
   })
@@ -77,8 +50,15 @@ export async function generateTicketWithOpenAi(
   if (!content) return null
 
   try {
-    const parsed = JSON.parse(content) as AiTicketResponse
-    return normalizeAiResponse(parsed, values)
+    const parsed = JSON.parse(content) as unknown
+    const validation = validateAiTicketResponse(parsed)
+
+    if (!validation.valid || !validation.data) {
+      console.warn('[AI] Invalid response schema:', validation.errors)
+      return null
+    }
+
+    return normalizeAiResponse(validation.data, values)
   } catch {
     console.warn('[AI] Failed to parse OpenAI JSON response')
     return null
