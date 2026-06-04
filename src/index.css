@@ -199,6 +199,21 @@
   :focus-visible {
     outline-color: var(--app-brand);
   }
+
+  select {
+    color: var(--app-text-primary);
+    background-color: var(--app-surface-elevated);
+    color-scheme: light;
+  }
+
+  select option {
+    color: var(--app-text-primary);
+    background-color: var(--app-surface-elevated);
+  }
+
+  .dark select {
+    color-scheme: dark;
+  }
 }
 
 @layer utilities {

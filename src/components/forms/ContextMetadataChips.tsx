@@ -88,7 +88,11 @@ export function ContextMetadataChips({
               <select
                 id={selectId}
                 aria-label={`${label}${sourceBadge ? ` (${sourceBadge})` : ''}`}
-                className="max-w-[9rem] cursor-pointer border-0 bg-transparent py-0.5 text-xs font-medium text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded"
+                className={cn(
+                  'max-w-[9rem] cursor-pointer rounded border-0 py-0.5 pl-1 pr-5',
+                  'bg-surface-elevated text-xs font-medium text-text-primary',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30',
+                )}
                 value={field.value}
                 onChange={(e) =>
                   onFieldChange(
@@ -98,7 +102,11 @@ export function ContextMetadataChips({
                 }
               >
                 {optionsForField(key).map((option) => (
-                  <option key={option} value={option}>
+                  <option
+                    key={option}
+                    value={option}
+                    className="bg-surface-elevated text-text-primary"
+                  >
                     {key === 'environment'
                       ? formatDetectedEnvironmentLabel(option as DetectedEnvironment)
                       : option}
