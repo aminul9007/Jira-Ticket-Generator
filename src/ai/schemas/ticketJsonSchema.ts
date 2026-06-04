@@ -91,7 +91,12 @@ export const AI_TICKET_JSON_SCHEMA = {
     expectedResult: { type: 'string' },
     actualResult: { type: 'string' },
     severity: { type: 'string', enum: ['Critical', 'High', 'Medium', 'Low'] },
-    priority: { type: 'string', enum: ['P1', 'P2', 'P3', 'P4'] },
+    priority: {
+      type: 'string',
+      enum: ['P0', 'P1', 'P2', 'P3', 'P4'],
+      description:
+        'P0 production blocker; P1 high impact; P2 normal; P3 minor. Map from severity: Critical→P0, High→P1, Medium→P2, Low→P3.',
+    },
     severityReasoning: {
       type: 'string',
       description:

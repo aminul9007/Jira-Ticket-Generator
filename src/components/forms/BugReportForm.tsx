@@ -5,10 +5,9 @@ import { MIN_ISSUE_DESCRIPTION_LENGTH } from '../../utils/validateForm'
 import { Button } from '../ui/Button'
 import { Card, CardHeader } from '../ui/Card'
 import { FormField } from '../ui/FormField'
-import { Label } from '../ui/Label'
-import { Textarea } from '../ui/Textarea'
 import { EnvironmentMultiSelect } from './EnvironmentMultiSelect'
 import { InputQualityAlerts } from './InputQualityAlerts'
+import { IssueDescriptionVoiceInput } from './IssueDescriptionVoiceInput'
 
 interface BugReportFormProps {
   values: BugReportFormValues
@@ -65,26 +64,19 @@ export function BugReportForm({
       />
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField>
-          <Label htmlFor="issue-description" required>
-            Issue Description
-          </Label>
-          <Textarea
+          <IssueDescriptionVoiceInput
             id="issue-description"
-            rows={8}
-            autoFocus
+            value={values.issueDescription}
+            maxLength={2000}
+            minHintLength={MIN_ISSUE_DESCRIPTION_LENGTH}
+            disabled={isGenerating}
             placeholder="Describe the bug in plain language. Include what you did, what happened, browser/device, and environment if known.
 
 Example: On Production, checkout button stays disabled after entering a valid address on iPhone Safari 17."
-            value={values.issueDescription}
-            onChange={(e) => onIssueDescriptionChange(e.target.value)}
+            onChange={onIssueDescriptionChange}
             onKeyDown={handleKeyDown}
-            maxLength={2000}
-            className="min-h-[180px]"
           />
-          <div className="flex items-center justify-between text-xs text-text-muted">
-            <span>Ctrl+Enter to generate</span>
-            <span className="tabular-nums">{values.issueDescription.length}/2000</span>
-          </div>
+          <p className="text-xs text-text-muted">Ctrl+Enter to generate</p>
         </FormField>
 
         <EnvironmentMultiSelect

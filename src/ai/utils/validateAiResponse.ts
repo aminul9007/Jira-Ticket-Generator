@@ -5,6 +5,7 @@ import {
 } from '../../data/ticketOptions'
 import type { Environment, GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 import { isBugCategory, isEnvironment, mergeEnvironments } from '../../utils/inferBugDetails'
+import { normalizeAiPayloadKeys } from './normalizeAiPayload'
 
 const SEVERITY_SET = new Set<string>(TICKET_SEVERITIES)
 const PRIORITY_SET = new Set<string>(TICKET_PRIORITIES)
@@ -39,7 +40,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
     return { valid: false, errors: ['Response is not an object'], data: null }
   }
 
-  const data = raw as Record<string, unknown>
+  const data = normalizeAiPayloadKeys(raw as Record<string, unknown>)
 
   if (!isBugCategory(String(data.category))) {
     errors.push('category must be a valid bug category')
@@ -73,7 +74,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
     errors.push('severity must be Critical, High, Medium, or Low')
   }
   if (!PRIORITY_SET.has(String(data.priority))) {
-    errors.push('priority must be P1, P2, P3, or P4')
+    errors.push('priority must be P0, P1, P2, P3, or P4')
   }
 
   if (!isStringArray(data.possibleRootCauses) || data.possibleRootCauses.length < 1) {
@@ -126,10 +127,12 @@ export function normalizeAiResponse(
   const recommended =
     titles.includes(raw.title) ? raw.title : titles[0] ?? raw.title
 
+  const featureLabel = raw.affectedFeaturePage.trim()
   const feature =
-    raw.affectedFeaturePage.trim() === 'Confirm with reporter'
+    featureLabel === 'Confirm with reporter' ||
+    featureLabel === 'Not specified'
       ? undefined
-      : raw.affectedFeaturePage.trim() || undefined
+      : featureLabel || undefined
 
   const environments = mergeEnvironments(values.environments, raw.environments)
 

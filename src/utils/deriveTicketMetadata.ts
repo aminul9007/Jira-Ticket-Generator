@@ -29,7 +29,7 @@ const SEVERITY_ORDER: TicketSeverity[] = [
   'Critical',
 ]
 
-const PRIORITY_ORDER: TicketPriority[] = ['P4', 'P3', 'P2', 'P1']
+const PRIORITY_ORDER: TicketPriority[] = ['P4', 'P3', 'P2', 'P1', 'P0']
 
 function bumpSeverity(severity: TicketSeverity): TicketSeverity {
   const index = SEVERITY_ORDER.indexOf(severity)

@@ -3,6 +3,7 @@ import type { PromptBundle, ReportContext } from '../types/promptTypes'
 import type { AiGenerationContext } from '../types/generationContext'
 import { AI_TICKET_JSON_SCHEMA } from '../schemas/ticketJsonSchema'
 import { buildBaseSystemPrompt } from '../prompts/baseSeniorQaPrompt'
+import { buildUserBugDescriptionSection } from '../prompts/jiraBugReportPrompt'
 import { formatCategoryInferenceSection } from '../prompts/categoryPrompts'
 import {
   formatHistoricalTicketsForPrompt,
@@ -42,8 +43,7 @@ function buildInputSection(ctx: ReportContext): string {
   }
 
   return [
-    '## Issue description (only source of truth)',
-    ctx.issueDescription,
+    buildUserBugDescriptionSection(ctx.issueDescription),
     '',
     `User-selected environments: ${ctx.environments}`,
     '',
@@ -100,7 +100,7 @@ export function buildTicketGenerationPrompt(
     buildInputSection(ctx),
     buildQualityChecklist(),
     '',
-    'Return JSON only.',
+    'Return JSON only. No extra text.',
   ]
     .filter(Boolean)
     .join('\n\n')

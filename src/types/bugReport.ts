@@ -10,7 +10,7 @@ export type Environment = 'Canary' | 'Beta' | 'Production'
 
 export type TicketSeverity = 'Critical' | 'High' | 'Medium' | 'Low'
 
-export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4'
+export type TicketPriority = 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
 
 /** Minimal dashboard form state — only user-entered fields. */
 export interface BugReportFormValues {

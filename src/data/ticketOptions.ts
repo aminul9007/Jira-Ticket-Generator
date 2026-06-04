@@ -11,6 +11,7 @@ export const TICKET_SEVERITIES: readonly TicketSeverity[] = [
 ] as const
 
 export const TICKET_PRIORITIES: readonly TicketPriority[] = [
+  'P0',
   'P1',
   'P2',
   'P3',

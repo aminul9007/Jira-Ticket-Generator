@@ -69,6 +69,16 @@ VITE_OPENAI_API_KEY=sk-...
 VITE_OPENAI_MODEL=gpt-4o-mini
 ```
 
+## Voice input (Issue Description)
+
+Use the microphone button next to **Issue Description** to dictate bugs instead of typing.
+
+- **Chrome / Edge** on desktop (Web Speech API; requires microphone permission)
+- **Append** or **Replace** mode for how spoken text merges with existing content
+- Live transcription while listening; status shows idle, listening, or processing
+
+Works on `localhost` and HTTPS. If the browser blocks the mic, allow microphone access in site settings and refresh.
+
 ## Ticket generation features
 
 - **3 Jira title suggestions** + recommended primary title
