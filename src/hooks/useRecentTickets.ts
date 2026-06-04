@@ -1,37 +1,52 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { GeneratedTicket } from '../types/bugReport'
-import type { RecentTicketFilters, RecentTicketRecord } from '../types/recentTicket'
-import { filterRecentTickets } from '../utils/filterRecentTickets'
+import type { RecentTicketRecord } from '../types/recentTicket'
+import { MAX_RECENT_TICKETS } from '../types/recentTicket'
 import {
-  addRecentTicket,
-  loadRecentTickets,
-  removeRecentTicket,
-} from '../utils/recentTicketsStorage'
-
-const DEFAULT_FILTERS: RecentTicketFilters = {
-  search: '',
-  category: 'all',
-  environment: 'all',
-}
+  deleteTicketHistoryRecord,
+  getTicketHistory,
+  historyRecordToRecentTicket,
+} from '../services/history/ticketHistoryService'
+import { filterRecentTickets } from '../utils/filterRecentTickets'
+import type { RecentTicketFilters } from '../types/recentTicket'
 
 export function useRecentTickets() {
-  const [records, setRecords] = useState<RecentTicketRecord[]>(loadRecentTickets)
-  const [filters, setFilters] = useState<RecentTicketFilters>(DEFAULT_FILTERS)
+  const [records, setRecords] = useState<RecentTicketRecord[]>(() =>
+    getTicketHistory()
+      .slice(0, MAX_RECENT_TICKETS)
+      .map(historyRecordToRecentTicket),
+  )
+  const [filters, setFilters] = useState<RecentTicketFilters>({
+    search: '',
+    category: 'all',
+    environment: 'all',
+  })
   const [activeId, setActiveId] = useState<string | null>(null)
+
+  const refreshFromHistory = useCallback(() => {
+    setRecords(
+      getTicketHistory()
+        .slice(0, MAX_RECENT_TICKETS)
+        .map(historyRecordToRecentTicket),
+    )
+  }, [])
+
+  const saveTicket = useCallback(() => {
+    refreshFromHistory()
+  }, [refreshFromHistory])
+
+  const deleteTicket = useCallback(
+    (id: string) => {
+      deleteTicketHistoryRecord(id)
+      setRecords((prev) => prev.filter((record) => record.id !== id))
+      if (activeId === id) setActiveId(null)
+    },
+    [activeId],
+  )
 
   const filteredRecords = useMemo(
     () => filterRecentTickets(records, filters),
     [records, filters],
   )
-
-  const saveTicket = useCallback((ticket: GeneratedTicket, usedAi: boolean) => {
-    setRecords((prev) => addRecentTicket(ticket, usedAi, prev))
-  }, [])
-
-  const deleteTicket = useCallback((id: string) => {
-    setRecords((prev) => removeRecentTicket(id, prev))
-    setActiveId((current) => (current === id ? null : current))
-  }, [])
 
   const setSearch = useCallback((search: string) => {
     setFilters((prev) => ({ ...prev, search }))
@@ -52,7 +67,7 @@ export function useRecentTickets() {
   )
 
   const resetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS)
+    setFilters({ search: '', category: 'all', environment: 'all' })
   }, [])
 
   const markActive = useCallback((id: string | null) => {
@@ -71,6 +86,7 @@ export function useRecentTickets() {
     setEnvironmentFilter,
     resetFilters,
     markActive,
+    refreshFromHistory,
   }
 }
 

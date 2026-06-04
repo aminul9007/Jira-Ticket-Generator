@@ -4,7 +4,7 @@ import {
   validateAiTicketResponse,
 } from '../utils/validateAiResponse'
 import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
-import type { QaContextSettings } from '../../types/qaContext'
+import type { AiGenerationContext } from '../types/generationContext'
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
@@ -15,13 +15,13 @@ export function isAiProviderConfigured(): boolean {
 
 export async function generateTicketWithOpenAi(
   values: ValidatedBugReportFormValues,
-  qaContext: QaContextSettings,
+  generationContext: AiGenerationContext,
 ): Promise<GeneratedTicket | null> {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY
   if (!apiKey) return null
 
   const model = import.meta.env.VITE_OPENAI_MODEL ?? 'gpt-4o-mini'
-  const { systemPrompt, userPrompt } = buildTicketGenerationPrompt(values, qaContext)
+  const { systemPrompt, userPrompt } = buildTicketGenerationPrompt(values, generationContext)
 
   const response = await fetch(OPENAI_API_URL, {
     method: 'POST',

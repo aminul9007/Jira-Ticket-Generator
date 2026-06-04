@@ -1,23 +1,21 @@
-import type { ValidatedBugReportFormValues } from '../../types/bugReport'
+import type { ResolvedBugInput } from '../../types/bugReport'
 import type { InputQualityReport } from '../../types/inputQuality'
 
 const REPRODUCTION_KEYWORDS =
-  /\b(click|tap|navigate|open|submit|refresh|scroll|login|browser|device|steps?|repro|when|after)\b/i
+  /\b(click|tap|navigate|open|submit|refresh|scroll|login|browser|device|steps?|repro|when|after|expected|actual)\b/i
 
 export function calculateConfidenceScore(
-  values: ValidatedBugReportFormValues,
+  values: ResolvedBugInput,
   qualityReport: InputQualityReport,
 ): number {
-  let score = 45
+  let score = 40
+  const description = values.issueDescription.trim()
 
   score += values.environments.length * 8
   if (values.affectedFeaturePage.trim()) score += 12
-  if (values.title.trim().length >= 25) score += 10
-  if (values.title.trim().length >= 50) score += 5
-  if (REPRODUCTION_KEYWORDS.test(`${values.title} ${values.additionalNotes}`)) {
-    score += 10
-  }
-  if (values.additionalNotes.trim().length >= 60) score += 8
+  if (description.length >= 40) score += 10
+  if (description.length >= 100) score += 8
+  if (REPRODUCTION_KEYWORDS.test(description)) score += 10
 
   score += Math.round(qualityReport.completenessScore * 0.15)
   score -= qualityReport.issues.length * 6

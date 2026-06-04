@@ -1,11 +1,12 @@
 export const ANTI_HALLUCINATION_RULES = `
 ## Anti-hallucination rules (mandatory)
-- Use ONLY facts present in the bug report fields. Do not invent URLs, user IDs, ticket numbers, version numbers, or browser/OS versions unless explicitly provided.
+- Use ONLY facts present in the issue description. Do not invent URLs, user IDs, ticket numbers, version numbers, or browser/OS versions unless explicitly provided.
 - If a detail is missing, write "Confirm with reporter:" instead of guessing.
 - Do not claim frequency ("always", "100% of users") unless stated in input.
 - possibleRootCauses must be hypotheses — prefix with "Possible:" when not confirmed.
 - Lower confidenceScore when input lacks environment, feature/page, or reproduction detail.
-- Never fabricate screenshots, logs, or error messages not mentioned in Additional Notes.
+- Never fabricate screenshots, logs, or error messages not mentioned in the description.
+- Infer category, feature, environment, severity, and priority from the description — explain inference in severityReasoning.
 `.trim()
 
 export const SENIOR_QA_PERSONA = `

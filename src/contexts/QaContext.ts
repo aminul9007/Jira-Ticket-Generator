@@ -1,9 +1,9 @@
 import { createContext } from 'react'
-import type { QaContextSettings } from '../types/qaContext'
+import type { ProjectKnowledgeSettings } from '../types/projectKnowledge'
 
 export interface QaContextValue {
-  settings: QaContextSettings
-  updateSettings: (patch: Partial<QaContextSettings>) => void
+  settings: ProjectKnowledgeSettings
+  updateSettings: (patch: Partial<ProjectKnowledgeSettings>) => void
   resetSettings: () => void
   isConfigured: boolean
 }

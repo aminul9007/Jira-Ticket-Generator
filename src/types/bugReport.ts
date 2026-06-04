@@ -13,17 +13,13 @@ export type TicketSeverity = 'Critical' | 'High' | 'Medium' | 'Low'
 export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4'
 
 export interface BugReportFormValues {
-  category: BugCategory | ''
+  issueDescription: string
   environments: Environment[]
-  title: string
-  affectedFeaturePage: string
-  additionalNotes: string
 }
 
-/** Form values after required fields pass validation. */
-export interface ValidatedBugReportFormValues
-  extends Omit<BugReportFormValues, 'category'> {
-  category: BugCategory
+/** Form values ready for ticket generation. */
+export interface ValidatedBugReportFormValues extends BugReportFormValues {
+  issueDescription: string
 }
 
 export interface GeneratedTicket {
@@ -42,4 +38,11 @@ export interface GeneratedTicket {
   category: BugCategory
   environments: Environment[]
   affectedFeaturePage?: string
+}
+
+/** Internal shape used by the rules engine after inferring metadata from description. */
+export interface ResolvedBugInput extends ValidatedBugReportFormValues {
+  category: BugCategory
+  affectedFeaturePage: string
+  shortTitle: string
 }

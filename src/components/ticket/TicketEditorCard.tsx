@@ -1,6 +1,7 @@
 import type { GeneratedTicket } from '../../types/bugReport'
 import { TICKET_PRIORITIES, TICKET_SEVERITIES } from '../../data/ticketOptions'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
+import type { TicketFeedbackRating } from '../../types/ticketFeedback'
 import { formatJiraTicket } from '../../utils/formatJiraTicket'
 import { Badge } from '../ui/Badge'
 import { Card, CardHeader } from '../ui/Card'
@@ -15,6 +16,7 @@ import {
   FormattedTicketList,
   FormattedTicketText,
 } from './FormattedTicketText'
+import { TicketFeedbackBar } from './TicketFeedbackBar'
 import { TicketEditorToolbar } from './TicketEditorToolbar'
 import { TitleSuggestions } from './TitleSuggestions'
 
@@ -22,6 +24,11 @@ interface TicketEditorCardProps {
   editor: TicketEditor
   usedAi?: boolean
   onCopySuccess: () => void
+  feedback?: {
+    rating: TicketFeedbackRating | null
+    canSubmit: boolean
+    onSubmit: (rating: TicketFeedbackRating) => void
+  }
 }
 
 function severityVariant(
@@ -55,6 +62,7 @@ export function TicketEditorCard({
   editor,
   usedAi = false,
   onCopySuccess,
+  feedback,
 }: TicketEditorCardProps) {
   const ticket = editor.editedTicket
   if (!ticket) return null
@@ -75,6 +83,14 @@ export function TicketEditorCard({
         usedAi={usedAi}
         onCopySuccess={onCopySuccess}
       />
+
+      {feedback && (
+        <TicketFeedbackBar
+          rating={feedback.rating}
+          canSubmit={feedback.canSubmit}
+          onSubmit={feedback.onSubmit}
+        />
+      )}
 
       <div className="mb-5 rounded-xl border border-border/70 bg-surface-subtle/40 p-4">
         <ConfidenceScore score={ticket.confidenceScore} />

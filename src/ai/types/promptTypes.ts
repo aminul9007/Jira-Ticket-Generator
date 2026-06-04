@@ -20,12 +20,8 @@ export interface CategoryPromptGuide {
 }
 
 export interface ReportContext {
-  category: BugCategory
+  issueDescription: string
   environments: string
-  affectedFeaturePage: string
-  title: string
-  additionalNotes: string
-  hasFeature: boolean
-  hasNotes: boolean
+  hasEnvironmentHint: boolean
   isProduction: boolean
 }

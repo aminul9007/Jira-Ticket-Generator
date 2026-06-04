@@ -1,23 +1,26 @@
 import type { ValidatedBugReportFormValues } from '../../types/bugReport'
-import type { QaContextSettings } from '../../types/qaContext'
 import type { PromptBundle, ReportContext } from '../types/promptTypes'
+import type { AiGenerationContext } from '../types/generationContext'
 import { AI_TICKET_JSON_SCHEMA } from '../schemas/ticketJsonSchema'
 import { buildBaseSystemPrompt } from '../prompts/baseSeniorQaPrompt'
+import { formatCategoryInferenceSection } from '../prompts/categoryPrompts'
 import {
-  formatCategoryPromptSection,
-  getCategoryPromptGuide,
-} from '../prompts/categoryPrompts'
-import { formatQaContextForPrompt } from '../prompts/qaContextSection'
+  formatHistoricalTicketsForPrompt,
+  formatKnowledgeForPrompt,
+} from './generationContextService'
+import { isCustomProjectKnowledge } from '../../utils/qaContextStorage'
 
 function buildReportContext(values: ValidatedBugReportFormValues): ReportContext {
+  const description = values.issueDescription.trim()
+  const envHint =
+    values.environments.length > 0
+      ? values.environments.join(', ')
+      : '(not specified — infer from description)'
+
   return {
-    category: values.category,
-    environments: values.environments.join(', '),
-    affectedFeaturePage: values.affectedFeaturePage.trim() || '(not specified)',
-    title: values.title.trim(),
-    additionalNotes: values.additionalNotes.trim() || '(none)',
-    hasFeature: values.affectedFeaturePage.trim().length > 0,
-    hasNotes: values.additionalNotes.trim().length > 0,
+    issueDescription: description,
+    environments: envHint,
+    hasEnvironmentHint: values.environments.length > 0,
     isProduction: values.environments.includes('Production'),
   }
 }
@@ -31,17 +34,18 @@ function buildJsonSchemaSection(): string {
 
 function buildInputSection(ctx: ReportContext): string {
   const gaps: string[] = []
-  if (!ctx.hasFeature) gaps.push('Affected feature/page is missing — use "Confirm with reporter" in steps.')
-  if (!ctx.hasNotes) gaps.push('Reproduction detail is limited — keep steps high-level and flag gaps in severityReasoning.')
-  if (!ctx.isProduction) gaps.push('Production not selected — cap priority at P3 unless impact warrants higher.')
+  if (!ctx.hasEnvironmentHint) {
+    gaps.push('No environment selected — infer from description or default to Beta.')
+  }
+  if (ctx.issueDescription.length < 60) {
+    gaps.push('Description is brief — expand steps from available details and flag gaps in severityReasoning.')
+  }
 
   return [
-    '## Bug report input (only source of truth)',
-    `Category: ${ctx.category}`,
-    `Environments: ${ctx.environments}`,
-    `Affected Feature/Page: ${ctx.affectedFeaturePage}`,
-    `Short Description: ${ctx.title}`,
-    `Additional Notes: ${ctx.additionalNotes}`,
+    '## Issue description (only source of truth)',
+    ctx.issueDescription,
+    '',
+    `User-selected environments: ${ctx.environments}`,
     '',
     gaps.length > 0 ? '### Input gaps to acknowledge\n' + gaps.map((g) => `- ${g}`).join('\n') : '',
   ]
@@ -52,10 +56,11 @@ function buildInputSection(ctx: ReportContext): string {
 function buildQualityChecklist(): string {
   return [
     '## Pre-submit checklist',
-    '- [ ] All 3 titles are unique and use the correct category prefix',
-    '- [ ] Steps are testable and derived from input (no invented URLs/versions)',
-    '- [ ] severityReasoning explains BOTH severity and priority with environment impact',
-    '- [ ] confidenceScore reflects missing fields',
+    '- [ ] Inferred category matches the description',
+    '- [ ] All 3 titles use the correct category prefix',
+    '- [ ] Steps are testable and derived from the description (no invented URLs/versions)',
+    '- [ ] severityReasoning explains inferred category, severity, and priority',
+    '- [ ] confidenceScore reflects missing environment or reproduction detail',
     '- [ ] possibleRootCauses are hypotheses, not stated as facts',
   ].join('\n')
 }
@@ -65,24 +70,33 @@ function buildQualityChecklist(): string {
  */
 export function buildTicketGenerationPrompt(
   values: ValidatedBugReportFormValues,
-  qaContext?: QaContextSettings,
+  generationContext: AiGenerationContext,
 ): PromptBundle {
-  const guide = getCategoryPromptGuide(values.category)
   const ctx = buildReportContext(values)
-  const qaContextSection = qaContext ? formatQaContextForPrompt(qaContext) : ''
+
+  const knowledgeSection = isCustomProjectKnowledge(generationContext.knowledgeSettings)
+    ? formatKnowledgeForPrompt(generationContext.knowledge)
+    : ''
+  const historySection = formatHistoricalTicketsForPrompt(generationContext.similarTickets)
+  const feedbackSection = generationContext.feedbackSummary
+
+  const contextSections = [knowledgeSection, historySection, feedbackSection].filter(Boolean)
 
   const systemPrompt = [
     buildBaseSystemPrompt(),
-    qaContextSection,
-    formatCategoryPromptSection(guide),
+    ...contextSections,
+    formatCategoryInferenceSection(),
     buildJsonSchemaSection(),
   ]
     .filter(Boolean)
     .join('\n\n')
 
   const userPrompt = [
-    'Generate a Jira-ready bug ticket JSON from the report below.',
-    qaContextSection ? 'Apply team QA context above when consistent with the report.' : '',
+    'Generate a complete Jira-ready bug ticket JSON from the issue description below.',
+    'Infer category, affected feature, environments, severity, and priority from the text.',
+    contextSections.length > 0
+      ? 'Apply project knowledge, historical patterns, and feedback insights when consistent with the description.'
+      : '',
     buildInputSection(ctx),
     buildQualityChecklist(),
     '',
@@ -94,9 +108,9 @@ export function buildTicketGenerationPrompt(
   return {
     systemPrompt,
     userPrompt,
-    category: values.category,
+    category: 'Functional Bug',
   }
 }
 
 export { buildBaseSystemPrompt } from '../prompts/baseSeniorQaPrompt'
-export { getCategoryPromptGuide, formatCategoryPromptSection } from '../prompts/categoryPrompts'
+export { getCategoryPromptGuide, formatCategoryPromptSection, formatCategoryInferenceSection } from '../prompts/categoryPrompts'

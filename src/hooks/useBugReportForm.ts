@@ -1,20 +1,17 @@
 import { useCallback, useState } from 'react'
-import type { BugCategory, BugReportFormValues, Environment } from '../types/bugReport'
+import type { BugReportFormValues, Environment } from '../types/bugReport'
 import { isBugReportFormComplete } from '../utils/validateForm'
 
 const initialValues: BugReportFormValues = {
-  category: '',
+  issueDescription: '',
   environments: [],
-  title: '',
-  affectedFeaturePage: '',
-  additionalNotes: '',
 }
 
 export function useBugReportForm() {
   const [values, setValues] = useState<BugReportFormValues>(initialValues)
 
-  const setCategory = useCallback((category: BugCategory | '') => {
-    setValues((prev) => ({ ...prev, category }))
+  const setIssueDescription = useCallback((issueDescription: string) => {
+    setValues((prev) => ({ ...prev, issueDescription }))
   }, [])
 
   const toggleEnvironment = useCallback((env: Environment) => {
@@ -29,18 +26,6 @@ export function useBugReportForm() {
     })
   }, [])
 
-  const setTitle = useCallback((title: string) => {
-    setValues((prev) => ({ ...prev, title }))
-  }, [])
-
-  const setAffectedFeaturePage = useCallback((affectedFeaturePage: string) => {
-    setValues((prev) => ({ ...prev, affectedFeaturePage }))
-  }, [])
-
-  const setAdditionalNotes = useCallback((additionalNotes: string) => {
-    setValues((prev) => ({ ...prev, additionalNotes }))
-  }, [])
-
   const reset = useCallback(() => {
     setValues(initialValues)
   }, [])
@@ -50,11 +35,8 @@ export function useBugReportForm() {
   return {
     values,
     isValid,
-    setCategory,
+    setIssueDescription,
     toggleEnvironment,
-    setTitle,
-    setAffectedFeaturePage,
-    setAdditionalNotes,
     reset,
   }
 }

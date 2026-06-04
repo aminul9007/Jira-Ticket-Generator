@@ -22,6 +22,26 @@ export function getCategoryPromptGuide(category: BugCategory): CategoryPromptGui
   return CATEGORY_PROMPT_GUIDES[category]
 }
 
+export function formatCategoryInferenceSection(): string {
+  const summaries = Object.values(CATEGORY_PROMPT_GUIDES).map(
+    (guide) => `- **${guide.category}** (${guide.prefix}): ${guide.focusAreas[0] ?? 'See category rules'}`,
+  )
+
+  return [
+    '## Category inference (required)',
+    'Analyze the issue description and infer:',
+    '- **category** — one of: UI Bug, Functional Bug, Mobile Bug, SEO Issue, Accessibility Issue, Performance Issue',
+    '- **affectedFeaturePage** — screen, module, or flow (use "Confirm with reporter" if unclear)',
+    '- **environments** — Canary, Beta, and/or Production mentioned or implied; merge with user-selected environments; default Beta if unknown',
+    '- **severity** and **priority** — based on category, environment, user impact, and description',
+    '',
+    'Category quick guide:',
+    ...summaries,
+    '',
+    'Apply the matching category prefix in all titleSuggestions.',
+  ].join('\n')
+}
+
 export function formatCategoryPromptSection(guide: CategoryPromptGuide): string {
   return [
     `## Category: ${guide.category}`,

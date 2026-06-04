@@ -14,7 +14,7 @@ interface DashboardPageProps {
 }
 
 export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
-  const { form, inputQuality, ticket, editor, recentTickets, reopenRecentTicket } =
+  const { form, inputQuality, ticket, editor, recentTickets, feedback, reopenRecentTicket } =
     useBugReportAssistant()
   const { generate: generateTicket, isGenerating, hasGenerated, usedAi } = ticket
   const { toast, showToast } = useToast()
@@ -50,8 +50,8 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
       }}
     >
       <PageHeader
-        title="Create a bug report"
-        description="Generate a ticket, edit inline, copy to Jira, and revisit recent tickets saved on this device."
+        title="Quick bug ticket"
+        description="Paste an issue description, generate a Jira-ready ticket in seconds, edit if needed, then copy."
       />
 
       <div className="grid gap-6 xl:grid-cols-2 xl:gap-8 xl:items-start">
@@ -61,11 +61,8 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             inputQuality={inputQuality}
             isGenerating={isGenerating}
             isValid={form.isValid}
-            onCategoryChange={form.setCategory}
             onEnvironmentToggle={form.toggleEnvironment}
-            onTitleChange={form.setTitle}
-            onAffectedFeatureChange={form.setAffectedFeaturePage}
-            onNotesChange={form.setAdditionalNotes}
+            onIssueDescriptionChange={form.setIssueDescription}
             onGenerate={onGenerate}
           />
         </div>
@@ -75,6 +72,7 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
           hasGenerated={hasGenerated}
           isGenerating={isGenerating}
           usedAi={usedAi}
+          feedback={feedback}
           onCopySuccess={onCopySuccess}
         />
       </div>

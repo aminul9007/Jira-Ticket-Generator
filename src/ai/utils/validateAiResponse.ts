@@ -3,7 +3,8 @@ import {
   TICKET_PRIORITIES,
   TICKET_SEVERITIES,
 } from '../../data/ticketOptions'
-import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
+import type { Environment, GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
+import { isBugCategory, isEnvironment, mergeEnvironments } from '../../utils/inferBugDetails'
 
 const SEVERITY_SET = new Set<string>(TICKET_SEVERITIES)
 const PRIORITY_SET = new Set<string>(TICKET_PRIORITIES)
@@ -26,6 +27,11 @@ function isStringArray(value: unknown): value is string[] {
   )
 }
 
+function parseEnvironments(value: unknown): Environment[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((item): item is Environment => isEnvironment(String(item)))
+}
+
 export function validateAiTicketResponse(raw: unknown): AiValidationResult {
   const errors: string[] = []
 
@@ -34,6 +40,19 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
   }
 
   const data = raw as Record<string, unknown>
+
+  if (!isBugCategory(String(data.category))) {
+    errors.push('category must be a valid bug category')
+  }
+
+  if (!isNonEmptyString(data.affectedFeaturePage)) {
+    errors.push('affectedFeaturePage is required')
+  }
+
+  const environments = parseEnvironments(data.environments)
+  if (environments.length === 0) {
+    errors.push('environments must contain at least one valid environment')
+  }
 
   if (!isStringArray(data.titleSuggestions) || data.titleSuggestions.length < 3) {
     errors.push('titleSuggestions must be an array of at least 3 strings')
@@ -81,6 +100,9 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
     valid: true,
     errors: [],
     data: {
+      category: data.category as AiTicketResponse['category'],
+      affectedFeaturePage: String(data.affectedFeaturePage).trim(),
+      environments,
       titleSuggestions: titles.slice(0, 3),
       title: String(data.title).trim(),
       issueSummary: String(data.issueSummary).trim(),
@@ -104,6 +126,13 @@ export function normalizeAiResponse(
   const recommended =
     titles.includes(raw.title) ? raw.title : titles[0] ?? raw.title
 
+  const feature =
+    raw.affectedFeaturePage.trim() === 'Confirm with reporter'
+      ? undefined
+      : raw.affectedFeaturePage.trim() || undefined
+
+  const environments = mergeEnvironments(values.environments, raw.environments)
+
   return {
     title: recommended,
     titleSuggestions: titles,
@@ -116,8 +145,8 @@ export function normalizeAiResponse(
     severityReasoning: raw.severityReasoning,
     possibleRootCauses: raw.possibleRootCauses.slice(0, 5),
     confidenceScore: raw.confidenceScore,
-    category: values.category,
-    environments: [...values.environments],
-    affectedFeaturePage: values.affectedFeaturePage.trim() || undefined,
+    category: raw.category,
+    environments: environments.length > 0 ? environments : ['Beta'],
+    affectedFeaturePage: feature,
   }
 }

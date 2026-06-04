@@ -2,10 +2,15 @@ import type {
   GeneratedTicket,
   TicketPriority,
   TicketSeverity,
+  BugCategory,
+  Environment,
 } from '../../types/bugReport'
 
 /** Structured JSON schema returned by the Senior QA Lead AI prompt. */
 export interface AiTicketResponse {
+  category: BugCategory
+  affectedFeaturePage: string
+  environments: Environment[]
   titleSuggestions: string[]
   title: string
   issueSummary: string
@@ -22,6 +27,9 @@ export interface AiTicketResponse {
 export const AI_TICKET_JSON_SCHEMA = {
   type: 'object',
   required: [
+    'category',
+    'affectedFeaturePage',
+    'environments',
     'titleSuggestions',
     'title',
     'issueSummary',
@@ -35,13 +43,35 @@ export const AI_TICKET_JSON_SCHEMA = {
     'confidenceScore',
   ],
   properties: {
+    category: {
+      type: 'string',
+      enum: [
+        'UI Bug',
+        'Functional Bug',
+        'Mobile Bug',
+        'SEO Issue',
+        'Accessibility Issue',
+        'Performance Issue',
+      ],
+      description: 'Inferred bug category from the issue description.',
+    },
+    affectedFeaturePage: {
+      type: 'string',
+      description: 'Inferred feature, page, or module. Use "Confirm with reporter" if unclear.',
+    },
+    environments: {
+      type: 'array',
+      items: { type: 'string', enum: ['Canary', 'Beta', 'Production'] },
+      minItems: 1,
+      description: 'Inferred from description and optional user selection. Default to Beta if unknown.',
+    },
     titleSuggestions: {
       type: 'array',
       items: { type: 'string' },
       minItems: 3,
       maxItems: 3,
       description:
-        'Exactly 3 distinct Jira titles. Include prefix, feature/page when known, environment if Production.',
+        'Exactly 3 distinct Jira titles. Include category prefix, feature when known, environment if Production.',
     },
     title: {
       type: 'string',
@@ -56,7 +86,7 @@ export const AI_TICKET_JSON_SCHEMA = {
       items: { type: 'string' },
       minItems: 3,
       maxItems: 8,
-      description: 'Numbered, testable steps. Use only actions supported by input.',
+      description: 'Numbered, testable steps derived from the issue description.',
     },
     expectedResult: { type: 'string' },
     actualResult: { type: 'string' },
@@ -65,7 +95,7 @@ export const AI_TICKET_JSON_SCHEMA = {
     severityReasoning: {
       type: 'string',
       description:
-        'Explain severity AND priority using category, environment, user impact, and data gaps.',
+        'Explain inferred category, severity AND priority using environment, user impact, and data gaps.',
     },
     possibleRootCauses: {
       type: 'array',
@@ -78,12 +108,15 @@ export const AI_TICKET_JSON_SCHEMA = {
       type: 'number',
       minimum: 0,
       maximum: 100,
-      description: 'Lower when environment, feature, or repro details are missing.',
+      description: 'Lower when environment, feature, or repro details are missing from input.',
     },
   },
 } as const
 
 export const AI_RESPONSE_FIELD_KEYS: (keyof AiTicketResponse)[] = [
+  'category',
+  'affectedFeaturePage',
+  'environments',
   'titleSuggestions',
   'title',
   'issueSummary',

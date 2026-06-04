@@ -6,19 +6,30 @@ import { FormField } from '../ui/FormField'
 interface EnvironmentMultiSelectProps {
   selected: Environment[]
   onToggle: (env: Environment) => void
+  optional?: boolean
 }
 
 export function EnvironmentMultiSelect({
   selected,
   onToggle,
+  optional = false,
 }: EnvironmentMultiSelectProps) {
   return (
     <FormField>
       <fieldset>
         <legend className="text-sm font-medium tracking-tight text-text-primary">
           Environment
-          <span className="ml-1 text-xs font-normal text-danger">Required</span>
+          {optional ? (
+            <span className="ml-1 text-xs font-normal text-text-muted">Optional</span>
+          ) : (
+            <span className="ml-1 text-xs font-normal text-danger">Required</span>
+          )}
         </legend>
+        <p className="mt-1 text-xs text-text-muted">
+          {optional
+            ? 'Leave blank to let AI infer from your description.'
+            : 'Select where the issue was observed.'}
+        </p>
         <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {ENVIRONMENTS.map((env) => {
             const isSelected = selected.includes(env)

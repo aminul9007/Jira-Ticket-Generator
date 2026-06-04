@@ -1,4 +1,5 @@
 import type { TicketEditor } from '../../hooks/useTicketEditor'
+import type { TicketFeedbackRating } from '../../types/ticketFeedback'
 import { Card, CardHeader } from '../ui/Card'
 import { LoadingOverlay } from '../ui/LoadingOverlay'
 import { TicketEditorCard } from './TicketEditorCard'
@@ -10,6 +11,11 @@ interface TicketPreviewPanelProps {
   hasGenerated: boolean
   isGenerating: boolean
   usedAi?: boolean
+  feedback?: {
+    rating: TicketFeedbackRating | null
+    canSubmit: boolean
+    submit: (rating: TicketFeedbackRating) => void
+  }
   onCopySuccess: () => void
 }
 
@@ -40,6 +46,7 @@ export function TicketPreviewPanel({
   hasGenerated,
   isGenerating,
   usedAi = false,
+  feedback,
   onCopySuccess,
 }: TicketPreviewPanelProps) {
   if (isGenerating && !hasGenerated) {
@@ -78,6 +85,15 @@ export function TicketPreviewPanel({
       <TicketEditorCard
         editor={editor}
         usedAi={usedAi}
+        feedback={
+          feedback
+            ? {
+                rating: feedback.rating,
+                canSubmit: feedback.canSubmit,
+                onSubmit: feedback.submit,
+              }
+            : undefined
+        }
         onCopySuccess={onCopySuccess}
       />
     </LoadingOverlay>

@@ -1,4 +1,4 @@
-import type { ValidatedBugReportFormValues } from '../../types/bugReport'
+import type { ResolvedBugInput } from '../../types/bugReport'
 import { CATEGORY_PREFIX } from './categoryConfig'
 
 function truncate(text: string, max: number): string {
@@ -6,23 +6,18 @@ function truncate(text: string, max: number): string {
   return `${text.slice(0, max - 1).trim()}…`
 }
 
-function featureLabel(values: ValidatedBugReportFormValues): string | null {
-  const feature = values.affectedFeaturePage.trim()
-  return feature || null
-}
-
-function envTag(values: ValidatedBugReportFormValues): string {
+function envTag(values: ResolvedBugInput): string {
   if (values.environments.includes('Production')) return 'Production'
   if (values.environments.includes('Beta')) return 'Beta'
-  return values.environments[0] ?? 'Env'
+  return values.environments[0] ?? 'Beta'
 }
 
 export function buildTitleSuggestions(
-  values: ValidatedBugReportFormValues,
+  values: ResolvedBugInput,
 ): [string, string, string] {
   const prefix = CATEGORY_PREFIX[values.category]
-  const shortTitle = truncate(values.title.trim(), 72)
-  const feature = featureLabel(values)
+  const shortTitle = truncate(values.shortTitle, 72)
+  const feature = values.affectedFeaturePage.trim() || null
   const env = envTag(values)
 
   const option1 = feature
@@ -35,8 +30,8 @@ export function buildTitleSuggestions(
 
   const categoryShort = values.category.replace(' Bug', '').replace(' Issue', '')
   const option3 = feature
-    ? `[${categoryShort}][${env}] ${feature}: ${truncate(values.title.trim(), 55)}`
-    : `[${categoryShort}][${env}] ${truncate(values.title.trim(), 60)}`
+    ? `[${categoryShort}][${env}] ${feature}: ${truncate(values.shortTitle, 55)}`
+    : `[${categoryShort}][${env}] ${truncate(values.shortTitle, 60)}`
 
   return [
     truncate(option1, 120),

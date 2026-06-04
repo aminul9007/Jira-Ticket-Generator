@@ -1,7 +1,7 @@
 import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 import type { InputQualityReport } from '../../types/inputQuality'
+import { resolveBugInput } from '../../utils/inferBugDetails'
 import { deriveTicketMetadata } from '../../utils/deriveTicketMetadata'
-import { calculateConfidenceScore } from './confidenceScorer'
 import { ROOT_CAUSE_HINTS } from './categoryConfig'
 import {
   buildActualResult,
@@ -12,15 +12,14 @@ import {
   formatEnvironmentList,
 } from './contentBuilders'
 import { buildTitleSuggestions } from './titleSuggestions'
+import { calculateConfidenceScore } from './confidenceScorer'
 
-function buildRootCauses(values: ValidatedBugReportFormValues): string[] {
+function buildRootCauses(values: ReturnType<typeof resolveBugInput>): string[] {
   const base = [...ROOT_CAUSE_HINTS[values.category]]
   const feature = values.affectedFeaturePage.trim()
 
   if (feature) {
-    base.unshift(
-      `Regression introduced in recent deploy affecting *${feature}*`,
-    )
+    base.unshift(`Regression introduced in recent deploy affecting *${feature}*`)
   }
 
   if (values.environments.includes('Production')) {
@@ -30,11 +29,19 @@ function buildRootCauses(values: ValidatedBugReportFormValues): string[] {
   return base.slice(0, 5)
 }
 
+function defaultEnvironments(
+  values: ReturnType<typeof resolveBugInput>,
+): ReturnType<typeof resolveBugInput> {
+  if (values.environments.length > 0) return values
+  return { ...values, environments: ['Beta'] }
+}
+
 /** Rule-based Senior QA Lead generator (frontend). Uses same schema as AI output. */
 export function generateSeniorQaTicket(
-  values: ValidatedBugReportFormValues,
+  formValues: ValidatedBugReportFormValues,
   qualityReport: InputQualityReport,
 ): GeneratedTicket {
+  const values = defaultEnvironments(resolveBugInput(formValues))
   const envList = formatEnvironmentList(values.environments)
   const { severity, priority } = deriveTicketMetadata(
     values.category,

@@ -15,8 +15,8 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
       }}
     >
       <PageHeader
-        title="QA Context Settings"
-        description="Configure product-specific context so AI-generated tickets use your team's naming, environments, and categories."
+        title="Project Knowledge Base"
+        description="Configure project context, testing standards, and terminology so AI-generated tickets match your team's patterns."
       />
 
       <div className="max-w-2xl">
