@@ -65,6 +65,14 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             onSetEnvironments={form.setEnvironments}
             onIssueDescriptionChange={form.setIssueDescription}
             onGenerate={onGenerate}
+            onVoiceAutoGenerate={async (voiceValues) => {
+              const success = await generateTicket(voiceValues)
+              if (success) {
+                document
+                  .getElementById('ticket-preview')
+                  ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+              }
+            }}
           />
         </div>
 

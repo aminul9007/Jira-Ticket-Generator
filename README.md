@@ -71,7 +71,19 @@ VITE_OPENAI_MODEL=gpt-4o-mini
 
 ## Voice dictation (optional)
 
-Use the **microphone** on the Issue Description field to dictate your bug (Chrome / Edge). Tap again to stop; text and **Environment** chips update automatically (say production, beta, staging, or canary — otherwise all three are selected). Click **Generate Jira Ticket** when ready.
+Use the **microphone** on the Issue Description field to dictate your bug (Chrome / Edge). Tap again to stop; text and **Environment** chips update automatically (say production, beta, staging, or canary — otherwise all three are selected). Click **Generate Jira Ticket** when ready, or enable **auto-generate after voice** in Settings.
+
+## Settings
+
+Open **Settings** from the dashboard to configure:
+
+- **AI** — project context textarea (injected into prompts), output style, auto-generate after voice
+- **Voice** — language, silence timeout, live transcript
+- **Jira** — domain, email, API token, connection test (architecture ready for issue creation)
+- **Defaults** — project key, issue type, labels, assignee
+- **Data** — history retention, export JSON, clear history
+
+All settings persist in `localStorage`.
 
 ## Ticket generation features
 

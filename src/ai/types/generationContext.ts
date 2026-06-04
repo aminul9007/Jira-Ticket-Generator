@@ -1,6 +1,7 @@
 import type { ValidatedBugReportFormValues } from '../../types/bugReport'
 import type { TicketHistoryRecord } from '../../types/ticketHistory'
 import type { TicketFeedbackRecord } from '../../types/ticketFeedback'
+import type { AiOutputStyle } from '../../types/appSettings'
 import type { ProjectKnowledgeSettings } from '../../types/projectKnowledge'
 
 export interface KnowledgeContext {
@@ -24,6 +25,8 @@ export interface KnowledgeContext {
 export interface AiGenerationContext {
   knowledge: KnowledgeContext
   knowledgeSettings: ProjectKnowledgeSettings
+  projectContextSection: string
+  aiOutputStyle: AiOutputStyle
   similarTickets: TicketHistoryRecord[]
   feedbackSummary: string
 }

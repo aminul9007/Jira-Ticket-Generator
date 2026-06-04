@@ -5,11 +5,8 @@ import { AI_TICKET_JSON_SCHEMA } from '../schemas/ticketJsonSchema'
 import { buildBaseSystemPrompt } from '../prompts/baseSeniorQaPrompt'
 import { buildUserBugDescriptionSection } from '../prompts/jiraBugReportPrompt'
 import { formatCategoryInferenceSection } from '../prompts/categoryPrompts'
-import {
-  formatHistoricalTicketsForPrompt,
-  formatKnowledgeForPrompt,
-} from './generationContextService'
-import { isCustomProjectKnowledge } from '../../utils/qaContextStorage'
+import { formatHistoricalTicketsForPrompt } from './generationContextService'
+import { formatAiOutputStyleInstruction } from '../../services/knowledge/projectContextPrompt'
 
 function buildReportContext(values: ValidatedBugReportFormValues): ReportContext {
   const description = values.issueDescription.trim()
@@ -74,13 +71,16 @@ export function buildTicketGenerationPrompt(
 ): PromptBundle {
   const ctx = buildReportContext(values)
 
-  const knowledgeSection = isCustomProjectKnowledge(generationContext.knowledgeSettings)
-    ? formatKnowledgeForPrompt(generationContext.knowledge)
-    : ''
   const historySection = formatHistoricalTicketsForPrompt(generationContext.similarTickets)
   const feedbackSection = generationContext.feedbackSummary
+  const outputStyleSection = formatAiOutputStyleInstruction(generationContext.aiOutputStyle)
 
-  const contextSections = [knowledgeSection, historySection, feedbackSection].filter(Boolean)
+  const contextSections = [
+    generationContext.projectContextSection,
+    outputStyleSection,
+    historySection,
+    feedbackSection,
+  ].filter(Boolean)
 
   const systemPrompt = [
     buildBaseSystemPrompt(),

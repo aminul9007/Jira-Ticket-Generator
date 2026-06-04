@@ -8,6 +8,7 @@ import {
   saveTicketFeedback,
 } from '../services/feedback/ticketFeedbackService'
 import { analyzeInputQuality } from '../services/ticketGeneration'
+import type { BugReportFormValues } from '../types/bugReport'
 import type { RecentTicketRecord } from '../types/recentTicket'
 import type { TicketFeedbackRating } from '../types/ticketFeedback'
 import { useBugReportForm } from './useBugReportForm'
@@ -61,26 +62,33 @@ export function useBugReportAssistant() {
     [activeHistoryId, editedTicket, refreshFromHistory],
   )
 
-  const generateTicket = useCallback(async () => {
-    if (activeHistoryId && editedTicket) {
-      finalizeTicketHistory(activeHistoryId, editedTicket)
-    }
+  const generateTicket = useCallback(
+    async (overrideValues?: BugReportFormValues) => {
+      const formValues = overrideValues ?? values
+      if (activeHistoryId && editedTicket) {
+        finalizeTicketHistory(activeHistoryId, editedTicket)
+      }
 
-    const result = await generateFromForm(values, knowledgeSettings)
-    if (result) {
-      const historyRecord = saveGeneratedTicketHistory(
-        values,
-        result.ticket,
-        result.usedAi,
-      )
-      loadTicket(result.ticket)
-      saveTicket()
-      setActiveHistoryId(historyRecord.id)
-      setFeedbackRating(null)
-      markActive(historyRecord.id)
-    }
-    return result !== null
-  }, [
+      const result = await generateFromForm(formValues, knowledgeSettings)
+      if (result) {
+        if (overrideValues) {
+          setIssueDescription(overrideValues.issueDescription)
+          setEnvironments(overrideValues.environments)
+        }
+        const historyRecord = saveGeneratedTicketHistory(
+          formValues,
+          result.ticket,
+          result.usedAi,
+        )
+        loadTicket(result.ticket)
+        saveTicket()
+        setActiveHistoryId(historyRecord.id)
+        setFeedbackRating(null)
+        markActive(historyRecord.id)
+      }
+      return result !== null
+    },
+  [
     activeHistoryId,
     editedTicket,
     generateFromForm,
@@ -89,6 +97,8 @@ export function useBugReportAssistant() {
     loadTicket,
     saveTicket,
     markActive,
+    setIssueDescription,
+    setEnvironments,
   ])
 
   const reopenRecentTicket = useCallback(

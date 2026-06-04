@@ -13,6 +13,7 @@ export type VoiceSessionStatus = 'idle' | 'listening' | 'finalizing'
 interface UseVoiceSessionOptions {
   maxLength?: number
   silenceTimeoutMs?: number
+  language?: string
   onSessionComplete?: (transcript: string) => void
 }
 
@@ -23,6 +24,7 @@ function buildLiveTranscript(final: string, interim: string): string {
 export function useVoiceSession({
   maxLength = 2000,
   silenceTimeoutMs = SILENCE_TIMEOUT_MS,
+  language,
   onSessionComplete,
 }: UseVoiceSessionOptions = {}) {
   const [status, setStatus] = useState<VoiceSessionStatus>('idle')
@@ -123,7 +125,7 @@ export function useVoiceSession({
     const recognition = new SpeechRecognitionCtor()
     recognition.continuous = true
     recognition.interimResults = true
-    recognition.lang = navigator.language || 'en-US'
+    recognition.lang = language ?? navigator.language ?? 'en-US'
     recognition.maxAlternatives = 1
 
     attachRecognitionHandlers(recognition)
@@ -137,7 +139,7 @@ export function useVoiceSession({
       setStatus('idle')
       cleanupRecognition()
     }
-  }, [attachRecognitionHandlers, cleanupRecognition])
+  }, [attachRecognitionHandlers, cleanupRecognition, language])
 
   const stopSpeaking = useCallback(() => {
     const recognition = recognitionRef.current

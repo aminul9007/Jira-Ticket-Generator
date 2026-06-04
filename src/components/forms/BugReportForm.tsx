@@ -18,6 +18,7 @@ interface BugReportFormProps {
   onSetEnvironments: (environments: Environment[]) => void
   onIssueDescriptionChange: (value: string) => void
   onGenerate: () => void
+  onVoiceAutoGenerate?: (values: BugReportFormValues) => void
 }
 
 const FormIcon = (
@@ -41,6 +42,7 @@ export function BugReportForm({
   onSetEnvironments,
   onIssueDescriptionChange,
   onGenerate,
+  onVoiceAutoGenerate,
 }: BugReportFormProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -77,6 +79,15 @@ export function BugReportForm({
 Example: On Production, checkout button stays disabled after entering a valid address on iPhone Safari 17."
             onChange={onIssueDescriptionChange}
             onEnvironmentsFromVoice={onSetEnvironments}
+            onVoiceAutoGenerate={
+              onVoiceAutoGenerate
+                ? (payload) =>
+                    onVoiceAutoGenerate({
+                      issueDescription: payload.text,
+                      environments: payload.environments,
+                    })
+                : undefined
+            }
             onKeyDown={handleKeyDown}
           />
           <p className="text-xs text-text-muted">Ctrl+Enter to generate</p>

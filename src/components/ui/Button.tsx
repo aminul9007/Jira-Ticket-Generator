@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { Spinner } from './Spinner'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -20,6 +20,8 @@ const variantStyles: Record<ButtonVariant, string> = {
     'border border-border-strong bg-surface-elevated text-text-primary shadow-sm hover:border-hover-border hover:bg-hover-surface focus-visible:ring-brand/40 focus-visible:ring-offset-surface-elevated',
   ghost:
     'text-text-secondary hover:bg-hover-surface hover:text-text-primary focus-visible:ring-brand/40 focus-visible:ring-offset-surface-elevated',
+  danger:
+    'border border-danger/40 bg-danger/10 text-danger hover:bg-danger/15 focus-visible:ring-danger/30 focus-visible:ring-offset-surface-elevated',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {

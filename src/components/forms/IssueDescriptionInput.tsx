@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from 'react'
-import type { Environment } from '../../types/bugReport'
+import { useAppSettings } from '../../hooks/useAppSettings'
 import { useIssueDescriptionVoice } from '../../hooks/useIssueDescriptionVoice'
+import type { Environment } from '../../types/bugReport'
 import { cn } from '../../utils/cn'
 import { Label } from '../ui/Label'
 import { Textarea } from '../ui/Textarea'
@@ -14,6 +15,10 @@ interface IssueDescriptionInputProps {
   disabled?: boolean
   onChange: (value: string) => void
   onEnvironmentsFromVoice: (environments: Environment[]) => void
+  onVoiceAutoGenerate?: (payload: {
+    text: string
+    environments: Environment[]
+  }) => void
   onKeyDown?: (e: KeyboardEvent<HTMLTextAreaElement>) => void
 }
 
@@ -48,17 +53,23 @@ export function IssueDescriptionInput({
   disabled = false,
   onChange,
   onEnvironmentsFromVoice,
+  onVoiceAutoGenerate,
   onKeyDown,
 }: IssueDescriptionInputProps) {
+  const { settings } = useAppSettings()
   const voice = useIssueDescriptionVoice({
     onApplyTranscript: onChange,
     onApplyEnvironments: onEnvironmentsFromVoice,
+    onAutoGenerate: onVoiceAutoGenerate,
   })
 
   const voiceDisabled = disabled || !voice.speechSupported || voice.isFinalizing
   const micLabel = voice.isListening ? 'Stop voice input' : 'Dictate issue description'
 
-  const showLivePreview = voice.isListening && voice.liveTranscript.length > 0
+  const showLivePreview =
+    settings.voice.showLiveTranscript &&
+    voice.isListening &&
+    voice.liveTranscript.length > 0
 
   return (
     <div className="space-y-2">

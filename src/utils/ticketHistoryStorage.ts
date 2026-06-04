@@ -3,10 +3,8 @@ import type {
   TicketHistoryFormSnapshot,
   TicketHistoryRecord,
 } from '../types/ticketHistory'
-import {
-  MAX_TICKET_HISTORY,
-  TICKET_HISTORY_STORAGE_KEY,
-} from '../types/ticketHistory'
+import { TICKET_HISTORY_STORAGE_KEY } from '../types/ticketHistory'
+import { getHistoryRetentionLimit } from './appSettingsStorage'
 import { cloneTicket } from './cloneTicket'
 import { getModifiedFields } from './ticketDiff'
 
@@ -49,14 +47,14 @@ export function loadTicketHistory(): TicketHistoryRecord[] {
     if (!raw) return []
     const parsed = JSON.parse(raw) as TicketHistoryRecord[]
     if (!Array.isArray(parsed)) return []
-    return parsed.slice(0, MAX_TICKET_HISTORY)
+    return parsed.slice(0, getHistoryRetentionLimit())
   } catch {
     return []
   }
 }
 
 function persist(records: TicketHistoryRecord[]): TicketHistoryRecord[] {
-  const trimmed = records.slice(0, MAX_TICKET_HISTORY)
+  const trimmed = records.slice(0, getHistoryRetentionLimit())
   try {
     localStorage.setItem(TICKET_HISTORY_STORAGE_KEY, JSON.stringify(trimmed))
   } catch {
@@ -69,7 +67,7 @@ export function addTicketHistoryRecord(
   record: TicketHistoryRecord,
   existing: TicketHistoryRecord[] = loadTicketHistory(),
 ): TicketHistoryRecord[] {
-  const next = [record, ...existing].slice(0, MAX_TICKET_HISTORY)
+  const next = [record, ...existing].slice(0, getHistoryRetentionLimit())
   return persist(next)
 }
 
@@ -109,6 +107,18 @@ export function removeTicketHistoryRecord(
 ): TicketHistoryRecord[] {
   const next = existing.filter((record) => record.id !== id)
   return persist(next)
+}
+
+export function trimTicketHistoryToRetention(): void {
+  persist(loadTicketHistory())
+}
+
+export function clearTicketHistoryStorage(): void {
+  try {
+    localStorage.removeItem(TICKET_HISTORY_STORAGE_KEY)
+  } catch {
+    /* storage unavailable */
+  }
 }
 
 export function historyRecordToRecentTicket(record: TicketHistoryRecord) {

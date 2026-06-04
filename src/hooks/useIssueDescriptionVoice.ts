@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { Environment } from '../types/bugReport'
+import { useAppSettings } from './useAppSettings'
+import { getSilenceTimeoutMs } from '../utils/appSettingsStorage'
 import { cleanVoiceTranscript } from '../utils/cleanVoiceTranscript'
 import { resolveEnvironmentsFromVoice } from '../utils/inferBugDetails'
 import { getSpeechRecognitionConstructor } from '../utils/voiceTranscript'
@@ -9,12 +11,18 @@ import { useVoiceSession } from './useVoiceSession'
 interface UseIssueDescriptionVoiceOptions {
   onApplyTranscript: (text: string) => void
   onApplyEnvironments: (environments: Environment[]) => void
+  onAutoGenerate?: (payload: {
+    text: string
+    environments: Environment[]
+  }) => void
 }
 
 export function useIssueDescriptionVoice({
   onApplyTranscript,
   onApplyEnvironments,
+  onAutoGenerate,
 }: UseIssueDescriptionVoiceOptions) {
+  const { settings } = useAppSettings()
   const speechSupported = useMemo(
     () => getSpeechRecognitionConstructor() !== null,
     [],
@@ -33,13 +41,26 @@ export function useIssueDescriptionVoice({
       }
 
       setFlowError(null)
+      const environments = resolveEnvironmentsFromVoice(rawTranscript)
       onApplyTranscript(cleaned)
-      onApplyEnvironments(resolveEnvironmentsFromVoice(rawTranscript))
+      onApplyEnvironments(environments)
+      if (settings.ai.autoGenerateAfterVoice) {
+        onAutoGenerate?.({ text: cleaned, environments })
+      }
     },
-    [onApplyEnvironments, onApplyTranscript],
+    [
+      onApplyEnvironments,
+      onApplyTranscript,
+      onAutoGenerate,
+      settings.ai.autoGenerateAfterVoice,
+    ],
   )
 
-  const session = useVoiceSession({ onSessionComplete: handleSessionComplete })
+  const session = useVoiceSession({
+    onSessionComplete: handleSessionComplete,
+    silenceTimeoutMs: getSilenceTimeoutMs(settings),
+    language: settings.voice.language,
+  })
 
   const toggleVoice = useCallback(() => {
     if (session.isListening) {

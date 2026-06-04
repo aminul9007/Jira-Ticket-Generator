@@ -6,12 +6,32 @@ import {
   buildKnowledgeContext,
   formatKnowledgeForPrompt,
 } from '../../services/knowledge/knowledgeContextService'
+import { loadAppSettings } from '../../utils/appSettingsStorage'
 import { isCustomProjectKnowledge } from '../../utils/qaContextStorage'
+import { formatProjectContextForPrompt } from '../../services/knowledge/projectContextPrompt'
+import { hasProjectContextContent } from '../../utils/projectContextFormat'
 import { getTicketHistory } from '../../services/history/ticketHistoryService'
 import {
   findSimilarTickets,
   formatHistoricalTicketsForPrompt,
 } from '../../services/memory/memoryEngine'
+
+function resolveProjectContextSection(
+  knowledgeSettings: ProjectKnowledgeSettings,
+): string {
+  const appSettings = loadAppSettings()
+  const fromTextarea = formatProjectContextForPrompt(appSettings.ai.projectContext)
+  if (hasProjectContextContent(appSettings.ai.projectContext)) {
+    return fromTextarea
+  }
+
+  const knowledge = buildKnowledgeContext(knowledgeSettings)
+  if (isCustomProjectKnowledge(knowledgeSettings)) {
+    return formatKnowledgeForPrompt(knowledge)
+  }
+
+  return ''
+}
 
 export function buildAiGenerationContext(
   values: ValidatedBugReportFormValues,
@@ -19,6 +39,7 @@ export function buildAiGenerationContext(
 ): AiGenerationContext {
   const history = getTicketHistory()
   const feedback = loadTicketFeedback()
+  const appSettings = loadAppSettings()
 
   const knowledge = buildKnowledgeContext(knowledgeSettings)
   const similarTickets = findSimilarTickets(values, history)
@@ -32,7 +53,14 @@ export function buildAiGenerationContext(
     })),
   )
 
-  return { knowledge, knowledgeSettings: knowledgeSettings, similarTickets, feedbackSummary }
+  return {
+    knowledge,
+    knowledgeSettings,
+    projectContextSection: resolveProjectContextSection(knowledgeSettings),
+    aiOutputStyle: appSettings.ai.outputStyle,
+    similarTickets,
+    feedbackSummary,
+  }
 }
 
 export function buildPromptSections(input: PromptGenerationInput): {

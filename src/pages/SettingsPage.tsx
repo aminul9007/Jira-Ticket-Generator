@@ -1,10 +1,82 @@
-import { QaContextForm } from '../components/settings/QaContextForm'
+import { AiConfigSection } from '../components/settings/AiConfigSection'
+import { DataHistorySection } from '../components/settings/DataHistorySection'
+import { JiraIntegrationSection } from '../components/settings/JiraIntegrationSection'
+import { SettingsPageCard } from '../components/settings/SettingsPageCard'
+import { TicketDefaultsSection } from '../components/settings/TicketDefaultsSection'
+import { VoiceSettingsSection } from '../components/settings/VoiceSettingsSection'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
+import { Button } from '../components/ui/Button'
 
 interface SettingsPageProps {
   onBack: () => void
 }
+
+const AiIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinejoin="round"
+    />
+    <path d="M5 19h14M8 16h8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+)
+
+const VoiceIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+    <path d="M6 11v1a6 6 0 0 0 12 0v-1" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+)
+
+const JiraIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M7 7h10v10H7V7Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinejoin="round"
+    />
+    <path d="M12 7v10M7 12h10" stroke="currentColor" strokeWidth="1.75" />
+  </svg>
+)
+
+const DefaultsIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 6h16M4 12h10M4 18h6"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+    />
+  </svg>
+)
+
+const DataIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M5 5h14v14H5V5Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinejoin="round"
+    />
+    <path d="M9 9h6v6H9V9Z" stroke="currentColor" strokeWidth="1.75" />
+  </svg>
+)
+
+const SECTION_LINKS = [
+  { id: 'ai-config', label: 'AI' },
+  { id: 'voice-settings', label: 'Voice' },
+  { id: 'jira-integration', label: 'Jira' },
+  { id: 'ticket-defaults', label: 'Defaults' },
+  { id: 'data-history', label: 'Data' },
+] as const
 
 export function SettingsPage({ onBack }: SettingsPageProps) {
   return (
@@ -15,23 +87,77 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
       }}
     >
       <PageHeader
-        title="Project Knowledge Base"
-        description="Configure project context, testing standards, and terminology so AI-generated tickets match your team's patterns."
+        title="Settings"
+        description="Tune AI quality, voice input, Jira integration, and defaults — built for fast QA workflows."
       />
 
-      <div className="max-w-2xl">
-        <QaContextForm />
-      </div>
+      <nav
+        aria-label="Settings sections"
+        className="mb-6 flex flex-wrap gap-2"
+      >
+        {SECTION_LINKS.map((link) => (
+          <a
+            key={link.id}
+            href={`#${link.id}`}
+            className="rounded-lg border border-border-strong bg-surface-elevated px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-brand/40 hover:text-brand"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
 
-      <p className="mt-6 text-sm text-text-muted">
-        <button
-          type="button"
-          className="font-medium text-brand hover:text-brand-hover"
-          onClick={onBack}
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-8">
+        <SettingsPageCard
+          id="ai-config"
+          title="AI Configuration"
+          description="Improve ticket quality and speed up generation with project-specific context."
+          icon={AiIcon}
         >
-          ← Back to dashboard
-        </button>
-      </p>
+          <AiConfigSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="voice-settings"
+          title="Voice Settings"
+          description="Control dictation behavior on the Issue Description field."
+          icon={VoiceIcon}
+        >
+          <VoiceSettingsSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="jira-integration"
+          title="Jira Integration"
+          description="Connect Jira Cloud for future one-click issue creation."
+          icon={JiraIcon}
+        >
+          <JiraIntegrationSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="ticket-defaults"
+          title="Ticket Defaults"
+          description="Reduce repetitive fields when filing bugs to Jira."
+          icon={DefaultsIcon}
+        >
+          <TicketDefaultsSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="data-history"
+          title="Data & History"
+          description="Manage locally stored ticket history on this device."
+          icon={DataIcon}
+        >
+          <DataHistorySection />
+        </SettingsPageCard>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            ← Back to dashboard
+          </Button>
+        </div>
+      </div>
     </DashboardLayout>
   )
 }

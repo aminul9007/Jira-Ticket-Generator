@@ -4,6 +4,8 @@ import {
   addTicketHistoryRecord,
   buildFormSnapshot,
   buildHistoryRecord,
+  clearTicketHistoryStorage,
+  trimTicketHistoryToRetention,
   loadTicketHistory,
   removeTicketHistoryRecord,
   updateTicketHistoryRecord,
@@ -42,6 +44,19 @@ export function finalizeTicketHistory(
 
 export function deleteTicketHistoryRecord(id: string): void {
   removeTicketHistoryRecord(id)
+}
+
+export function clearAllTicketHistory(): void {
+  clearTicketHistoryStorage()
+}
+
+export function exportTicketHistory() {
+  return loadTicketHistory()
+}
+
+/** Re-trim stored history to the current retention setting. */
+export function applyHistoryRetentionLimit(): void {
+  trimTicketHistoryToRetention()
 }
 
 export { loadTicketHistory, historyRecordToRecentTicket } from '../../utils/ticketHistoryStorage'
