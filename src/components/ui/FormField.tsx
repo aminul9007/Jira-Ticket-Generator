@@ -7,7 +7,7 @@ interface FormFieldProps {
 }
 
 export function FormField({ children, className }: FormFieldProps) {
-  return <div className={cn('space-y-2', className)}>{children}</div>
+  return <div className={cn('space-y-3', className)}>{children}</div>
 }
 
 interface FormSectionProps {

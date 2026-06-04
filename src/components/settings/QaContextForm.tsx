@@ -42,7 +42,7 @@ export function QaContextForm() {
         }
       />
 
-      <div className="space-y-2">
+      <div className="space-y-8">
         <SettingsSection
           title="Project"
           description="Core product identity and goals used in titles and summaries."

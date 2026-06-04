@@ -31,7 +31,7 @@ export function Label({
         )}
       </label>
       {hint && (
-        <p className="mt-1 text-xs leading-relaxed text-text-muted">{hint}</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-text-muted">{hint}</p>
       )}
     </div>
   )

@@ -19,7 +19,7 @@ function normalizeList(items: string[]): string[] {
 }
 
 function normalizeText(value: string | undefined): string {
-  return value?.trim() ?? ''
+  return value ?? ''
 }
 
 type LegacySettings = Partial<ProjectKnowledgeSettings> & {
