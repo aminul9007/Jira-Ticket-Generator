@@ -12,12 +12,13 @@ export type TicketSeverity = 'Critical' | 'High' | 'Medium' | 'Low'
 
 export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4'
 
+/** Minimal dashboard form state — only user-entered fields. */
 export interface BugReportFormValues {
   issueDescription: string
   environments: Environment[]
 }
 
-/** Form values ready for ticket generation. */
+/** Valid form state (non-empty issue description). No inferred fields. */
 export interface ValidatedBugReportFormValues extends BugReportFormValues {
   issueDescription: string
 }
@@ -40,7 +41,7 @@ export interface GeneratedTicket {
   affectedFeaturePage?: string
 }
 
-/** Internal shape used by the rules engine after inferring metadata from description. */
+/** Rules-engine input after inferring category, feature, and title from description. */
 export interface ResolvedBugInput extends ValidatedBugReportFormValues {
   category: BugCategory
   affectedFeaturePage: string
