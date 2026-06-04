@@ -66,6 +66,16 @@ export function inferEnvironmentsFromText(description: string): Environment[] {
   return inferred
 }
 
+/** Voice dictation: all environments when none mentioned; otherwise only those spoken. */
+export function resolveEnvironmentsFromVoice(description: string): Environment[] {
+  const inferred = inferEnvironmentsFromText(description)
+  if (inferred.length === 0) {
+    return [...ENVIRONMENTS]
+  }
+
+  return ENVIRONMENTS.filter((env) => inferred.includes(env))
+}
+
 export function mergeEnvironments(
   selected: Environment[],
   inferred: Environment[],

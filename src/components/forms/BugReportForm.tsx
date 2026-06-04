@@ -7,7 +7,7 @@ import { Card, CardHeader } from '../ui/Card'
 import { FormField } from '../ui/FormField'
 import { EnvironmentMultiSelect } from './EnvironmentMultiSelect'
 import { InputQualityAlerts } from './InputQualityAlerts'
-import { IssueDescriptionVoiceInput } from './IssueDescriptionVoiceInput'
+import { IssueDescriptionInput } from './IssueDescriptionInput'
 
 interface BugReportFormProps {
   values: BugReportFormValues
@@ -15,6 +15,7 @@ interface BugReportFormProps {
   isGenerating: boolean
   isValid: boolean
   onEnvironmentToggle: (env: Environment) => void
+  onSetEnvironments: (environments: Environment[]) => void
   onIssueDescriptionChange: (value: string) => void
   onGenerate: () => void
 }
@@ -37,6 +38,7 @@ export function BugReportForm({
   isGenerating,
   isValid,
   onEnvironmentToggle,
+  onSetEnvironments,
   onIssueDescriptionChange,
   onGenerate,
 }: BugReportFormProps) {
@@ -59,12 +61,12 @@ export function BugReportForm({
     <Card id="bug-report-form" variant="elevated" className="h-full">
       <CardHeader
         title="Quick Bug Report"
-        description="Paste what you found — AI infers category, feature, severity, and priority."
+        description="Describe the bug — type or use the mic — then generate a Jira-ready ticket."
         icon={FormIcon}
       />
       <form onSubmit={handleSubmit} className="space-y-6">
         <FormField>
-          <IssueDescriptionVoiceInput
+          <IssueDescriptionInput
             id="issue-description"
             value={values.issueDescription}
             maxLength={2000}
@@ -74,6 +76,7 @@ export function BugReportForm({
 
 Example: On Production, checkout button stays disabled after entering a valid address on iPhone Safari 17."
             onChange={onIssueDescriptionChange}
+            onEnvironmentsFromVoice={onSetEnvironments}
             onKeyDown={handleKeyDown}
           />
           <p className="text-xs text-text-muted">Ctrl+Enter to generate</p>

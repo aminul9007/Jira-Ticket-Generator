@@ -51,7 +51,7 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
     >
       <PageHeader
         title="Quick bug ticket"
-        description="Paste an issue description, generate a Jira-ready ticket in seconds, edit if needed, then copy."
+        description="Describe the issue (type or mic), generate a Jira-ready ticket, edit if needed, then create in Jira."
       />
 
       <div className="grid gap-6 xl:grid-cols-2 xl:gap-8 xl:items-start">
@@ -62,6 +62,7 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             isGenerating={isGenerating}
             isValid={form.isValid}
             onEnvironmentToggle={form.toggleEnvironment}
+            onSetEnvironments={form.setEnvironments}
             onIssueDescriptionChange={form.setIssueDescription}
             onGenerate={onGenerate}
           />

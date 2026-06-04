@@ -60,7 +60,7 @@ export function TicketEditorToolbar({
             disabled={!editedTicket}
             onClick={handleCopy}
           >
-            Copy Jira ticket
+            Create Jira Ticket
           </Button>
         </div>
       </div>

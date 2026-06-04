@@ -5,6 +5,7 @@ import {
   inferEnvironmentsFromText,
   inferFeature,
   mergeEnvironments,
+  resolveEnvironmentsFromVoice,
 } from './inferBugDetails'
 
 describe('inferBugDetails', () => {
@@ -18,6 +19,20 @@ describe('inferBugDetails', () => {
 
   it('infers production environment from text', () => {
     expect(inferEnvironmentsFromText('Happens on production checkout')).toEqual(['Production'])
+  })
+
+  it('selects all environments from voice when none mentioned', () => {
+    expect(resolveEnvironmentsFromVoice('Checkout button broken on Safari')).toEqual([
+      'Canary',
+      'Beta',
+      'Production',
+    ])
+  })
+
+  it('selects only spoken environments from voice', () => {
+    expect(
+      resolveEnvironmentsFromVoice('Fails on production and beta checkout'),
+    ).toEqual(['Beta', 'Production'])
   })
 
   it('extracts checkout feature from description', () => {

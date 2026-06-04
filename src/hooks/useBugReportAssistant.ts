@@ -21,6 +21,7 @@ export function useBugReportAssistant() {
     values,
     isValid,
     setIssueDescription,
+    setEnvironments,
     toggleEnvironment,
     reset: resetForm,
   } = useBugReportForm()
@@ -125,6 +126,7 @@ export function useBugReportAssistant() {
       values,
       isValid,
       setIssueDescription,
+      setEnvironments,
       toggleEnvironment,
       reset: resetForm,
     },

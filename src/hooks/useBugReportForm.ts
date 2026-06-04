@@ -26,6 +26,10 @@ export function useBugReportForm() {
     })
   }, [])
 
+  const setEnvironments = useCallback((environments: Environment[]) => {
+    setValues((prev) => ({ ...prev, environments }))
+  }, [])
+
   const reset = useCallback(() => {
     setValues(initialValues)
   }, [])
@@ -36,6 +40,7 @@ export function useBugReportForm() {
     values,
     isValid,
     setIssueDescription,
+    setEnvironments,
     toggleEnvironment,
     reset,
   }
