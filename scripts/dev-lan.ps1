@@ -40,8 +40,9 @@ Write-Host '========================================' -ForegroundColor Cyan
 Write-Host '  Jira Ticket Generator - Dev Server' -ForegroundColor Cyan
 Write-Host '========================================' -ForegroundColor Cyan
 Write-Host ''
-Write-Host "  This PC:     http://localhost:5173" -ForegroundColor White
-Write-Host "  Other devices: http://${lanIp}:5173" -ForegroundColor Yellow
+Write-Host "  This PC:       https://localhost:5173" -ForegroundColor White
+Write-Host "  Other devices: https://${lanIp}:5173" -ForegroundColor Yellow
+Write-Host "  (Accept the self-signed certificate warning on each device.)" -ForegroundColor DarkGray
 Write-Host ''
 
 if (-not $firewallOk) {
