@@ -1,4 +1,4 @@
-import { generateTicketWithOpenAi, isAiProviderConfigured } from '../../ai/providers/openAiProvider'
+import { generateTicketWithAi, isAiProviderConfigured } from '../../ai/providers/aiProvider'
 import { buildAiGenerationContext } from '../../ai/services/generationContextService'
 import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 import type { ProjectKnowledgeSettings } from '../../types/projectKnowledge'
@@ -20,9 +20,9 @@ export async function generateTicket(
   const generationContext = buildAiGenerationContext(values, knowledgeSettings)
 
   if (isAiProviderConfigured()) {
-    const aiTicket = await generateTicketWithOpenAi(values, generationContext)
-    if (aiTicket) {
-      return { ticket: aiTicket, usedAi: true }
+    const aiResult = await generateTicketWithAi(values, generationContext)
+    if (aiResult) {
+      return { ticket: aiResult.ticket, usedAi: true }
     }
   }
 

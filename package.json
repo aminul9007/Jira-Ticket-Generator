@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run",
+    "llama:server": "powershell -ExecutionPolicy Bypass -File ./scripts/start-llama.ps1",
     "preview": "vite preview"
   },
   "dependencies": {
