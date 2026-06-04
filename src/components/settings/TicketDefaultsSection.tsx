@@ -1,9 +1,9 @@
 import { useAppSettings } from '../../hooks/useAppSettings'
 import type { DefaultIssueType } from '../../types/appSettings'
 import { Input } from '../ui/Input'
-import { Select } from '../ui/Select'
 import { TagListEditor } from './TagListEditor'
 import { SettingsField } from './SettingsField'
+import { SettingsSelect } from './SettingsSelect'
 
 export function TicketDefaultsSection() {
   const { settings, updateTicketDefaults } = useAppSettings()
@@ -26,19 +26,18 @@ export function TicketDefaultsSection() {
         />
       </SettingsField>
 
-      <SettingsField id="default-issue-type" label="Default issue type">
-        <Select
-          id="default-issue-type"
-          value={ticketDefaults.issueType}
-          onChange={(e) =>
-            updateTicketDefaults({ issueType: e.target.value as DefaultIssueType })
-          }
-        >
-          <option value="Bug">Bug</option>
-          <option value="Task">Task</option>
-          <option value="Story">Story</option>
-        </Select>
-      </SettingsField>
+      <SettingsSelect
+        fieldId="default-issue-type"
+        label="Default issue type"
+        value={ticketDefaults.issueType}
+        onChange={(e) =>
+          updateTicketDefaults({ issueType: e.target.value as DefaultIssueType })
+        }
+      >
+        <option value="Bug">Bug</option>
+        <option value="Task">Task</option>
+        <option value="Story">Story</option>
+      </SettingsSelect>
 
       <TagListEditor
         id="default-labels"

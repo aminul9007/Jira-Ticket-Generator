@@ -1,7 +1,6 @@
 import { generateTicketWithAi, isAiProviderConfigured } from '../../ai/providers/aiProvider'
 import { buildAiGenerationContext } from '../../ai/services/generationContextService'
 import type { GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
-import type { ProjectKnowledgeSettings } from '../../types/projectKnowledge'
 import { analyzeInputQuality } from './inputQualityAnalyzer'
 import { generateSeniorQaTicket } from './seniorQaTicketGenerator'
 
@@ -14,10 +13,9 @@ export interface TicketGenerationResult {
 
 export async function generateTicket(
   values: ValidatedBugReportFormValues,
-  knowledgeSettings: ProjectKnowledgeSettings,
 ): Promise<TicketGenerationResult> {
   const qualityReport = analyzeInputQuality(values)
-  const generationContext = buildAiGenerationContext(values, knowledgeSettings)
+  const generationContext = buildAiGenerationContext(values)
 
   if (isAiProviderConfigured()) {
     const aiResult = await generateTicketWithAi(values, generationContext)

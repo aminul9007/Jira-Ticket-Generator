@@ -15,6 +15,7 @@ interface UseVoiceSessionOptions {
   silenceTimeoutMs?: number
   language?: string
   onSessionComplete?: (transcript: string) => void
+  onTranscriptUpdate?: (transcript: string) => void
 }
 
 function buildLiveTranscript(final: string, interim: string): string {
@@ -26,6 +27,7 @@ export function useVoiceSession({
   silenceTimeoutMs = SILENCE_TIMEOUT_MS,
   language,
   onSessionComplete,
+  onTranscriptUpdate,
 }: UseVoiceSessionOptions = {}) {
   const [status, setStatus] = useState<VoiceSessionStatus>('idle')
   const [transcript, setTranscript] = useState('')
@@ -37,12 +39,17 @@ export function useVoiceSession({
   const keepListeningRef = useRef(false)
   const lastSpeechAtRef = useRef(0)
   const onCompleteRef = useRef(onSessionComplete)
+  const onTranscriptUpdateRef = useRef(onTranscriptUpdate)
 
   const isSupported = getSpeechRecognitionConstructor() !== null
 
   useEffect(() => {
     onCompleteRef.current = onSessionComplete
   }, [onSessionComplete])
+
+  useEffect(() => {
+    onTranscriptUpdateRef.current = onTranscriptUpdate
+  }, [onTranscriptUpdate])
 
   const finalizeSession = useCallback(() => {
     const text = buildLiveTranscript(finalTranscriptRef.current, '').slice(
@@ -69,12 +76,12 @@ export function useVoiceSession({
           event.results,
         )
         finalTranscriptRef.current = finalTranscript
-        setTranscript(
-          buildLiveTranscript(finalTranscript, interimTranscript).slice(
-            0,
-            maxLength,
-          ),
+        const live = buildLiveTranscript(finalTranscript, interimTranscript).slice(
+          0,
+          maxLength,
         )
+        setTranscript(live)
+        onTranscriptUpdateRef.current?.(live)
       }
 
       recognition.onerror = (event) => {

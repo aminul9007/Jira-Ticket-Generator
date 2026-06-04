@@ -10,8 +10,7 @@ import type { HistoryRetentionCount } from '../../types/appSettings'
 import { downloadJsonFile } from '../../utils/downloadJson'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
-import { Select } from '../ui/Select'
-import { SettingsField } from './SettingsField'
+import { SettingsSelect } from './SettingsSelect'
 
 interface DataHistorySectionProps {
   onHistoryCleared?: () => void
@@ -37,26 +36,22 @@ export function DataHistorySection({ onHistoryCleared }: DataHistorySectionProps
 
   return (
     <>
-      <SettingsField
-        id="history-retention"
+      <SettingsSelect
+        fieldId="history-retention"
         label="Ticket history retention"
         hint={`Keeps up to this many tickets in local storage. Currently storing ${recordCount}.`}
+        value={String(settings.data.historyRetention)}
+        onChange={(e) => {
+          updateData({
+            historyRetention: Number(e.target.value) as HistoryRetentionCount,
+          })
+          applyHistoryRetentionLimit()
+        }}
       >
-        <Select
-          id="history-retention"
-          value={String(settings.data.historyRetention)}
-          onChange={(e) => {
-            updateData({
-              historyRetention: Number(e.target.value) as HistoryRetentionCount,
-            })
-            applyHistoryRetentionLimit()
-          }}
-        >
-          <option value="30">30 tickets</option>
-          <option value="50">50 tickets</option>
-          <option value="100">100 tickets</option>
-        </Select>
-      </SettingsField>
+        <option value="30">30 tickets</option>
+        <option value="50">50 tickets</option>
+        <option value="100">100 tickets</option>
+      </SettingsSelect>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button type="button" variant="secondary" onClick={handleExport}>

@@ -20,6 +20,8 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
   className,
 }: SegmentedControlProps<T>) {
+  const groupName = ariaLabel.replace(/\s+/g, '-').toLowerCase()
+
   return (
     <div
       className={cn(
@@ -31,23 +33,29 @@ export function SegmentedControl<T extends string>({
     >
       {options.map((option) => {
         const isActive = option.value === value
+        const inputId = `${groupName}-${option.value}`
         return (
-          <button
+          <label
             key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={isActive}
+            htmlFor={inputId}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-xs font-semibold transition-all sm:px-4 sm:text-sm',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated',
+              'cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-all sm:px-4 sm:text-sm',
+              'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand has-[:focus-visible]:ring-offset-1 has-[:focus-visible]:ring-offset-surface-elevated',
               isActive
                 ? 'bg-surface-elevated text-text-primary shadow-sm'
                 : 'text-text-muted hover:text-text-secondary',
             )}
-            onClick={() => onChange(option.value)}
           >
+            <input
+              id={inputId}
+              type="radio"
+              name={groupName}
+              checked={isActive}
+              onChange={() => onChange(option.value)}
+              className="sr-only"
+            />
             {option.label}
-          </button>
+          </label>
         )
       })}
     </div>

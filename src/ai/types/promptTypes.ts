@@ -1,4 +1,5 @@
 import type { BugCategory } from '../../types/bugReport'
+import type { ExtractedContext } from '../../types/contextDetection'
 
 export interface PromptBundle {
   systemPrompt: string
@@ -24,4 +25,5 @@ export interface ReportContext {
   environments: string
   hasEnvironmentHint: boolean
   isProduction: boolean
+  qaContext: ExtractedContext
 }

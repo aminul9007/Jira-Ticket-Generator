@@ -1,10 +1,10 @@
 import { PROJECT_CONTEXT_PLACEHOLDER } from '../../data/defaultAppSettings'
 import { useAppSettings } from '../../hooks/useAppSettings'
 import type { AiOutputStyle } from '../../types/appSettings'
-import { Select } from '../ui/Select'
 import { Textarea } from '../ui/Textarea'
 import { Toggle } from '../ui/Toggle'
 import { SettingsField } from './SettingsField'
+import { SettingsSelect } from './SettingsSelect'
 
 export function AiConfigSection() {
   const { settings, updateAi } = useAppSettings()
@@ -27,21 +27,17 @@ export function AiConfigSection() {
         />
       </SettingsField>
 
-      <SettingsField
-        id="ai-output-style"
+      <SettingsSelect
+        fieldId="ai-output-style"
         label="AI output style"
         hint="Controls how verbose AI-generated summaries and steps are."
+        value={ai.outputStyle}
+        onChange={(e) => updateAi({ outputStyle: e.target.value as AiOutputStyle })}
       >
-        <Select
-          id="ai-output-style"
-          value={ai.outputStyle}
-          onChange={(e) => updateAi({ outputStyle: e.target.value as AiOutputStyle })}
-        >
-          <option value="concise">Concise</option>
-          <option value="standard">Standard</option>
-          <option value="detailed">Detailed</option>
-        </Select>
-      </SettingsField>
+        <option value="concise">Concise</option>
+        <option value="standard">Standard</option>
+        <option value="detailed">Detailed</option>
+      </SettingsSelect>
 
       <Toggle
         id="auto-generate-voice"

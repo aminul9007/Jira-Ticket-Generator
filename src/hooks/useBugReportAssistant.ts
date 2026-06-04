@@ -13,7 +13,6 @@ import type { RecentTicketRecord } from '../types/recentTicket'
 import type { TicketFeedbackRating } from '../types/ticketFeedback'
 import { useBugReportForm } from './useBugReportForm'
 import { useGeneratedTicket } from './useGeneratedTicket'
-import { useQaContext } from './useQaContext'
 import { useRecentTickets } from './useRecentTickets'
 import { useTicketEditor } from './useTicketEditor'
 
@@ -24,6 +23,11 @@ export function useBugReportAssistant() {
     setIssueDescription,
     setEnvironments,
     toggleEnvironment,
+    setContextField,
+    clearContextField,
+    applyVoiceResult,
+    buildVoiceFormValues,
+    syncContextFromTranscript,
     reset: resetForm,
   } = useBugReportForm()
 
@@ -40,8 +44,6 @@ export function useBugReportAssistant() {
   const { loadTicket, clearTicket: clearEditor, editedTicket } = editor
   const recent = useRecentTickets()
   const { saveTicket, markActive, refreshFromHistory } = recent
-  const { settings: knowledgeSettings } = useQaContext()
-
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null)
   const [feedbackRating, setFeedbackRating] = useState<TicketFeedbackRating | null>(null)
 
@@ -64,17 +66,16 @@ export function useBugReportAssistant() {
 
   const generateTicket = useCallback(
     async (overrideValues?: BugReportFormValues) => {
+      if (overrideValues) {
+        applyVoiceResult(overrideValues.issueDescription)
+      }
       const formValues = overrideValues ?? values
       if (activeHistoryId && editedTicket) {
         finalizeTicketHistory(activeHistoryId, editedTicket)
       }
 
-      const result = await generateFromForm(formValues, knowledgeSettings)
+      const result = await generateFromForm(formValues)
       if (result) {
-        if (overrideValues) {
-          setIssueDescription(overrideValues.issueDescription)
-          setEnvironments(overrideValues.environments)
-        }
         const historyRecord = saveGeneratedTicketHistory(
           formValues,
           result.ticket,
@@ -93,12 +94,10 @@ export function useBugReportAssistant() {
     editedTicket,
     generateFromForm,
     values,
-    knowledgeSettings,
     loadTicket,
     saveTicket,
     markActive,
-    setIssueDescription,
-    setEnvironments,
+    applyVoiceResult,
   ])
 
   const reopenRecentTicket = useCallback(
@@ -138,6 +137,11 @@ export function useBugReportAssistant() {
       setIssueDescription,
       setEnvironments,
       toggleEnvironment,
+      setContextField,
+      clearContextField,
+      applyVoiceResult,
+      buildVoiceFormValues,
+      syncContextFromTranscript,
       reset: resetForm,
     },
     inputQuality,

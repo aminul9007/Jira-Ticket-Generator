@@ -5,12 +5,14 @@ interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   children: ReactNode
   required?: boolean
   hint?: string
+  hintId?: string
 }
 
 export function Label({
   children,
   required,
   hint,
+  hintId,
   className,
   ...props
 }: LabelProps) {
@@ -31,7 +33,9 @@ export function Label({
         )}
       </label>
       {hint && (
-        <p className="mt-1.5 text-xs leading-relaxed text-text-muted">{hint}</p>
+        <p id={hintId} className="mt-1.5 text-xs leading-relaxed text-text-muted">
+          {hint}
+        </p>
       )}
     </div>
   )

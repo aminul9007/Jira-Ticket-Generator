@@ -89,7 +89,9 @@ export function Dropdown({
               key={item.id}
               type="button"
               role="menuitemradio"
-              aria-checked={item.isActive}
+              {...(item.isActive
+                ? { 'aria-checked': 'true' as const }
+                : { 'aria-checked': 'false' as const })}
               className={cn(
                 'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                 'text-text-primary hover:bg-hover-surface focus-visible:outline-none focus-visible:bg-hover-surface',

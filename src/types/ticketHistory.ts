@@ -1,9 +1,11 @@
 import type { BugReportFormValues, GeneratedTicket } from './bugReport'
+import type { ExtractedContext } from './contextDetection'
 import type { EditableTicketField } from './ticketEditor'
 
 export interface TicketHistoryFormSnapshot {
   issueDescription: string
   environments: BugReportFormValues['environments']
+  qaContext: ExtractedContext
 }
 
 export interface TicketHistoryRecord {

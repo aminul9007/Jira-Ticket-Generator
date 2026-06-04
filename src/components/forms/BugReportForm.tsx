@@ -5,6 +5,8 @@ import { MIN_ISSUE_DESCRIPTION_LENGTH } from '../../utils/validateForm'
 import { Button } from '../ui/Button'
 import { Card, CardHeader } from '../ui/Card'
 import { FormField } from '../ui/FormField'
+import type { ExtractedContext } from '../../types/contextDetection'
+import { ContextMetadataChips } from './ContextMetadataChips'
 import { EnvironmentMultiSelect } from './EnvironmentMultiSelect'
 import { InputQualityAlerts } from './InputQualityAlerts'
 import { IssueDescriptionInput } from './IssueDescriptionInput'
@@ -15,10 +17,16 @@ interface BugReportFormProps {
   isGenerating: boolean
   isValid: boolean
   onEnvironmentToggle: (env: Environment) => void
-  onSetEnvironments: (environments: Environment[]) => void
   onIssueDescriptionChange: (value: string) => void
+  onVoiceComplete: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
+  onVoiceTranscriptUpdate?: (transcript: string) => void
+  onContextFieldChange: <K extends keyof ExtractedContext>(
+    field: K,
+    value: ExtractedContext[K]['value'],
+  ) => void
+  onContextFieldClear: (field: keyof ExtractedContext) => void
   onGenerate: () => void
-  onVoiceAutoGenerate?: (values: BugReportFormValues) => void
+  onVoiceAutoGenerate?: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
 }
 
 const FormIcon = (
@@ -39,8 +47,11 @@ export function BugReportForm({
   isGenerating,
   isValid,
   onEnvironmentToggle,
-  onSetEnvironments,
   onIssueDescriptionChange,
+  onVoiceComplete,
+  onVoiceTranscriptUpdate,
+  onContextFieldChange,
+  onContextFieldClear,
   onGenerate,
   onVoiceAutoGenerate,
 }: BugReportFormProps) {
@@ -78,20 +89,19 @@ export function BugReportForm({
 
 Example: On Production, checkout button stays disabled after entering a valid address on iPhone Safari 17."
             onChange={onIssueDescriptionChange}
-            onEnvironmentsFromVoice={onSetEnvironments}
-            onVoiceAutoGenerate={
-              onVoiceAutoGenerate
-                ? (payload) =>
-                    onVoiceAutoGenerate({
-                      issueDescription: payload.text,
-                      environments: payload.environments,
-                    })
-                : undefined
-            }
+            onVoiceComplete={onVoiceComplete}
+            onVoiceTranscriptUpdate={onVoiceTranscriptUpdate}
+            onVoiceAutoGenerate={onVoiceAutoGenerate}
             onKeyDown={handleKeyDown}
           />
           <p className="text-xs text-text-muted">Ctrl+Enter to generate</p>
         </FormField>
+
+        <ContextMetadataChips
+          context={values.qaContext}
+          onFieldChange={onContextFieldChange}
+          onFieldClear={onContextFieldClear}
+        />
 
         <EnvironmentMultiSelect
           selected={values.environments}

@@ -5,10 +5,25 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   hasError?: boolean
 }
 
-export function Select({ className, hasError, children, ...props }: SelectProps) {
+export function Select({
+  className,
+  hasError,
+  children,
+  id,
+  title,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  ...props
+}: SelectProps) {
   return (
     <div className="relative">
       <select
+        id={id}
+        title={title}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
         className={cn(
           'w-full appearance-none rounded-xl border bg-surface-subtle/50 px-3.5 py-3 pr-11 text-sm text-text-primary',
           'transition-all duration-150 focus-visible:outline-none focus-visible:border-brand focus-visible:bg-surface-elevated focus-visible:ring-[3px] focus-visible:ring-brand/15',

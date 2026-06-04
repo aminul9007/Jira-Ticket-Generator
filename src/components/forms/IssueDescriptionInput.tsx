@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react'
 import { useAppSettings } from '../../hooks/useAppSettings'
 import { useIssueDescriptionVoice } from '../../hooks/useIssueDescriptionVoice'
-import type { Environment } from '../../types/bugReport'
+import type { BugReportFormValues } from '../../types/bugReport'
 import { cn } from '../../utils/cn'
 import { Label } from '../ui/Label'
 import { Textarea } from '../ui/Textarea'
@@ -14,11 +14,9 @@ interface IssueDescriptionInputProps {
   placeholder: string
   disabled?: boolean
   onChange: (value: string) => void
-  onEnvironmentsFromVoice: (environments: Environment[]) => void
-  onVoiceAutoGenerate?: (payload: {
-    text: string
-    environments: Environment[]
-  }) => void
+  onVoiceComplete: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
+  onVoiceTranscriptUpdate?: (transcript: string) => void
+  onVoiceAutoGenerate?: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
   onKeyDown?: (e: KeyboardEvent<HTMLTextAreaElement>) => void
 }
 
@@ -52,14 +50,15 @@ export function IssueDescriptionInput({
   placeholder,
   disabled = false,
   onChange,
-  onEnvironmentsFromVoice,
+  onVoiceComplete,
+  onVoiceTranscriptUpdate,
   onVoiceAutoGenerate,
   onKeyDown,
 }: IssueDescriptionInputProps) {
   const { settings } = useAppSettings()
   const voice = useIssueDescriptionVoice({
-    onApplyTranscript: onChange,
-    onApplyEnvironments: onEnvironmentsFromVoice,
+    onVoiceComplete,
+    onTranscriptUpdate: onVoiceTranscriptUpdate,
     onAutoGenerate: onVoiceAutoGenerate,
   })
 
@@ -97,7 +96,7 @@ export function IssueDescriptionInput({
             disabled={voiceDisabled}
             onClick={voice.toggleVoice}
             aria-label={micLabel}
-            aria-pressed={voice.isListening}
+            aria-pressed={voice.isListening ? 'true' : 'false'}
             title={micLabel}
             className={cn(
               'absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-xl border transition-all',

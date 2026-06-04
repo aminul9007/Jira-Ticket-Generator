@@ -9,9 +9,12 @@ interface SettingsFieldProps {
 }
 
 export function SettingsField({ id, label, hint, children }: SettingsFieldProps) {
+  const labelId = id ? `${id}-label` : undefined
+  const hintId = id && hint ? `${id}-hint` : undefined
+
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} hint={hint}>
+      <Label htmlFor={id} id={labelId} hint={hint} hintId={hintId}>
         {label}
       </Label>
       {children}

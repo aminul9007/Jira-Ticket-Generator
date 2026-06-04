@@ -1,8 +1,7 @@
 import { useAppSettings } from '../../hooks/useAppSettings'
 import type { SilenceTimeoutSeconds, VoiceLanguage } from '../../types/appSettings'
-import { Select } from '../ui/Select'
 import { Toggle } from '../ui/Toggle'
-import { SettingsField } from './SettingsField'
+import { SettingsSelect } from './SettingsSelect'
 
 export function VoiceSettingsSection() {
   const { settings, updateVoice } = useAppSettings()
@@ -10,40 +9,32 @@ export function VoiceSettingsSection() {
 
   return (
     <>
-      <SettingsField
-        id="voice-language"
+      <SettingsSelect
+        fieldId="voice-language"
         label="Voice language"
         hint="Speech recognition language for dictation."
+        value={voice.language}
+        onChange={(e) => updateVoice({ language: e.target.value as VoiceLanguage })}
       >
-        <Select
-          id="voice-language"
-          value={voice.language}
-          onChange={(e) => updateVoice({ language: e.target.value as VoiceLanguage })}
-        >
-          <option value="en-US">English (US)</option>
-          <option value="en-GB">English (UK)</option>
-        </Select>
-      </SettingsField>
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+      </SettingsSelect>
 
-      <SettingsField
-        id="silence-timeout"
+      <SettingsSelect
+        fieldId="silence-timeout"
         label="Silence timeout"
         hint="Automatically stop recording after this period of silence."
+        value={String(voice.silenceTimeoutSeconds)}
+        onChange={(e) =>
+          updateVoice({
+            silenceTimeoutSeconds: Number(e.target.value) as SilenceTimeoutSeconds,
+          })
+        }
       >
-        <Select
-          id="silence-timeout"
-          value={String(voice.silenceTimeoutSeconds)}
-          onChange={(e) =>
-            updateVoice({
-              silenceTimeoutSeconds: Number(e.target.value) as SilenceTimeoutSeconds,
-            })
-          }
-        >
-          <option value="5">5 seconds</option>
-          <option value="10">10 seconds</option>
-          <option value="15">15 seconds</option>
-        </Select>
-      </SettingsField>
+        <option value="5">5 seconds</option>
+        <option value="10">10 seconds</option>
+        <option value="15">15 seconds</option>
+      </SettingsSelect>
 
       <Toggle
         id="live-transcript"

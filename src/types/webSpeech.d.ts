@@ -47,6 +47,20 @@ interface Window {
   webkitSpeechRecognition?: typeof SpeechRecognition
 }
 
+interface NavigatorUABrandVersion {
+  brand: string
+  version: string
+}
+
+interface NavigatorUAData {
+  brands: NavigatorUABrandVersion[]
+  mobile: boolean
+}
+
+interface Navigator {
+  userAgentData?: NavigatorUAData
+}
+
 interface SpeechRecognitionErrorEvent extends Event {
   error: string
   message: string

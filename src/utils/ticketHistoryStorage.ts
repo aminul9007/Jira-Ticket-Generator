@@ -14,6 +14,7 @@ export function buildFormSnapshot(
   return {
     issueDescription: values.issueDescription.trim(),
     environments: [...values.environments],
+    qaContext: values.qaContext,
   }
 }
 

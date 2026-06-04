@@ -7,19 +7,30 @@ import { buildUserBugDescriptionSection } from '../prompts/jiraBugReportPrompt'
 import { formatCategoryInferenceSection } from '../prompts/categoryPrompts'
 import { formatHistoricalTicketsForPrompt } from './generationContextService'
 import { formatAiOutputStyleInstruction } from '../../services/knowledge/projectContextPrompt'
+import { formatDetectedEnvironmentLabel } from '../../types/contextDetection'
+import { formatExtractedContextForPrompt } from '../../utils/contextDetection/formatContextForPrompt'
 
 function buildReportContext(values: ValidatedBugReportFormValues): ReportContext {
   const description = values.issueDescription.trim()
+  const detectedEnv = values.qaContext.environment
+  const envFromContext =
+    detectedEnv.source !== 'unknown' && detectedEnv.value !== 'unknown'
+      ? formatDetectedEnvironmentLabel(detectedEnv.value)
+      : null
   const envHint =
     values.environments.length > 0
       ? values.environments.join(', ')
-      : '(not specified — infer from description)'
+      : envFromContext ?? '(not specified — infer from description)'
 
   return {
     issueDescription: description,
     environments: envHint,
-    hasEnvironmentHint: values.environments.length > 0,
-    isProduction: values.environments.includes('Production'),
+    hasEnvironmentHint:
+      values.environments.length > 0 ||
+      (detectedEnv.source !== 'unknown' && detectedEnv.value !== 'unknown'),
+    isProduction:
+      values.environments.includes('Production') || detectedEnv.value === 'production',
+    qaContext: values.qaContext,
   }
 }
 
@@ -43,6 +54,8 @@ function buildInputSection(ctx: ReportContext): string {
     buildUserBugDescriptionSection(ctx.issueDescription),
     '',
     `User-selected environments: ${ctx.environments}`,
+    '',
+    formatExtractedContextForPrompt(ctx.qaContext),
     '',
     gaps.length > 0 ? '### Input gaps to acknowledge\n' + gaps.map((g) => `- ${g}`).join('\n') : '',
   ]

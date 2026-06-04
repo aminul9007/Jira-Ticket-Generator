@@ -37,7 +37,8 @@ export function PasswordInput({
           'hover:bg-hover-surface hover:text-text-primary',
         )}
         onClick={() => setVisible((v) => !v)}
-        aria-pressed={visible}
+        aria-pressed={visible ? 'true' : 'false'}
+        aria-label={visible ? 'Hide password' : 'Show password'}
       >
         {visible ? 'Hide' : 'Show'}
       </button>

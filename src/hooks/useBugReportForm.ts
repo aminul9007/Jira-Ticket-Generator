@@ -1,17 +1,56 @@
 import { useCallback, useState } from 'react'
 import type { BugReportFormValues, Environment } from '../types/bugReport'
+import type { ExtractedContext } from '../types/contextDetection'
+import { resolveEnvironmentsFromVoice } from '../utils/inferBugDetails'
+import { mapDetectedEnvironmentToLegacy } from '../utils/contextDetection/mapDetectedEnvironment'
+import {
+  extractContext,
+  mergeExtractedContext,
+} from '../utils/contextDetection/extractContext'
 import { isBugReportFormComplete } from '../utils/validateForm'
 
-const initialValues: BugReportFormValues = {
-  issueDescription: '',
-  environments: [],
+/** Synchronous voice payload — safe to pass to generate before React state flushes. */
+export function buildVoiceFormValues(issueDescription: string): BugReportFormValues {
+  return {
+    issueDescription,
+    environments: resolveEnvironmentsFromVoice(issueDescription),
+    qaContext: extractContext(issueDescription),
+  }
 }
 
 export function useBugReportForm() {
-  const [values, setValues] = useState<BugReportFormValues>(initialValues)
+  const [values, setValues] = useState<BugReportFormValues>(() => ({
+    issueDescription: '',
+    environments: [],
+    qaContext: extractContext(''),
+  }))
+
+  const syncContextFromTranscript = useCallback((transcript: string) => {
+    const trimmed = transcript.trim()
+    if (!trimmed) return
+
+    setValues((prev) => {
+      const extracted = extractContext(trimmed)
+      const qaContext = mergeExtractedContext(prev.qaContext, extracted)
+      return {
+        ...prev,
+        qaContext,
+        environments: resolveEnvironmentsFromVoice(trimmed),
+      }
+    })
+  }, [])
 
   const setIssueDescription = useCallback((issueDescription: string) => {
-    setValues((prev) => ({ ...prev, issueDescription }))
+    setValues((prev) => {
+      const extracted = extractContext(issueDescription)
+      const qaContext = mergeExtractedContext(prev.qaContext, extracted)
+      return {
+        ...prev,
+        issueDescription,
+        qaContext,
+        environments: resolveEnvironmentsFromVoice(issueDescription),
+      }
+    })
   }, [])
 
   const toggleEnvironment = useCallback((env: Environment) => {
@@ -30,8 +69,59 @@ export function useBugReportForm() {
     setValues((prev) => ({ ...prev, environments }))
   }, [])
 
+  const setContextField = useCallback(
+    <K extends keyof ExtractedContext>(
+      field: K,
+      value: ExtractedContext[K]['value'],
+    ) => {
+      setValues((prev) => {
+        const qaContext: ExtractedContext = {
+          ...prev.qaContext,
+          [field]: { value, source: 'user' as const },
+        }
+        return {
+          ...prev,
+          qaContext,
+          environments:
+            field === 'environment'
+              ? mapDetectedEnvironmentToLegacy(value as ExtractedContext['environment']['value'])
+              : prev.environments,
+        }
+      })
+    },
+    [],
+  )
+
+  const clearContextField = useCallback((field: keyof ExtractedContext) => {
+    setValues((prev) => {
+      const unknownValue =
+        field === 'environment'
+          ? ({ value: 'unknown' as const, source: 'unknown' as const })
+          : ({ value: 'Unknown' as const, source: 'unknown' as const })
+
+      return {
+        ...prev,
+        qaContext: {
+          ...prev.qaContext,
+          [field]: unknownValue,
+        },
+        environments: field === 'environment' ? [] : prev.environments,
+      }
+    })
+  }, [])
+
+  const applyVoiceResult = useCallback((issueDescription: string) => {
+    const next = buildVoiceFormValues(issueDescription)
+    setValues(next)
+    return next
+  }, [])
+
   const reset = useCallback(() => {
-    setValues(initialValues)
+    setValues({
+      issueDescription: '',
+      environments: [],
+      qaContext: extractContext(''),
+    })
   }, [])
 
   const isValid = isBugReportFormComplete(values)
@@ -42,6 +132,11 @@ export function useBugReportForm() {
     setIssueDescription,
     setEnvironments,
     toggleEnvironment,
+    setContextField,
+    clearContextField,
+    applyVoiceResult,
+    buildVoiceFormValues,
+    syncContextFromTranscript,
     reset,
   }
 }

@@ -62,10 +62,16 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             isGenerating={isGenerating}
             isValid={form.isValid}
             onEnvironmentToggle={form.toggleEnvironment}
-            onSetEnvironments={form.setEnvironments}
             onIssueDescriptionChange={form.setIssueDescription}
+            onVoiceTranscriptUpdate={form.syncContextFromTranscript}
+            onVoiceComplete={(payload) => {
+              form.applyVoiceResult(payload.issueDescription)
+            }}
+            onContextFieldChange={form.setContextField}
+            onContextFieldClear={form.clearContextField}
             onGenerate={onGenerate}
-            onVoiceAutoGenerate={async (voiceValues) => {
+            onVoiceAutoGenerate={async (payload) => {
+              const voiceValues = form.buildVoiceFormValues(payload.issueDescription)
               const success = await generateTicket(voiceValues)
               if (success) {
                 document

@@ -33,21 +33,26 @@ export function EnvironmentMultiSelect({
         <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {ENVIRONMENTS.map((env) => {
             const isSelected = selected.includes(env)
+            const inputId = `env-${env.toLowerCase()}`
             return (
-              <button
+              <label
                 key={env}
-                type="button"
-                role="checkbox"
-                aria-checked={isSelected}
-                onClick={() => onToggle(env)}
+                htmlFor={inputId}
                 className={cn(
-                  'group relative flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-150',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+                  'group relative flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-150',
+                  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand has-[:focus-visible]:ring-offset-2',
                   isSelected
                     ? 'border-brand bg-brand-muted text-brand shadow-sm shadow-brand/10'
                     : 'border-border-strong bg-surface-subtle/40 text-text-secondary hover:border-hover-border hover:bg-surface-elevated hover:text-text-primary',
                 )}
               >
+                <input
+                  id={inputId}
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => onToggle(env)}
+                  className="sr-only"
+                />
                 <span
                   className={cn(
                     'flex size-4 shrink-0 items-center justify-center rounded-md border transition-colors',
@@ -70,7 +75,7 @@ export function EnvironmentMultiSelect({
                   )}
                 </span>
                 {env}
-              </button>
+              </label>
             )
           })}
         </div>

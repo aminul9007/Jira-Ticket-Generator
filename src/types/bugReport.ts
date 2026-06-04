@@ -1,3 +1,5 @@
+import type { ExtractedContext } from './contextDetection'
+
 export type BugCategory =
   | 'UI Bug'
   | 'Functional Bug'
@@ -16,6 +18,7 @@ export type TicketPriority = 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
 export interface BugReportFormValues {
   issueDescription: string
   environments: Environment[]
+  qaContext: ExtractedContext
 }
 
 /** Valid form state (non-empty issue description). No inferred fields. */

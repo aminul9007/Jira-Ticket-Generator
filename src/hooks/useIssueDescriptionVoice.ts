@@ -1,25 +1,21 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { Environment } from '../types/bugReport'
+import type { BugReportFormValues } from '../types/bugReport'
 import { useAppSettings } from './useAppSettings'
 import { getSilenceTimeoutMs } from '../utils/appSettingsStorage'
 import { cleanVoiceTranscript } from '../utils/cleanVoiceTranscript'
-import { resolveEnvironmentsFromVoice } from '../utils/inferBugDetails'
 import { getSpeechRecognitionConstructor } from '../utils/voiceTranscript'
 import { MIN_ISSUE_DESCRIPTION_LENGTH } from '../utils/validateForm'
 import { useVoiceSession } from './useVoiceSession'
 
 interface UseIssueDescriptionVoiceOptions {
-  onApplyTranscript: (text: string) => void
-  onApplyEnvironments: (environments: Environment[]) => void
-  onAutoGenerate?: (payload: {
-    text: string
-    environments: Environment[]
-  }) => void
+  onVoiceComplete: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
+  onTranscriptUpdate?: (transcript: string) => void
+  onAutoGenerate?: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
 }
 
 export function useIssueDescriptionVoice({
-  onApplyTranscript,
-  onApplyEnvironments,
+  onVoiceComplete,
+  onTranscriptUpdate,
   onAutoGenerate,
 }: UseIssueDescriptionVoiceOptions) {
   const { settings } = useAppSettings()
@@ -41,23 +37,18 @@ export function useIssueDescriptionVoice({
       }
 
       setFlowError(null)
-      const environments = resolveEnvironmentsFromVoice(rawTranscript)
-      onApplyTranscript(cleaned)
-      onApplyEnvironments(environments)
+      const payload = { issueDescription: cleaned }
+      onVoiceComplete(payload)
       if (settings.ai.autoGenerateAfterVoice) {
-        onAutoGenerate?.({ text: cleaned, environments })
+        onAutoGenerate?.(payload)
       }
     },
-    [
-      onApplyEnvironments,
-      onApplyTranscript,
-      onAutoGenerate,
-      settings.ai.autoGenerateAfterVoice,
-    ],
+    [onAutoGenerate, onVoiceComplete, settings.ai.autoGenerateAfterVoice],
   )
 
   const session = useVoiceSession({
     onSessionComplete: handleSessionComplete,
+    onTranscriptUpdate,
     silenceTimeoutMs: getSilenceTimeoutMs(settings),
     language: settings.voice.language,
   })

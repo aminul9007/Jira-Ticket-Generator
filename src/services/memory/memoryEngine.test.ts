@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { findSimilarTickets, scoreTicketSimilarity } from './memoryEngine'
 import type { TicketHistoryRecord } from '../../types/ticketHistory'
 import type { ValidatedBugReportFormValues } from '../../types/bugReport'
+import { extractContext } from '../../utils/contextDetection/extractContext'
 
 const baseForm: ValidatedBugReportFormValues = {
   environments: ['Production'],
   issueDescription:
     'On Production checkout, the pay button stays disabled after entering a valid address on iPhone Safari.',
+  qaContext: extractContext(
+    'On Production checkout, the pay button stays disabled after entering a valid address on iPhone Safari.',
+  ),
 }
 
 function makeRecord(overrides: Partial<TicketHistoryRecord> = {}): TicketHistoryRecord {
@@ -16,6 +20,7 @@ function makeRecord(overrides: Partial<TicketHistoryRecord> = {}): TicketHistory
     formInput: {
       issueDescription: 'Checkout pay button disabled on mobile Safari after valid address',
       environments: ['Production'],
+      qaContext: baseForm.qaContext,
     },
     generatedTicket: {
       title: 'UI Bug: Checkout pay button disabled',
@@ -70,6 +75,7 @@ describe('memoryEngine', () => {
       formInput: {
         issueDescription: 'Blog page missing meta description tags in search results',
         environments: ['Beta'],
+        qaContext: extractContext('Blog page missing meta description tags'),
       },
       finalTicket: {
         ...makeRecord().finalTicket,

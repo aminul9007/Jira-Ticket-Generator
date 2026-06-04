@@ -1,5 +1,22 @@
-import type { KnowledgeContext } from '../../ai/types/generationContext'
 import type { ProjectKnowledgeSettings } from '../../types/projectKnowledge'
+
+export interface KnowledgeContext {
+  project: {
+    name: string
+    overview: string
+    description: string
+    goals: string
+  }
+  testing: {
+    guidelines: string
+    bugReportingStandards: string
+  }
+  taxonomy: {
+    environments: string[]
+    features: string[]
+    terminology: string[]
+  }
+}
 import {
   hasProjectKnowledge,
   loadProjectKnowledge,
