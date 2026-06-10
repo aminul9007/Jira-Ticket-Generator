@@ -64,6 +64,7 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
   return {
     ai: {
       projectContext: migrateProjectContext(raw ?? {}),
+      ticketGuidelines: normalizeString(ai.ticketGuidelines),
       outputStyle: normalizeEnum(ai.outputStyle, OUTPUT_STYLES, base.ai.outputStyle),
       autoGenerateAfterVoice: normalizeBoolean(
         ai.autoGenerateAfterVoice,

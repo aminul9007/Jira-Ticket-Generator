@@ -10,6 +10,8 @@ export type DefaultIssueType = 'Bug' | 'Task' | 'Story'
 
 export interface AiSettings {
   projectContext: string
+  /** Project-specific ticket writing rules, terminology, and tone — injected into AI prompts. */
+  ticketGuidelines: string
   outputStyle: AiOutputStyle
   autoGenerateAfterVoice: boolean
 }

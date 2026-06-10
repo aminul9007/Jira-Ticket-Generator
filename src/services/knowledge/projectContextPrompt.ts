@@ -16,6 +16,19 @@ export function formatProjectContextForPrompt(projectContext: string): string {
   ].join('\n')
 }
 
+export function formatTicketGuidelinesForPrompt(ticketGuidelines: string): string {
+  const trimmed = ticketGuidelines.trim()
+  if (!trimmed) return ''
+
+  return [
+    '## Ticket Writing Guidelines (project-specific training)',
+    'Follow these rules for titles, summaries, steps, and tone when generating tickets for this project.',
+    'These guidelines override generic style when they do not conflict with the bug report facts.',
+    '',
+    trimmed,
+  ].join('\n')
+}
+
 export function formatAiOutputStyleInstruction(
   style: 'concise' | 'standard' | 'detailed',
 ): string {

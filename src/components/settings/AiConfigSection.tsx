@@ -1,4 +1,7 @@
-import { PROJECT_CONTEXT_PLACEHOLDER } from '../../data/defaultAppSettings'
+import {
+  PROJECT_CONTEXT_PLACEHOLDER,
+  TICKET_GUIDELINES_PLACEHOLDER,
+} from '../../data/defaultAppSettings'
 import { useAppSettings } from '../../hooks/useAppSettings'
 import type { AiOutputStyle } from '../../types/appSettings'
 import { Textarea } from '../ui/Textarea'
@@ -15,15 +18,30 @@ export function AiConfigSection() {
       <SettingsField
         id="project-context"
         label="Project context / knowledge base"
-        hint="Injected into AI prompts to improve ticket quality. Include environments, components, and severity rules."
+        hint="Product facts: environments, components, modules, and severity rules for your project."
       >
         <Textarea
           id="project-context"
-          rows={14}
+          rows={12}
           value={ai.projectContext}
           placeholder={PROJECT_CONTEXT_PLACEHOLDER}
           onChange={(e) => updateAi({ projectContext: e.target.value })}
-          className="min-h-[280px] font-mono text-sm leading-relaxed"
+          className="min-h-[240px] font-mono text-sm leading-relaxed"
+        />
+      </SettingsField>
+
+      <SettingsField
+        id="ticket-guidelines"
+        label="Ticket writing guidelines"
+        hint="Train how tickets should read — tone, naming, title style, and environment vocabulary. Applied to every AI-generated ticket."
+      >
+        <Textarea
+          id="ticket-guidelines"
+          rows={12}
+          value={ai.ticketGuidelines}
+          placeholder={TICKET_GUIDELINES_PLACEHOLDER}
+          onChange={(e) => updateAi({ ticketGuidelines: e.target.value })}
+          className="min-h-[220px] font-mono text-sm leading-relaxed"
         />
       </SettingsField>
 

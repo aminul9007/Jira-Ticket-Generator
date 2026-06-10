@@ -1,10 +1,8 @@
 import type { ResolvedBugInput } from '../../types/bugReport'
+import { trimTitleAtWord } from '../../utils/titleText'
 import { CATEGORY_PREFIX } from './categoryConfig'
 
-function truncate(text: string, max: number): string {
-  if (text.length <= max) return text
-  return `${text.slice(0, max - 1).trim()}…`
-}
+const JIRA_TITLE_MAX = 200
 
 function envTag(values: ResolvedBugInput): string {
   if (values.environments.includes('Production')) return 'Production'
@@ -16,7 +14,7 @@ export function buildTitleSuggestions(
   values: ResolvedBugInput,
 ): [string, string, string] {
   const prefix = CATEGORY_PREFIX[values.category]
-  const shortTitle = truncate(values.shortTitle, 72)
+  const shortTitle = values.shortTitle
   const feature = values.affectedFeaturePage.trim() || null
   const env = envTag(values)
 
@@ -30,12 +28,12 @@ export function buildTitleSuggestions(
 
   const categoryShort = values.category.replace(' Bug', '').replace(' Issue', '')
   const option3 = feature
-    ? `[${categoryShort}][${env}] ${feature}: ${truncate(values.shortTitle, 55)}`
-    : `[${categoryShort}][${env}] ${truncate(values.shortTitle, 60)}`
+    ? `[${categoryShort}][${env}] ${feature}: ${shortTitle}`
+    : `[${categoryShort}][${env}] ${shortTitle}`
 
   return [
-    truncate(option1, 120),
-    truncate(option2, 120),
-    truncate(option3, 120),
+    trimTitleAtWord(option1, JIRA_TITLE_MAX),
+    trimTitleAtWord(option2, JIRA_TITLE_MAX),
+    trimTitleAtWord(option3, JIRA_TITLE_MAX),
   ]
 }

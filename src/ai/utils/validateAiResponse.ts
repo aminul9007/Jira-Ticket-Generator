@@ -5,6 +5,7 @@ import {
 } from '../../data/ticketOptions'
 import type { Environment, GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 import { isBugCategory, isEnvironment, mergeEnvironments } from '../../utils/inferBugDetails'
+import { cleanTitleText } from '../../utils/titleText'
 import { normalizeAiPayloadKeys } from './normalizeAiPayload'
 
 const SEVERITY_SET = new Set<string>(TICKET_SEVERITIES)
@@ -90,7 +91,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
   }
 
   const titles = (data.titleSuggestions as string[])
-    .map((t) => t.trim())
+    .map((t) => cleanTitleText(t))
     .filter(Boolean)
 
   while (titles.length < 3) {
@@ -105,7 +106,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
       affectedFeaturePage: String(data.affectedFeaturePage).trim(),
       environments,
       titleSuggestions: titles.slice(0, 3),
-      title: String(data.title).trim(),
+      title: cleanTitleText(String(data.title)),
       issueSummary: String(data.issueSummary).trim(),
       stepsToReproduce: (data.stepsToReproduce as string[]).map((s) => s.trim()),
       expectedResult: String(data.expectedResult).trim(),

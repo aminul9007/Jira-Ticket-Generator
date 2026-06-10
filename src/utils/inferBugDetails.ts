@@ -5,6 +5,8 @@ import type {
   ValidatedBugReportFormValues,
 } from '../types/bugReport'
 import { BUG_CATEGORIES, ENVIRONMENTS } from '../data/constants'
+import { normalizeEnvironmentPhrases } from './normalizeEnvironmentText'
+import { cleanTitleText, trimTitleAtWord } from './titleText'
 
 export function isBugCategory(value: string): value is BugCategory {
   return (BUG_CATEGORIES as readonly string[]).includes(value)
@@ -56,12 +58,12 @@ export function inferFeature(description: string): string {
 }
 
 export function inferEnvironmentsFromText(description: string): Environment[] {
-  const text = description.toLowerCase()
+  const text = normalizeEnvironmentPhrases(description).toLowerCase()
   const inferred: Environment[] = []
 
   if (/\b(production|prod)\b/.test(text)) inferred.push('Production')
-  if (/\b(beta|staging|stage)\b/.test(text)) inferred.push('Beta')
-  if (/\b(canary)\b/.test(text)) inferred.push('Canary')
+  if (/\b(beta|staging)\b/.test(text)) inferred.push('Beta')
+  if (/\bcanary\b/.test(text)) inferred.push('Canary')
 
   return inferred
 }
@@ -97,9 +99,7 @@ export function extractShortTitle(description: string): string {
   const trimmed = description.trim()
   const firstLine = trimmed.split(/\n+/)[0]?.trim() ?? trimmed
   const sentence = firstLine.split(/(?<=[.!?])\s+/)[0]?.trim() ?? firstLine
-
-  if (sentence.length <= 120) return sentence
-  return `${sentence.slice(0, 117).trim()}…`
+  return trimTitleAtWord(cleanTitleText(sentence), 100)
 }
 
 export function resolveBugInput(

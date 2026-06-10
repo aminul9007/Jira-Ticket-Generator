@@ -25,7 +25,7 @@ export function TitleSuggestions({
               <span className="type-helper mt-0.5 shrink-0 font-semibold tabular-nums">
                 {index + 1}.
               </span>
-              <span className="type-body flex-1 font-medium leading-snug">
+              <span className="type-body flex-1 break-words font-medium leading-snug whitespace-normal">
                 {title}
               </span>
               {isRecommended && (

@@ -17,8 +17,8 @@ export const JSON_OUTPUT_RULES = `
 ## Output discipline
 - Respond with valid JSON only. No markdown fences. No commentary outside JSON.
 - Match the Required JSON schema section exactly (field names, types, enums).
-- titleSuggestions must contain exactly 3 unique strings.
-- title must equal the strongest option from titleSuggestions (or a trimmed variant of it).
+- titleSuggestions must contain exactly 3 unique, complete strings (no trailing "..." or ellipsis).
+- title must equal the strongest option from titleSuggestions (or a lightly refined variant — still complete).
 - stepsToReproduce: 3–8 imperative steps, each starting with a verb (Open, Navigate, Click, Enter, Observe).
 `.trim()
 

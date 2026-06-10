@@ -48,4 +48,13 @@ describe('inferBugDetails', () => {
       'Pay button broken on Safari.',
     )
   })
+
+  it('does not add ellipsis when trimming long titles', () => {
+    const long = 'A'.repeat(150)
+    expect(extractShortTitle(long).endsWith('…')).toBe(false)
+  })
+
+  it('selects only Production for production stage voice phrase', () => {
+    expect(resolveEnvironmentsFromVoice('production stage has issue')).toEqual(['Production'])
+  })
 })

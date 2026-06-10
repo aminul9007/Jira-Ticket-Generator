@@ -71,11 +71,12 @@ export const AI_TICKET_JSON_SCHEMA = {
       minItems: 3,
       maxItems: 3,
       description:
-        'Exactly 3 distinct Jira titles. Include category prefix, feature when known, environment if Production.',
+        'Exactly 3 distinct, complete Jira titles (max ~200 chars each, no ellipsis). Include category prefix, feature when known, environment if Production.',
     },
     title: {
       type: 'string',
-      description: 'Best recommended title — must be one of the 3 suggestions or a refined variant.',
+      description:
+        'Best recommended title — complete sentence fragment, no ellipsis; must match one of the 3 suggestions or a refined variant.',
     },
     issueSummary: {
       type: 'string',

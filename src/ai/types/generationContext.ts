@@ -5,6 +5,7 @@ import type { AiOutputStyle } from '../../types/appSettings'
 
 export interface AiGenerationContext {
   projectContextSection: string
+  ticketGuidelinesSection: string
   aiOutputStyle: AiOutputStyle
   similarTickets: TicketHistoryRecord[]
   feedbackSummary: string

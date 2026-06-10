@@ -22,6 +22,11 @@ describe('extractContext', () => {
     expect(ctx.environment).toEqual({ value: 'staging', source: 'user' })
   })
 
+  it('maps production stage to production environment', () => {
+    const ctx = extractContext('production stage checkout is broken')
+    expect(ctx.environment).toEqual({ value: 'production', source: 'user' })
+  })
+
   it('auto-detects browser, OS, and device from session when not in transcript', () => {
     const ctx = extractContext('Layer panel appears broken when site is unlocked')
     expect(ctx.environment).toEqual({ value: 'unknown', source: 'unknown' })

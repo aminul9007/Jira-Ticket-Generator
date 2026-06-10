@@ -67,6 +67,7 @@ function buildQualityChecklist(): string {
   return [
     '## Pre-submit checklist',
     '- [ ] Inferred category matches the description',
+    '- [ ] All 3 titles are complete phrases with no trailing ellipsis',
     '- [ ] All 3 titles use the correct category prefix',
     '- [ ] Steps are testable and derived from the description (no invented URLs/versions)',
     '- [ ] severityReasoning explains inferred category, severity, and priority',
@@ -90,6 +91,7 @@ export function buildTicketGenerationPrompt(
 
   const contextSections = [
     generationContext.projectContextSection,
+    generationContext.ticketGuidelinesSection,
     outputStyleSection,
     historySection,
     feedbackSection,

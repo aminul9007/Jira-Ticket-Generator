@@ -5,7 +5,10 @@ import {
   buildKnowledgeContext,
   formatKnowledgeForPrompt,
 } from '../../services/knowledge/knowledgeContextService'
-import { formatProjectContextForPrompt } from '../../services/knowledge/projectContextPrompt'
+import {
+  formatProjectContextForPrompt,
+  formatTicketGuidelinesForPrompt,
+} from '../../services/knowledge/projectContextPrompt'
 import { hasProjectContextContent } from '../../utils/projectContextFormat'
 import { loadAppSettings } from '../../utils/appSettingsStorage'
 import { isCustomProjectKnowledge, loadProjectKnowledge } from '../../utils/qaContextStorage'
@@ -51,6 +54,9 @@ export function buildAiGenerationContext(
 
   return {
     projectContextSection: resolveProjectContextSection(),
+    ticketGuidelinesSection: formatTicketGuidelinesForPrompt(
+      appSettings.ai.ticketGuidelines,
+    ),
     aiOutputStyle: appSettings.ai.outputStyle,
     similarTickets,
     feedbackSummary,

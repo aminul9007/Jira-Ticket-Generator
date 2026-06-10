@@ -15,9 +15,16 @@ export const JIRA_BUG_REPORT_OUTPUT_RULES = `
 
 Return ONLY valid JSON. Do NOT explain anything. Do NOT include markdown or backticks.
 
+### Writing quality (mandatory)
+- Use professional, neutral QA language suitable for Jira triage.
+- Write complete sentences — NEVER end titles or summaries with "...", "…", or trailing dots.
+- Be specific: name the feature, symptom, and outcome (avoid vague "issue", "problem", "buggy").
+- issueSummary: lead with impact, then scope, then affected area.
+- stepsToReproduce: imperative mood, one clear action per step.
+
 ### Core ticket fields (required)
-- title — short (max 12–15 words), clear, no vague words like "issue" or "problem"
-- issueSummary — 2–4 sentences on impact and scope (use "summary" mentally; field name is issueSummary)
+- title — concise but COMPLETE (max ~15 words); clear symptom; no vague words; no ellipsis
+- issueSummary — 2–4 polished sentences on impact and scope (field name is issueSummary)
 - stepsToReproduce — actionable, reproducible steps from user action; add missing steps only when logically required (do NOT invent system behavior)
 - expectedResult — expected behavior
 - actualResult — observed behavior
@@ -29,7 +36,7 @@ Return ONLY valid JSON. Do NOT explain anything. Do NOT include markdown or back
 - category — inferred bug category (UI Bug, Functional Bug, Mobile Bug, SEO Issue, Accessibility Issue, Performance Issue)
 - affectedFeaturePage — inferred feature/page; use "Not specified" if unclear
 - environments — array: Canary, Beta, and/or Production (at least one)
-- titleSuggestions — exactly 3 distinct Jira-ready titles; title must match the best one
+- titleSuggestions — exactly 3 distinct, COMPLETE Jira-ready titles (no truncation, no ellipsis); title must match the best one
 - severityReasoning — why category, severity, and priority were chosen
 - possibleRootCauses — 3–5 developer hypotheses; prefix uncertain items with "Possible:"
 
