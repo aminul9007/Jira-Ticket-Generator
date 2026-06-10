@@ -11,7 +11,11 @@
     "lint": "eslint .",
     "test": "vitest run",
     "llama:server": "powershell -ExecutionPolicy Bypass -File ./scripts/start-llama.ps1",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api:dev": "npm run dev --prefix server",
+    "api:install": "npm install --prefix server",
+    "api:test": "npm test --prefix server",
+    "mcp:install": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-jira-mcp.ps1"
   },
   "dependencies": {
     "react": "^19.2.6",

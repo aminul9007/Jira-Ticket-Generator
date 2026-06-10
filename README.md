@@ -79,8 +79,8 @@ Open **Settings** from the dashboard to configure:
 
 - **AI** — project context textarea (injected into prompts), output style, auto-generate after voice
 - **Voice** — language, silence timeout, live transcript
-- **Jira** — domain, email, API token, connection test (architecture ready for issue creation)
-- **Defaults** — project key, issue type, labels, assignee
+- **Jira** — domain, email, API token, connection test
+- **Defaults** — project key, issue type, labels, assignee (sent to API when creating issues)
 - **Data** — history retention, export JSON, clear history
 
 All settings persist in `localStorage`.
@@ -95,11 +95,28 @@ All settings persist in `localStorage`.
 - **Collapsible root causes** for developers
 - **Jira wiki export** block in preview
 
+## Jira issue creation (MCP)
+
+Create issues in Jira Cloud from the ticket preview via a **Node.js API** and an external **Jira MCP Server**. Credentials stay on the server — never in the browser.
+
+```bash
+npm run api:install
+cp server/.env.example server/.env   # configure Jira + MCP
+npm run api:dev                       # terminal 1
+npm run dev                           # terminal 2
+```
+
+Set ticket defaults in **Settings → Ticket Defaults**, generate a ticket, then click **Create Jira Ticket**.
+
+Full setup: [docs/JIRA_MCP_SETUP.md](docs/JIRA_MCP_SETUP.md)
+
 ## Scripts
 
 | Command | Description |
 | ------- | ----------- |
 | `npm run dev` | Start development server |
+| `npm run api:dev` | Start Jira API backend (port 3001) |
+| `npm run api:install` | Install API server dependencies |
 | `npm run llama:server` | Start local llama.cpp with Qwen GGUF |
 | `npm run build` | Production build |
 | `npm run lint` | Run ESLint |
@@ -107,6 +124,5 @@ All settings persist in `localStorage`.
 
 ## Out of scope
 
-- Backend / REST APIs
-- Authentication
-- Jira API integration
+- Authentication / multi-user accounts
+- Hosting the Jira MCP server itself (use an external MCP process)

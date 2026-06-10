@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_LLAMACPP_BASE_URL?: string
   readonly VITE_LLAMACPP_API_KEY?: string
   readonly VITE_LLAMACPP_MODEL?: string
+  /** Optional API base URL. Leave empty in dev to use the Vite /api proxy. */
+  readonly VITE_API_BASE_URL?: string
 }
 
 interface ImportMeta {

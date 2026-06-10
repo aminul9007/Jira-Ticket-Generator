@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useAppSettings } from '../../hooks/useAppSettings'
+import { testMcpViaApi } from '../../services/jira/testMcpConnection'
 import {
   testJiraConnection,
   type JiraConnectionResult,
 } from '../../services/jira/testJiraConnection'
+import type { McpStatusResponse } from '../../../shared/jiraApi'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { PasswordInput } from './PasswordInput'
@@ -13,7 +15,9 @@ export function JiraIntegrationSection() {
   const { settings, updateJira } = useAppSettings()
   const { jira } = settings
   const [testing, setTesting] = useState(false)
+  const [testingMcp, setTestingMcp] = useState(false)
   const [result, setResult] = useState<JiraConnectionResult | null>(null)
+  const [mcpStatus, setMcpStatus] = useState<McpStatusResponse | null>(null)
 
   const handleTest = async () => {
     setTesting(true)
@@ -21,6 +25,19 @@ export function JiraIntegrationSection() {
     const connection = await testJiraConnection(jira)
     setResult(connection)
     setTesting(false)
+  }
+
+  const handleTestMcp = async () => {
+    setTestingMcp(true)
+    setMcpStatus(null)
+    const domain = jira.domain.trim()
+    const email = jira.email.trim()
+    const apiToken = jira.apiToken.trim()
+    const status = await testMcpViaApi(
+      domain && email && apiToken ? { domain, email, apiToken } : undefined,
+    )
+    setMcpStatus(status)
+    setTestingMcp(false)
   }
 
   return (
@@ -52,7 +69,7 @@ export function JiraIntegrationSection() {
       <SettingsField
         id="jira-token"
         label="Jira API token"
-        hint="Create at id.atlassian.com → Security → API tokens. Stored locally only."
+        hint="Create at id.atlassian.com → Security → API tokens. Sent only to your local API backend."
       >
         <PasswordInput
           id="jira-token"
@@ -62,33 +79,60 @@ export function JiraIntegrationSection() {
         />
       </SettingsField>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Button
-          type="button"
-          variant="secondary"
-          size="md"
-          isLoading={testing}
-          onClick={() => void handleTest()}
-        >
-          Test Jira Connection
-        </Button>
-        {result && (
-          <p
-            role="status"
-            className={
-              result.status === 'success'
-                ? 'text-sm font-medium text-[var(--color-success)]'
-                : 'text-sm font-medium text-danger'
-            }
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button
+            type="button"
+            variant="secondary"
+            size="md"
+            isLoading={testing}
+            onClick={() => void handleTest()}
           >
-            {result.status === 'success' ? '✅' : '❌'} {result.message}
-          </p>
-        )}
+            Test Jira (browser)
+          </Button>
+          {result && (
+            <p
+              role="status"
+              className={
+                result.status === 'success'
+                  ? 'text-sm font-medium text-[var(--color-success)]'
+                  : 'text-sm font-medium text-danger'
+              }
+            >
+              {result.status === 'success' ? '✅' : '❌'} {result.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            isLoading={testingMcp}
+            onClick={() => void handleTestMcp()}
+          >
+            Test API & MCP connection
+          </Button>
+          {mcpStatus && (
+            <p
+              role="status"
+              className={
+                mcpStatus.connected && mcpStatus.hasCreateTool
+                  ? 'text-sm font-medium text-[var(--color-success)]'
+                  : 'text-sm font-medium text-danger'
+              }
+            >
+              {mcpStatus.connected && mcpStatus.hasCreateTool ? '✅' : '❌'} {mcpStatus.message}
+            </p>
+          )}
+        </div>
       </div>
 
-      <p className="text-xs leading-relaxed text-text-muted">
-        Issue creation from this app is prepared for a future release. Credentials are saved
-        locally for when server-side Jira API calls are added.
+      <p className="type-helper leading-6">
+        Credentials are stored locally and forwarded to your API backend when creating issues.
+        The backend spawns the Jira MCP server (<code className="text-text-secondary">mcp-atlassian</code>)
+        with these values. For production, prefer setting credentials only in <code className="text-text-secondary">server/.env</code>.
       </p>
     </>
   )

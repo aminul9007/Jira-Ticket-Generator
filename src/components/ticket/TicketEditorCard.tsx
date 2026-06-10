@@ -1,5 +1,6 @@
 import type { GeneratedTicket } from '../../types/bugReport'
 import { TICKET_PRIORITIES, TICKET_SEVERITIES } from '../../data/ticketOptions'
+import type { JiraCreationState } from '../../hooks/useJiraIssueCreation'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
 import type { TicketFeedbackRating } from '../../types/ticketFeedback'
 import { formatJiraTicket } from '../../utils/formatJiraTicket'
@@ -23,7 +24,11 @@ import { TitleSuggestions } from './TitleSuggestions'
 interface TicketEditorCardProps {
   editor: TicketEditor
   usedAi?: boolean
+  jiraCreation: JiraCreationState
+  isCreatingJira?: boolean
+  onCreateJira: () => void
   onCopySuccess: () => void
+  onDismissJiraStatus?: () => void
   feedback?: {
     rating: TicketFeedbackRating | null
     canSubmit: boolean
@@ -61,7 +66,11 @@ const EditorIcon = (
 export function TicketEditorCard({
   editor,
   usedAi = false,
+  jiraCreation,
+  isCreatingJira = false,
+  onCreateJira,
   onCopySuccess,
+  onDismissJiraStatus,
   feedback,
 }: TicketEditorCardProps) {
   const ticket = editor.editedTicket
@@ -81,7 +90,11 @@ export function TicketEditorCard({
       <TicketEditorToolbar
         editor={editor}
         usedAi={usedAi}
+        jiraCreation={jiraCreation}
+        isCreatingJira={isCreatingJira}
+        onCreateJira={onCreateJira}
         onCopySuccess={onCopySuccess}
+        onDismissJiraStatus={onDismissJiraStatus}
       />
 
       {feedback && (

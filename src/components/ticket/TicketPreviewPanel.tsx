@@ -1,3 +1,4 @@
+import type { JiraCreationState } from '../../hooks/useJiraIssueCreation'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
 import type { TicketFeedbackRating } from '../../types/ticketFeedback'
 import { Card, CardHeader } from '../ui/Card'
@@ -16,7 +17,11 @@ interface TicketPreviewPanelProps {
     canSubmit: boolean
     submit: (rating: TicketFeedbackRating) => void
   }
+  jiraCreation: JiraCreationState
+  isCreatingJira?: boolean
+  onCreateJira: () => void
   onCopySuccess: () => void
+  onDismissJiraStatus?: () => void
 }
 
 const PreviewIcon = (
@@ -47,7 +52,11 @@ export function TicketPreviewPanel({
   isGenerating,
   usedAi = false,
   feedback,
+  jiraCreation,
+  isCreatingJira = false,
+  onCreateJira,
   onCopySuccess,
+  onDismissJiraStatus,
 }: TicketPreviewPanelProps) {
   if (isGenerating && !hasGenerated) {
     return (
@@ -94,7 +103,11 @@ export function TicketPreviewPanel({
               }
             : undefined
         }
+        jiraCreation={jiraCreation}
+        isCreatingJira={isCreatingJira}
+        onCreateJira={onCreateJira}
         onCopySuccess={onCopySuccess}
+        onDismissJiraStatus={onDismissJiraStatus}
       />
     </LoadingOverlay>
   )

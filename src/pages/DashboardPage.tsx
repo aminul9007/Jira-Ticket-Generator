@@ -7,6 +7,7 @@ import { TicketPreviewPanel } from '../components/ticket/TicketPreviewPanel'
 import { Toast } from '../components/ui/Toast'
 import { useToast } from '../hooks/useToast'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
+import { useJiraIssueCreation } from '../hooks/useJiraIssueCreation'
 import type { RecentTicketRecord } from '../types/recentTicket'
 
 interface DashboardPageProps {
@@ -17,6 +18,8 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
   const { form, inputQuality, ticket, editor, recentTickets, feedback, reopenRecentTicket } =
     useBugReportAssistant()
   const { generate: generateTicket, isGenerating, hasGenerated, usedAi } = ticket
+  const { state: jiraCreation, createIssue, reset: resetJiraCreation } =
+    useJiraIssueCreation()
   const { toast, showToast } = useToast()
 
   const onGenerate = useCallback(async () => {
@@ -31,6 +34,12 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
   const onCopySuccess = useCallback(() => {
     showToast('Jira ticket copied to clipboard')
   }, [showToast])
+
+  const onCreateJira = useCallback(() => {
+    const editedTicket = editor.editedTicket
+    if (!editedTicket) return
+    void createIssue(editedTicket, form.values.qaContext)
+  }, [createIssue, editor.editedTicket, form.values.qaContext])
 
   const onOpenRecentTicket = useCallback(
     (record: RecentTicketRecord) => {
@@ -88,7 +97,11 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
           isGenerating={isGenerating}
           usedAi={usedAi}
           feedback={feedback}
+          jiraCreation={jiraCreation}
+          isCreatingJira={jiraCreation.status === 'creating'}
+          onCreateJira={onCreateJira}
           onCopySuccess={onCopySuccess}
+          onDismissJiraStatus={resetJiraCreation}
         />
       </div>
 

@@ -1,19 +1,29 @@
 import { formatJiraTicket } from '../../utils/formatJiraTicket'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
+import type { JiraCreationState } from '../../hooks/useJiraIssueCreation'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { SegmentedControl } from '../ui/SegmentedControl'
+import { JiraCreationStatus } from './JiraCreationStatus'
 
 interface TicketEditorToolbarProps {
   editor: TicketEditor
-  onCopySuccess: () => void
   usedAi?: boolean
+  jiraCreation: JiraCreationState
+  isCreatingJira?: boolean
+  onCreateJira: () => void
+  onCopySuccess: () => void
+  onDismissJiraStatus?: () => void
 }
 
 export function TicketEditorToolbar({
   editor,
-  onCopySuccess,
   usedAi = false,
+  jiraCreation,
+  isCreatingJira = false,
+  onCreateJira,
+  onCopySuccess,
+  onDismissJiraStatus,
 }: TicketEditorToolbarProps) {
   const { viewMode, setViewMode, editedTicket, hasModifications, resetToGenerated } =
     editor
@@ -53,17 +63,30 @@ export function TicketEditorToolbar({
             Reset to generated
           </Button>
           <Button
-            variant="primary"
+            variant="ghost"
             size="sm"
             fullWidth
             className="sm:w-auto"
             disabled={!editedTicket}
-            onClick={handleCopy}
+            onClick={() => void handleCopy()}
+          >
+            Copy wiki text
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            fullWidth
+            className="sm:w-auto"
+            disabled={!editedTicket || isCreatingJira}
+            isLoading={isCreatingJira}
+            onClick={onCreateJira}
           >
             Create Jira Ticket
           </Button>
         </div>
       </div>
+
+      <JiraCreationStatus state={jiraCreation} onDismiss={onDismissJiraStatus} />
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
         {usedAi && <Badge variant="brand">AI enhanced</Badge>}
