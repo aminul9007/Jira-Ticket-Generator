@@ -110,7 +110,7 @@ export function TicketEditorCard({
         <Badge variant="default">Priority {ticket.priority}</Badge>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <EditableTicketSection
           title="Title suggestions"
           viewMode={viewMode}
@@ -144,7 +144,7 @@ export function TicketEditorCard({
           viewMode={viewMode}
           isModified={isFieldModified('title')}
           preview={
-            <p className="font-semibold tracking-tight">{ticket.title}</p>
+            <p className="type-ticket-title">{ticket.title}</p>
           }
           edit={
             <Input

@@ -19,13 +19,13 @@ export function InputQualityAlerts({ report, className }: InputQualityAlertsProp
       className={className}
       role="status"
     >
-      <p className="text-xs font-medium text-text-secondary">
+      <p className="type-helper font-medium text-text-secondary">
         Tips for a stronger ticket ({report.completenessScore}% complete)
       </p>
-      <ul className="mt-2 space-y-1.5">
+      <ul className="mt-2.5 space-y-2">
         {report.issues.map((issue) => (
-          <li key={issue.type} className="text-xs text-text-muted">
-            <span className="mr-1.5 inline-flex rounded-md bg-surface-subtle px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+          <li key={issue.type} className="type-helper leading-5">
+            <span className="type-micro mr-1.5 inline-flex rounded-md bg-surface-subtle px-1.5 py-0.5 text-text-secondary">
               {issueIcons[issue.type]}
             </span>
             {issue.suggestion}

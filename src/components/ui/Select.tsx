@@ -25,7 +25,7 @@ export function Select({
         aria-labelledby={ariaLabelledBy}
         aria-describedby={ariaDescribedBy}
         className={cn(
-          'w-full appearance-none rounded-xl border bg-surface-subtle/50 px-3.5 py-3 pr-11 text-sm text-text-primary',
+          'w-full appearance-none rounded-xl border bg-surface-subtle/50 px-3.5 py-3 pr-11 text-[0.9375rem] leading-6 text-text-primary',
           'transition-all duration-150 focus-visible:outline-none focus-visible:border-brand focus-visible:bg-surface-elevated focus-visible:ring-[3px] focus-visible:ring-brand/15',
           'disabled:cursor-not-allowed disabled:bg-disabled-surface disabled:opacity-60',
           hasError

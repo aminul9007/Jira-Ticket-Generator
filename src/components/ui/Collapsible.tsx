@@ -28,9 +28,7 @@ export function Collapsible({
         aria-controls={panelId}
         onClick={() => setIsOpen((open) => !open)}
       >
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-text-muted">
-          {title}
-        </span>
+        <span className="type-ticket-label">{title}</span>
         <span className="flex items-center gap-2">
           {badge}
           <svg
@@ -55,7 +53,7 @@ export function Collapsible({
         </span>
       </button>
       {isOpen && (
-        <div id={panelId} className="border-t border-border/60 px-4 py-3 text-sm leading-relaxed text-text-primary">
+        <div id={panelId} className="type-ticket-content border-t border-border/60 px-4 py-4 sm:px-5">
           {children}
         </div>
       )}

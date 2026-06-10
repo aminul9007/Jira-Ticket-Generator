@@ -45,10 +45,10 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
               </svg>
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold tracking-tight text-text-primary">
+              <p className="type-nav truncate font-semibold tracking-tight">
                 {APP_NAME}
               </p>
-              <p className="hidden truncate text-xs text-text-muted sm:block">
+              <p className="type-nav-meta hidden truncate sm:block">
                 {APP_TAGLINE}
               </p>
             </div>
@@ -60,7 +60,7 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
             <button
               type="button"
               className={cn(
-                'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                'type-nav rounded-lg px-3 py-1.5 transition-colors',
                 activePage === 'dashboard'
                   ? 'bg-brand-muted text-brand'
                   : 'text-text-secondary hover:bg-hover-surface hover:text-text-primary',
@@ -72,7 +72,7 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
             <button
               type="button"
               className={cn(
-                'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                'type-nav rounded-lg px-3 py-1.5 transition-colors',
                 activePage === 'settings'
                   ? 'bg-brand-muted text-brand'
                   : 'text-text-secondary hover:bg-hover-surface hover:text-text-primary',
@@ -86,7 +86,7 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
           {onNavigate && (
             <button
               type="button"
-              className="rounded-lg border border-border bg-surface-subtle px-2.5 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-hover-border hover:bg-hover-surface hover:text-text-primary sm:hidden"
+              className="type-helper rounded-lg border border-border bg-surface-subtle px-2.5 py-1.5 font-medium text-text-secondary transition-colors hover:border-hover-border hover:bg-hover-surface hover:text-text-primary sm:hidden"
               onClick={() =>
                 onNavigate(activePage === 'dashboard' ? 'settings' : 'dashboard')
               }
@@ -96,7 +96,7 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
           )}
 
           <ThemeToggle />
-          <span className="hidden rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-brand lg:inline-flex">
+          <span className="type-helper hidden rounded-full bg-brand-muted px-3 py-1 font-medium text-brand lg:inline-flex">
             Beta
           </span>
         </div>

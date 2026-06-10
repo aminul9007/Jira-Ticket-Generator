@@ -25,12 +25,10 @@ export function FormSection({
 }: FormSectionProps) {
   return (
     <section className={cn('space-y-4', className)}>
-      <div className="border-b border-border pb-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-          {title}
-        </h3>
+      <div className="border-b border-border pb-3.5">
+        <h3 className="type-overline">{title}</h3>
         {description && (
-          <p className="mt-1 text-sm text-text-secondary">{description}</p>
+          <p className="type-body-secondary mt-1.5">{description}</p>
         )}
       </div>
       <div className="space-y-4">{children}</div>

@@ -24,10 +24,10 @@ export function ConfidenceScore({ score, className }: ConfidenceScoreProps) {
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <div className="min-w-[3.5rem] text-right">
-        <span className="text-lg font-bold tabular-nums text-text-primary">
+        <span className="text-lg font-bold tabular-nums tracking-tight text-text-primary">
           {clamped}
         </span>
-        <span className="text-xs text-text-muted">%</span>
+        <span className="type-helper">%</span>
       </div>
       <div className="flex-1">
         <div className="h-2 overflow-hidden rounded-full bg-confidence-track">
@@ -41,7 +41,7 @@ export function ConfidenceScore({ score, className }: ConfidenceScoreProps) {
             aria-label={`Confidence score ${clamped} percent`}
           />
         </div>
-        <p className="mt-1 text-xs text-text-muted">Ticket confidence</p>
+        <p className="type-helper mt-1.5">Ticket confidence</p>
       </div>
     </div>
   )

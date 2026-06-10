@@ -7,9 +7,9 @@ function Stop-PortListener {
 
   $lines = netstat -ano | Select-String ":$Port\s+.*LISTENING"
   foreach ($line in $lines) {
-    $pid = ($line -split '\s+')[-1]
-    if ($pid -match '^\d+$') {
-      Stop-Process -Id [int]$pid -Force
+    $listenerPid = ($line -split '\s+')[-1]
+    if ($listenerPid -match '^\d+$') {
+      Stop-Process -Id [int]$listenerPid -Force
     }
   }
 }
@@ -42,7 +42,9 @@ Write-Host '========================================' -ForegroundColor Cyan
 Write-Host ''
 Write-Host "  This PC:       https://localhost:5173" -ForegroundColor White
 Write-Host "  Other devices: https://${lanIp}:5173" -ForegroundColor Yellow
-Write-Host "  (Accept the self-signed certificate warning on each device.)" -ForegroundColor DarkGray
+Write-Host ''
+Write-Host '  HTTPS is required for voice on other devices.' -ForegroundColor DarkGray
+Write-Host '  Accept the self-signed certificate warning on first visit.' -ForegroundColor DarkGray
 Write-Host ''
 
 if (-not $firewallOk) {
@@ -54,4 +56,5 @@ if (-not $firewallOk) {
 
 Set-Location $PSScriptRoot\..
 
+$env:VITE_DEV_HTTPS = 'true'
 npm run dev:vite

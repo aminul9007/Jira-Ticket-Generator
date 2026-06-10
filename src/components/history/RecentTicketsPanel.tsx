@@ -61,11 +61,11 @@ export function RecentTicketsPanel({
       )}
 
       {records.length === 0 ? (
-        <p className="text-sm text-text-muted">
+        <p className="type-body-secondary">
           No recent tickets yet. Generate a ticket to save it here automatically.
         </p>
       ) : filteredRecords.length === 0 ? (
-        <p className="text-sm text-text-muted">
+        <p className="type-body-secondary">
           No tickets match your search or filters. Try adjusting the filters above.
         </p>
       ) : (

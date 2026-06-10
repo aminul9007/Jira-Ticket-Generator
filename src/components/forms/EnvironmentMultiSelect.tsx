@@ -17,15 +17,15 @@ export function EnvironmentMultiSelect({
   return (
     <FormField>
       <fieldset>
-        <legend className="text-sm font-medium tracking-tight text-text-primary">
+        <legend className="type-label">
           Environment
           {optional ? (
-            <span className="ml-1 text-xs font-normal text-text-muted">Optional</span>
+            <span className="type-helper ml-1.5 font-normal">Optional</span>
           ) : (
-            <span className="ml-1 text-xs font-normal text-danger">Required</span>
+            <span className="type-helper ml-1.5 font-normal text-danger">Required</span>
           )}
         </legend>
-        <p className="mt-1 text-xs text-text-muted">
+        <p className="type-field-hint mt-0">
           {optional
             ? 'Leave blank to let AI infer from your description.'
             : 'Select where the issue was observed.'}

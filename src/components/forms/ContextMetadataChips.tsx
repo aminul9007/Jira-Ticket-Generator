@@ -66,7 +66,7 @@ export function ContextMetadataChips({
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-text-muted">Detected context</p>
+      <p className="type-overline">Detected context</p>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Detected QA context">
         {visibleFields.map(({ key, icon, label }) => {
           const field = context[key]
@@ -78,7 +78,7 @@ export function ContextMetadataChips({
               key={key}
               className={cn(
                 'inline-flex items-center gap-1 rounded-full border border-border-strong',
-                'bg-surface-subtle/60 pl-2.5 pr-1 py-1 text-xs text-text-primary',
+                'bg-surface-subtle/60 pl-2.5 pr-1 py-1.5 text-xs leading-5 text-text-primary',
               )}
             >
               <span aria-hidden="true">{icon}</span>
@@ -114,7 +114,9 @@ export function ContextMetadataChips({
                 ))}
               </select>
               {sourceBadge && (
-                <span className="text-[10px] text-text-muted">({sourceBadge})</span>
+                <span className="type-micro font-medium normal-case text-text-muted">
+                  ({sourceBadge})
+                </span>
               )}
               <button
                 type="button"

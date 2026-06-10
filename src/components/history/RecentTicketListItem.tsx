@@ -33,10 +33,10 @@ export function RecentTicketListItem({
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 font-medium leading-snug text-text-primary">
+          <p className="type-body line-clamp-2 font-medium leading-snug">
             {ticket.title}
           </p>
-          <p className="mt-1 text-xs text-text-muted">
+          <p className="type-helper mt-1.5">
             <time dateTime={record.createdAt} title={formatRecentTicketDate(record.createdAt)}>
               {formatRecentTicketRelative(record.createdAt)}
               <span className="mx-1.5 text-border-strong">·</span>

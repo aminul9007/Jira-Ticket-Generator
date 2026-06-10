@@ -18,22 +18,16 @@ export function Label({
 }: LabelProps) {
   return (
     <div>
-      <label
-        className={cn(
-          'block text-sm font-medium tracking-tight text-text-primary',
-          className,
-        )}
-        {...props}
-      >
+      <label className={cn('type-label', className)} {...props}>
         {children}
         {required && (
-          <span className="ml-1 text-xs font-normal text-danger" aria-hidden="true">
+          <span className="type-helper ml-1.5 font-normal text-danger" aria-hidden="true">
             Required
           </span>
         )}
       </label>
       {hint && (
-        <p id={hintId} className="mt-1.5 text-xs leading-relaxed text-text-muted">
+        <p id={hintId} className="type-field-hint">
           {hint}
         </p>
       )}

@@ -16,7 +16,7 @@ export function TicketFeedbackBar({
 
   return (
     <div className="mb-5 rounded-xl border border-border/70 bg-surface-subtle/40 p-4">
-      <p className="mb-3 text-sm font-medium text-text-primary">
+      <p className="type-section-title mb-3">
         Was this ticket helpful?
       </p>
       <div className="flex flex-wrap gap-2">
@@ -40,7 +40,7 @@ export function TicketFeedbackBar({
         </Button>
       </div>
       {rating && (
-        <p className="mt-2 text-xs text-text-muted">
+        <p className="type-helper mt-2.5">
           Thanks — feedback saved locally to improve future tickets.
         </p>
       )}

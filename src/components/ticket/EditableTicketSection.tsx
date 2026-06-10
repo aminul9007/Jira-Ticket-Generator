@@ -21,24 +21,22 @@ export function EditableTicketSection({
   return (
     <section
       className={cn(
-        'rounded-xl border p-4 transition-colors',
+        'rounded-xl border p-4 sm:p-5 transition-colors',
         isModified
           ? 'border-brand/40 bg-brand-subtle/50 ring-1 ring-brand/20'
           : 'border-border/80 bg-surface-subtle/30',
         className,
       )}
     >
-      <div className="mb-2.5 flex flex-wrap items-center gap-2">
-        <h3 className="text-[11px] font-semibold uppercase tracking-widest text-text-muted">
-          {title}
-        </h3>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <h3 className="type-ticket-label">{title}</h3>
         {isModified && (
-          <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand">
+          <span className="type-micro rounded-full bg-brand-muted px-2 py-0.5 text-brand">
             Modified
           </span>
         )}
       </div>
-      <div className="text-sm leading-relaxed text-text-primary">
+      <div className="type-ticket-content">
         {viewMode === 'edit' ? edit : preview}
       </div>
     </section>

@@ -28,9 +28,9 @@ export function FormattedTicketBlock({ text }: FormattedTicketTextProps) {
   const paragraphs = text.split(/\n\n+/)
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {paragraphs.map((paragraph, index) => (
-        <p key={index} className="whitespace-pre-wrap">
+        <p key={index} className="whitespace-pre-wrap leading-7">
           <FormattedTicketText text={paragraph} />
         </p>
       ))}
@@ -40,9 +40,9 @@ export function FormattedTicketBlock({ text }: FormattedTicketTextProps) {
 
 export function FormattedTicketList({ items }: { items: string[] }): ReactNode {
   return (
-    <ol className="list-decimal space-y-2 pl-5 marker:text-text-muted">
+    <ol className="list-decimal space-y-2.5 pl-5 marker:text-text-muted marker:font-medium">
       {items.map((step, index) => (
-        <li key={index} className="pl-1">
+        <li key={index} className="pl-1 leading-7">
           <FormattedTicketText text={step} />
         </li>
       ))}

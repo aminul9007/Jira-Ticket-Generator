@@ -71,7 +71,7 @@ export function IssueDescriptionInput({
     voice.liveTranscript.length > 0
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       <Label htmlFor={id} required>
         Issue Description
       </Label>
@@ -112,10 +112,10 @@ export function IssueDescriptionInput({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2 text-xs text-text-muted">
+      <div className="flex items-center justify-between gap-3 type-helper">
         <p id={`${id}-voice-hint`}>
           {voice.isListening ? (
-            <span className="font-medium text-brand" role="status" aria-live="polite">
+            <span className="type-transcript-status" role="status" aria-live="polite">
               Listening… tap mic to stop
             </span>
           ) : (
@@ -130,26 +130,27 @@ export function IssueDescriptionInput({
       </div>
 
       {showLivePreview && (
-        <p
-          className="rounded-lg border border-brand/30 bg-brand/5 px-3 py-2 text-sm leading-relaxed text-text-secondary"
+        <div
+          className="rounded-xl border border-brand/30 bg-brand/5 px-4 py-3"
           role="status"
           aria-live="polite"
         >
-          {voice.liveTranscript}
-        </p>
+          <p className="type-micro mb-1.5 text-brand">Live transcript</p>
+          <p className="type-transcript">{voice.liveTranscript}</p>
+        </div>
       )}
 
       {voice.error && (
         <p
           role="alert"
-          className="rounded-lg border border-danger/30 bg-danger/5 px-3 py-2 text-xs leading-relaxed text-danger"
+          className="type-helper rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 leading-6 text-danger"
         >
           {voice.error}
         </p>
       )}
 
       {!voice.speechSupported && (
-        <p className="text-xs text-text-muted">
+        <p className="type-helper">
           Voice dictation works in Chrome and Edge on desktop.
         </p>
       )}
@@ -157,7 +158,7 @@ export function IssueDescriptionInput({
       {value.trim().length > 0 &&
         value.trim().length < minHintLength &&
         !voice.isListening && (
-          <p className="text-xs text-text-muted">
+          <p className="type-helper">
             Add a bit more detail (at least {minHintLength} characters).
           </p>
         )}

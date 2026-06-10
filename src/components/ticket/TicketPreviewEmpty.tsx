@@ -72,16 +72,16 @@ export function TicketPreviewEmpty() {
           </div>
         </div>
 
-        <h3 className="text-base font-semibold text-text-primary">
+        <h3 className="type-card-title">
           No ticket generated yet
         </h3>
-        <p className="mt-2 max-w-xs text-sm leading-relaxed text-text-secondary">
+        <p className="type-body-secondary mt-3 max-w-xs">
           Complete the form and click{' '}
           <span className="font-medium text-brand">Generate Ticket</span> to build
           a Jira-style preview from your input.
         </p>
 
-        <ul className="mt-8 flex flex-col gap-2 text-left text-xs text-text-muted sm:items-center">
+        <ul className="type-helper mt-8 flex flex-col gap-2.5 text-left sm:items-center">
           {[
             'Category & environment',
             'Affected feature (recommended)',
@@ -89,7 +89,7 @@ export function TicketPreviewEmpty() {
           ].map(
             (step, i) => (
               <li key={step} className="flex items-center gap-2">
-                <span className="flex size-5 items-center justify-center rounded-full bg-brand-muted text-[10px] font-semibold text-brand">
+                <span className="type-micro flex size-5 items-center justify-center rounded-full bg-brand-muted text-brand">
                   {i + 1}
                 </span>
                 {step}

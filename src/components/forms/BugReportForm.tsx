@@ -123,7 +123,7 @@ Example: On Production, checkout button stays disabled after entering a valid ad
           </Button>
 
           {!isValid && (
-            <p className="text-center text-xs leading-relaxed text-text-muted" role="status">
+            <p className="type-helper text-center" role="status">
               Enter at least {MIN_ISSUE_DESCRIPTION_LENGTH} characters describing the issue.
             </p>
           )}

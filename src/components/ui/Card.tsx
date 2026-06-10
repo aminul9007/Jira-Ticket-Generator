@@ -56,20 +56,16 @@ interface CardHeaderProps {
 export function CardHeader({ title, description, action, icon }: CardHeaderProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex gap-3">
+      <div className="flex gap-3.5">
         {icon && (
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-muted text-brand">
             {icon}
           </div>
         )}
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-text-primary sm:text-lg">
-            {title}
-          </h2>
+          <h2 className="type-card-title">{title}</h2>
           {description && (
-            <p className="mt-1 max-w-prose text-sm leading-relaxed text-text-secondary">
-              {description}
-            </p>
+            <p className="type-card-desc mt-1.5">{description}</p>
           )}
         </div>
       </div>

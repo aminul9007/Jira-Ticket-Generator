@@ -99,7 +99,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
           <a
             key={link.id}
             href={`#${link.id}`}
-            className="rounded-lg border border-border-strong bg-surface-elevated px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-brand/40 hover:text-brand"
+            className="type-nav rounded-lg border border-border-strong bg-surface-elevated px-3 py-1.5 text-text-secondary transition-colors hover:border-brand/40 hover:text-brand"
           >
             {link.label}
           </a>

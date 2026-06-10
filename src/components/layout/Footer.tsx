@@ -6,10 +6,10 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t border-border/80 bg-surface-elevated/60">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:px-6 sm:text-left lg:px-8">
-        <p className="text-xs text-text-muted">
+        <p className="type-helper">
           © {year} {APP_NAME}
         </p>
-        <p className="text-xs text-text-muted">
+        <p className="type-helper">
           Local llama.cpp or optional OpenAI · Jira API coming soon
         </p>
       </div>

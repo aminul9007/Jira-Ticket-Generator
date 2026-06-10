@@ -9,10 +9,10 @@ interface SettingsSectionProps {
 export function SettingsSection({ title, description, children }: SettingsSectionProps) {
   return (
     <section className="space-y-5 border-t border-border pt-8 first:border-t-0 first:pt-0">
-      <div className="space-y-1">
-        <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
+      <div className="space-y-1.5">
+        <h3 className="type-section-title">{title}</h3>
         {description && (
-          <p className="text-xs leading-relaxed text-text-muted">{description}</p>
+          <p className="type-section-desc">{description}</p>
         )}
       </div>
       <div className="space-y-5">{children}</div>

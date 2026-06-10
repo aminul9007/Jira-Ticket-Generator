@@ -13,7 +13,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        'w-full min-h-[88px] resize-y rounded-xl border bg-surface-subtle/50 px-3.5 py-3 text-sm leading-relaxed text-text-primary',
+        'w-full min-h-[88px] resize-y rounded-xl border bg-surface-subtle/50 px-3.5 py-3 text-[0.9375rem] leading-7 text-text-primary',
         'placeholder:text-text-muted/80 transition-all duration-150',
         'focus-visible:outline-none focus-visible:border-brand focus-visible:bg-surface-elevated focus-visible:ring-[3px] focus-visible:ring-brand/15',
         'disabled:cursor-not-allowed disabled:bg-disabled-surface disabled:opacity-60',

@@ -62,18 +62,18 @@ export function Modal({
           className,
         )}
       >
-        <div className="mb-4">
-          <h2 id={titleId} className="text-lg font-semibold text-text-primary">
+        <div className="mb-5">
+          <h2 id={titleId} className="type-modal-title">
             {title}
           </h2>
           {description && (
-            <p id={descriptionId} className="mt-1 text-sm text-text-secondary">
+            <p id={descriptionId} className="type-modal-desc">
               {description}
             </p>
           )}
         </div>
 
-        <div className="text-sm text-text-primary">{children}</div>
+        <div className="type-body">{children}</div>
 
         {footer ?? (
           <div className="mt-6 flex justify-end">
