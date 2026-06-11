@@ -1,5 +1,7 @@
 /** Shared contract between the React app and the Jira API backend. */
 
+import type { TicketTemplateSettings } from './ticketTemplate.js'
+
 /** Optional per-request Jira credentials from app Settings (sent only to your API backend). */
 export interface JiraConnectionConfig {
   domain: string
@@ -26,6 +28,8 @@ export interface CreateJiraIssuePayload {
   assignee?: string
   /** When set, the API uses these credentials for the MCP child process. */
   connection?: JiraConnectionConfig
+  /** Controls which sections appear in the Jira issue description. */
+  template?: TicketTemplateSettings
 }
 
 export interface McpStatusResponse {

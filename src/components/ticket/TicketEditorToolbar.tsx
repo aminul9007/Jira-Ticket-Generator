@@ -1,4 +1,5 @@
 import { formatJiraTicket } from '../../utils/formatJiraTicket'
+import { useAppSettings } from '../../hooks/useAppSettings'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
 import type { JiraCreationState } from '../../hooks/useJiraIssueCreation'
 import { Badge } from '../ui/Badge'
@@ -25,13 +26,16 @@ export function TicketEditorToolbar({
   onCopySuccess,
   onDismissJiraStatus,
 }: TicketEditorToolbarProps) {
+  const { settings } = useAppSettings()
   const { viewMode, setViewMode, editedTicket, hasModifications, resetToGenerated } =
     editor
 
   const handleCopy = async () => {
     if (!editedTicket) return
     try {
-      await navigator.clipboard.writeText(formatJiraTicket(editedTicket))
+      await navigator.clipboard.writeText(
+        formatJiraTicket(editedTicket, settings.ticketTemplate),
+      )
       onCopySuccess()
     } catch {
       /* clipboard unavailable */

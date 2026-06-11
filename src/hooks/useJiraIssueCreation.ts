@@ -30,6 +30,7 @@ export function useJiraIssueCreation() {
           qaContext,
           settings.ticketDefaults,
           settings.jira,
+          settings.ticketTemplate,
         )
         const result = await createJiraIssue(payload)
         setState({ status: 'success', result })
@@ -43,7 +44,7 @@ export function useJiraIssueCreation() {
         return null
       }
     },
-    [settings.ticketDefaults, settings.jira],
+    [settings.ticketDefaults, settings.jira, settings.ticketTemplate],
   )
 
   return { state, createIssue, reset }

@@ -1,3 +1,7 @@
+import type { TicketTemplateSettings } from '../../shared/ticketTemplate'
+
+export type { TicketTemplateFieldKey, TicketTemplatePreset, TicketTemplateSettings } from '../../shared/ticketTemplate'
+
 export type AiOutputStyle = 'concise' | 'standard' | 'detailed'
 
 export type VoiceLanguage = 'en-US' | 'en-GB'
@@ -44,6 +48,7 @@ export interface AppSettings {
   voice: VoiceSettings
   jira: JiraSettings
   ticketDefaults: TicketDefaultSettings
+  ticketTemplate: TicketTemplateSettings
   data: DataSettings
 }
 

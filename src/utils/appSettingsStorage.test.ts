@@ -10,6 +10,8 @@ describe('appSettingsStorage', () => {
     expect(settings.ai.autoGenerateAfterVoice).toBe(true)
     expect(settings.voice.silenceTimeoutSeconds).toBe(5)
     expect(settings.data.historyRetention).toBe(50)
+    expect(settings.ticketTemplate.preset).toBe('full')
+    expect(settings.ticketTemplate.fields.issueSummary).toBe(true)
   })
 
   it('preserves valid voice and AI overrides', () => {

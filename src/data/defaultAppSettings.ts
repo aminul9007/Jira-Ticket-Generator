@@ -1,3 +1,4 @@
+import { createDefaultTicketTemplateSettings } from '../../shared/ticketTemplate'
 import type { AppSettings } from '../types/appSettings'
 
 export const PROJECT_CONTEXT_PLACEHOLDER = `Product: Website Builder
@@ -54,6 +55,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     labels: [],
     assignee: '',
   },
+  ticketTemplate: createDefaultTicketTemplateSettings(),
   data: {
     historyRetention: 50,
   },

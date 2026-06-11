@@ -1,4 +1,8 @@
 import type { CreateJiraIssuePayload } from '../../../shared/jiraApi.js'
+import {
+  createDefaultTicketTemplateSettings,
+  isTemplateFieldEnabled,
+} from '../../../shared/ticketTemplate.js'
 
 function formatSteps(steps: string[]): string {
   if (steps.length === 0) return '_No steps provided._'
@@ -15,32 +19,48 @@ function contextLine(label: string, value: string): string | null {
 
 /** Markdown description for mcp-atlassian jira_create_issue. */
 export function buildJiraIssueDescription(payload: CreateJiraIssuePayload): string {
-  const contextLines = [
-    contextLine('Environment', payload.environment),
-    contextLine('Browser', payload.browser),
-    contextLine('OS', payload.os),
-    contextLine('Device', payload.device),
-    contextLine('Severity', payload.severity),
-    contextLine('Priority', payload.priority),
-  ].filter(Boolean)
+  const template = payload.template ?? createDefaultTicketTemplateSettings()
+  const include = (field: Parameters<typeof isTemplateFieldEnabled>[1]) =>
+    isTemplateFieldEnabled(template, field)
 
-  const sections = [
-    '## Summary',
-    payload.summary.replace(/\*/g, ''),
-    '',
-    '## Steps to Reproduce',
-    formatSteps(payload.steps),
-    '',
-    '## Expected Result',
-    payload.expected.replace(/\*/g, '') || '_Not specified._',
-    '',
-    '## Actual Result',
-    payload.actual.replace(/\*/g, '') || '_Not specified._',
-  ]
+  const sections: string[] = []
+
+  if (include('issueSummary')) {
+    sections.push('## Summary', payload.summary.replace(/\*/g, ''))
+  }
+
+  if (include('stepsToReproduce')) {
+    sections.push('', '## Steps to Reproduce', formatSteps(payload.steps))
+  }
+
+  if (include('expectedResult')) {
+    sections.push(
+      '',
+      '## Expected Result',
+      payload.expected.replace(/\*/g, '') || '_Not specified._',
+    )
+  }
+
+  if (include('actualResult')) {
+    sections.push(
+      '',
+      '## Actual Result',
+      payload.actual.replace(/\*/g, '') || '_Not specified._',
+    )
+  }
+
+  const contextLines = [
+    include('environment') ? contextLine('Environment', payload.environment) : null,
+    include('qaContext') ? contextLine('Browser', payload.browser) : null,
+    include('qaContext') ? contextLine('OS', payload.os) : null,
+    include('qaContext') ? contextLine('Device', payload.device) : null,
+    include('severity') ? contextLine('Severity', payload.severity) : null,
+    include('priority') ? contextLine('Priority', payload.priority) : null,
+  ].filter(Boolean)
 
   if (contextLines.length > 0) {
     sections.push('', '## QA Context', ...contextLines)
   }
 
-  return sections.join('\n')
+  return sections.join('\n').trim()
 }

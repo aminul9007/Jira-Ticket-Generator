@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_APP_SETTINGS } from '../data/defaultAppSettings'
 import type { GeneratedTicket } from '../types/bugReport'
 import type { ExtractedContext } from '../types/contextDetection'
+import { applyTicketTemplatePreset } from '../../shared/ticketTemplate'
 import { buildJiraCreatePayload } from './buildJiraCreatePayload'
 
 const ticket: GeneratedTicket = {
@@ -54,5 +55,19 @@ describe('buildJiraCreatePayload', () => {
     expect(payload.projectKey).toBe('QA')
     expect(payload.labels).toEqual(['regression'])
     expect(payload.connection?.domain).toBe('company.atlassian.net')
+  })
+
+  it('omits QA context fields when disabled in template', () => {
+    const payload = buildJiraCreatePayload(
+      ticket,
+      qaContext,
+      DEFAULT_APP_SETTINGS.ticketDefaults,
+      DEFAULT_APP_SETTINGS.jira,
+      applyTicketTemplatePreset('minimal'),
+    )
+
+    expect(payload.browser).toBe('')
+    expect(payload.environment).toBe('')
+    expect(payload.template?.preset).toBe('minimal')
   })
 })

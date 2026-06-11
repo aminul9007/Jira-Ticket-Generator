@@ -1,6 +1,14 @@
 import { z } from 'zod'
 import type { CreateJiraIssuePayload } from '../../../shared/jiraApi.js'
+import { normalizeTicketTemplateSettings } from '../../../shared/ticketTemplate.js'
 import { ApiError } from '../errors.js'
+
+const ticketTemplateSchema = z
+  .object({
+    preset: z.enum(['full', 'standard', 'minimal', 'custom']).optional(),
+    fields: z.record(z.string(), z.boolean()).optional(),
+  })
+  .optional()
 
 const createIssueSchema = z.object({
   title: z.string().trim().min(1, 'Title is required'),
@@ -25,6 +33,7 @@ const createIssueSchema = z.object({
       apiToken: z.string().trim().min(1),
     })
     .optional(),
+  template: ticketTemplateSchema,
 })
 
 export function parseCreateIssuePayload(body: unknown): CreateJiraIssuePayload {
@@ -33,5 +42,10 @@ export function parseCreateIssuePayload(body: unknown): CreateJiraIssuePayload {
     const message = parsed.error.issues.map((issue) => issue.message).join(' ')
     throw new ApiError(400, 'VALIDATION_ERROR', message)
   }
-  return parsed.data
+  return {
+    ...parsed.data,
+    template: parsed.data.template
+      ? normalizeTicketTemplateSettings(parsed.data.template)
+      : undefined,
+  }
 }

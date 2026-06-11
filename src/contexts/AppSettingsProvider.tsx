@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { DEFAULT_APP_SETTINGS } from '../data/defaultAppSettings'
 import type { AppSettings } from '../types/appSettings'
+import { normalizeTicketTemplateSettings } from '../../shared/ticketTemplate'
 import { loadAppSettings, normalizeAppSettings, saveAppSettings } from '../utils/appSettingsStorage'
 import { AppSettingsContext, type AppSettingsContextValue } from './AppSettings'
 
@@ -10,6 +11,7 @@ function mergeSettings(prev: AppSettings, patch: Partial<AppSettings>): AppSetti
     voice: { ...prev.voice, ...patch.voice },
     jira: { ...prev.jira, ...patch.jira },
     ticketDefaults: { ...prev.ticketDefaults, ...patch.ticketDefaults },
+    ticketTemplate: { ...prev.ticketTemplate, ...patch.ticketTemplate },
     data: { ...prev.data, ...patch.data },
   })
 }
@@ -59,6 +61,19 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     [updateSettings],
   )
 
+  const updateTicketTemplate = useCallback(
+    (patch: Partial<AppSettings['ticketTemplate']>) => {
+      updateSettings((prev) => ({
+        ticketTemplate: normalizeTicketTemplateSettings({
+          ...prev.ticketTemplate,
+          ...patch,
+          fields: { ...prev.ticketTemplate.fields, ...patch.fields },
+        }),
+      }))
+    },
+    [updateSettings],
+  )
+
   const updateData = useCallback(
     (patch: Partial<AppSettings['data']>) => {
       updateSettings((prev) => ({ data: { ...prev.data, ...patch } }))
@@ -80,6 +95,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       updateVoice,
       updateJira,
       updateTicketDefaults,
+      updateTicketTemplate,
       updateData,
       resetSettings,
     }),
@@ -90,6 +106,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       updateVoice,
       updateJira,
       updateTicketDefaults,
+      updateTicketTemplate,
       updateData,
       resetSettings,
     ],

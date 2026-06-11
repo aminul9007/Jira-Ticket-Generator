@@ -3,6 +3,8 @@ import { TICKET_PRIORITIES, TICKET_SEVERITIES } from '../../data/ticketOptions'
 import type { JiraCreationState } from '../../hooks/useJiraIssueCreation'
 import type { TicketEditor } from '../../hooks/useTicketEditor'
 import type { TicketFeedbackRating } from '../../types/ticketFeedback'
+import { useAppSettings } from '../../hooks/useAppSettings'
+import { isTemplateFieldEnabled } from '../../../shared/ticketTemplate'
 import { formatJiraTicket } from '../../utils/formatJiraTicket'
 import { Badge } from '../ui/Badge'
 import { Card, CardHeader } from '../ui/Card'
@@ -73,6 +75,11 @@ export function TicketEditorCard({
   onDismissJiraStatus,
   feedback,
 }: TicketEditorCardProps) {
+  const { settings } = useAppSettings()
+  const template = settings.ticketTemplate
+  const include = (field: Parameters<typeof isTemplateFieldEnabled>[1]) =>
+    isTemplateFieldEnabled(template, field)
+
   const ticket = editor.editedTicket
   if (!ticket) return null
 
@@ -111,19 +118,25 @@ export function TicketEditorCard({
 
       <div className="mb-5 flex flex-wrap gap-2">
         <Badge variant="brand">{ticket.category}</Badge>
-        {ticket.environments.map((env) => (
-          <Badge key={env} variant="neutral">
-            {env}
-          </Badge>
-        ))}
-        {ticket.affectedFeaturePage && (
+        {include('environment') &&
+          ticket.environments.map((env) => (
+            <Badge key={env} variant="neutral">
+              {env}
+            </Badge>
+          ))}
+        {include('affectedFeaturePage') && ticket.affectedFeaturePage && (
           <Badge variant="default">{ticket.affectedFeaturePage}</Badge>
         )}
-        <Badge variant={severityVariant(ticket.severity)}>{ticket.severity}</Badge>
-        <Badge variant="default">Priority {ticket.priority}</Badge>
+        {include('severity') && (
+          <Badge variant={severityVariant(ticket.severity)}>{ticket.severity}</Badge>
+        )}
+        {include('priority') && (
+          <Badge variant="default">Priority {ticket.priority}</Badge>
+        )}
       </div>
 
       <div className="space-y-4">
+        {include('titleSuggestions') && (
         <EditableTicketSection
           title="Title suggestions"
           viewMode={viewMode}
@@ -151,6 +164,7 @@ export function TicketEditorCard({
             </div>
           }
         />
+        )}
 
         <EditableTicketSection
           title="Recommended title"
@@ -168,6 +182,7 @@ export function TicketEditorCard({
           }
         />
 
+        {include('affectedFeaturePage') && (
         <EditableTicketSection
           title="Affected feature / page"
           viewMode={viewMode}
@@ -184,7 +199,9 @@ export function TicketEditorCard({
             />
           }
         />
+        )}
 
+        {include('issueSummary') && (
         <EditableTicketSection
           title="Issue Summary"
           viewMode={viewMode}
@@ -199,7 +216,9 @@ export function TicketEditorCard({
             />
           }
         />
+        )}
 
+        {include('stepsToReproduce') && (
         <EditableTicketSection
           title="Steps to Reproduce"
           viewMode={viewMode}
@@ -223,7 +242,9 @@ export function TicketEditorCard({
             </div>
           }
         />
+        )}
 
+        {include('expectedResult') && (
         <EditableTicketSection
           title="Expected Result"
           viewMode={viewMode}
@@ -238,7 +259,9 @@ export function TicketEditorCard({
             />
           }
         />
+        )}
 
+        {include('actualResult') && (
         <EditableTicketSection
           title="Actual Result"
           viewMode={viewMode}
@@ -253,8 +276,11 @@ export function TicketEditorCard({
             />
           }
         />
+        )}
 
+        {(include('severity') || include('priority')) && (
         <div className="grid gap-3 sm:grid-cols-2">
+          {include('severity') && (
           <EditableTicketSection
             title="Severity"
             viewMode={viewMode}
@@ -280,7 +306,9 @@ export function TicketEditorCard({
               </Select>
             }
           />
+          )}
 
+          {include('priority') && (
           <EditableTicketSection
             title="Priority"
             viewMode={viewMode}
@@ -302,8 +330,11 @@ export function TicketEditorCard({
               </Select>
             }
           />
+          )}
         </div>
+        )}
 
+        {include('severityReasoning') && (
         <EditableTicketSection
           title="Severity reasoning"
           viewMode={viewMode}
@@ -318,7 +349,9 @@ export function TicketEditorCard({
             />
           }
         />
+        )}
 
+        {include('possibleRootCauses') && (
         <Collapsible
           title="Possible root causes"
           badge={<Badge variant="neutral">{ticket.possibleRootCauses.length}</Badge>}
@@ -348,10 +381,11 @@ export function TicketEditorCard({
             <p className="mt-2 text-xs font-medium text-brand">Modified</p>
           )}
         </Collapsible>
+        )}
 
         <Collapsible title="Jira wiki export" defaultOpen={false}>
           <pre className="max-h-48 overflow-auto rounded-lg bg-code-bg p-3 text-xs leading-relaxed text-code-text">
-            {formatJiraTicket(ticket)}
+            {formatJiraTicket(ticket, template)}
           </pre>
         </Collapsible>
       </div>

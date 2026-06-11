@@ -3,6 +3,7 @@ import { DataHistorySection } from '../components/settings/DataHistorySection'
 import { JiraIntegrationSection } from '../components/settings/JiraIntegrationSection'
 import { SettingsPageCard } from '../components/settings/SettingsPageCard'
 import { TicketDefaultsSection } from '../components/settings/TicketDefaultsSection'
+import { TicketTemplateSection } from '../components/settings/TicketTemplateSection'
 import { VoiceSettingsSection } from '../components/settings/VoiceSettingsSection'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
@@ -58,6 +59,17 @@ const DefaultsIcon = (
   </svg>
 )
 
+const TemplateIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+    <path d="M8 9h8M8 13h5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+)
+
 const DataIcon = (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
@@ -75,6 +87,7 @@ const SECTION_LINKS = [
   { id: 'voice-settings', label: 'Voice' },
   { id: 'jira-integration', label: 'Jira' },
   { id: 'ticket-defaults', label: 'Defaults' },
+  { id: 'ticket-template', label: 'Template' },
   { id: 'data-history', label: 'Data' },
 ] as const
 
@@ -141,6 +154,15 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
           icon={DefaultsIcon}
         >
           <TicketDefaultsSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="ticket-template"
+          title="Ticket Template"
+          description="Choose which fields appear in ticket previews, wiki exports, and Jira issues."
+          icon={TemplateIcon}
+        >
+          <TicketTemplateSection />
         </SettingsPageCard>
 
         <SettingsPageCard

@@ -8,6 +8,7 @@ export interface AppSettingsContextValue {
   updateVoice: (patch: Partial<AppSettings['voice']>) => void
   updateJira: (patch: Partial<AppSettings['jira']>) => void
   updateTicketDefaults: (patch: Partial<AppSettings['ticketDefaults']>) => void
+  updateTicketTemplate: (patch: Partial<AppSettings['ticketTemplate']>) => void
   updateData: (patch: Partial<AppSettings['data']>) => void
   resetSettings: () => void
 }

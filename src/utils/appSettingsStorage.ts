@@ -11,6 +11,7 @@ import type {
   VoiceLanguage,
   VoiceSettings,
 } from '../types/appSettings'
+import { normalizeTicketTemplateSettings } from '../../shared/ticketTemplate'
 import { APP_SETTINGS_STORAGE_KEY } from '../types/appSettings'
 import { loadProjectKnowledge } from './qaContextStorage'
 import { formatLegacyKnowledgeAsProjectContext } from './projectContextFormat'
@@ -59,6 +60,7 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
   const voice: Partial<VoiceSettings> = raw?.voice ?? {}
   const jira: Partial<JiraSettings> = raw?.jira ?? {}
   const ticketDefaults: Partial<TicketDefaultSettings> = raw?.ticketDefaults ?? {}
+  const ticketTemplate = normalizeTicketTemplateSettings(raw?.ticketTemplate)
   const data: Partial<AppSettings['data']> = raw?.data ?? {}
 
   return {
@@ -94,6 +96,7 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
       labels: normalizeStringArray(ticketDefaults.labels),
       assignee: normalizeString(ticketDefaults.assignee).trim(),
     },
+    ticketTemplate,
     data: {
       historyRetention: normalizeEnum(
         data.historyRetention,
