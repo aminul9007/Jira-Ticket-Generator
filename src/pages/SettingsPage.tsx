@@ -1,6 +1,7 @@
 import { AiConfigSection } from '../components/settings/AiConfigSection'
 import { DataHistorySection } from '../components/settings/DataHistorySection'
 import { JiraIntegrationSection } from '../components/settings/JiraIntegrationSection'
+import { QaTicketStandardsSection } from '../components/settings/QaTicketStandardsSection'
 import { SettingsPageCard } from '../components/settings/SettingsPageCard'
 import { TicketDefaultsSection } from '../components/settings/TicketDefaultsSection'
 import { TicketTemplateSection } from '../components/settings/TicketTemplateSection'
@@ -22,6 +23,23 @@ const AiIcon = (
       strokeLinejoin="round"
     />
     <path d="M5 19h14M8 16h8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+)
+
+const StandardsIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2Z"
+      stroke="currentColor"
+      strokeWidth="1.75"
+    />
+    <path d="M9 12h6M9 16h4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
   </svg>
 )
 
@@ -84,6 +102,7 @@ const DataIcon = (
 
 const SECTION_LINKS = [
   { id: 'ai-config', label: 'AI' },
+  { id: 'qa-standards', label: 'Standards' },
   { id: 'voice-settings', label: 'Voice' },
   { id: 'jira-integration', label: 'Jira' },
   { id: 'ticket-defaults', label: 'Defaults' },
@@ -127,6 +146,15 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
           icon={AiIcon}
         >
           <AiConfigSection />
+        </SettingsPageCard>
+
+        <SettingsPageCard
+          id="qa-standards"
+          title="QA Ticket Standards"
+          description="Structured QA writing rules that guide AI ticket generation — presets, toggles, and custom project rules."
+          icon={StandardsIcon}
+        >
+          <QaTicketStandardsSection />
         </SettingsPageCard>
 
         <SettingsPageCard

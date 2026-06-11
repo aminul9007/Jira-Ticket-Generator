@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { DEFAULT_APP_SETTINGS } from '../data/defaultAppSettings'
 import type { AppSettings } from '../types/appSettings'
+import { normalizeQaTicketStandards } from '../../shared/qaTicketStandards'
 import { normalizeTicketTemplateSettings } from '../../shared/ticketTemplate'
 import { loadAppSettings, normalizeAppSettings, saveAppSettings } from '../utils/appSettingsStorage'
 import { AppSettingsContext, type AppSettingsContextValue } from './AppSettings'
@@ -12,6 +13,7 @@ function mergeSettings(prev: AppSettings, patch: Partial<AppSettings>): AppSetti
     jira: { ...prev.jira, ...patch.jira },
     ticketDefaults: { ...prev.ticketDefaults, ...patch.ticketDefaults },
     ticketTemplate: { ...prev.ticketTemplate, ...patch.ticketTemplate },
+    qaTicketStandards: { ...prev.qaTicketStandards, ...patch.qaTicketStandards },
     data: { ...prev.data, ...patch.data },
   })
 }
@@ -67,7 +69,20 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         ticketTemplate: normalizeTicketTemplateSettings({
           ...prev.ticketTemplate,
           ...patch,
-          fields: { ...prev.ticketTemplate.fields, ...patch.fields },
+          fields: { ...prev.ticketTemplate.fields, ...(patch.fields ?? {}) },
+        }),
+      }))
+    },
+    [updateSettings],
+  )
+
+  const updateQaTicketStandards = useCallback(
+    (patch: Partial<AppSettings['qaTicketStandards']>) => {
+      updateSettings((prev) => ({
+        qaTicketStandards: normalizeQaTicketStandards({
+          ...prev.qaTicketStandards,
+          ...patch,
+          rules: { ...prev.qaTicketStandards.rules, ...(patch.rules ?? {}) },
         }),
       }))
     },
@@ -96,6 +111,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       updateJira,
       updateTicketDefaults,
       updateTicketTemplate,
+      updateQaTicketStandards,
       updateData,
       resetSettings,
     }),
@@ -107,6 +123,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       updateJira,
       updateTicketDefaults,
       updateTicketTemplate,
+      updateQaTicketStandards,
       updateData,
       resetSettings,
     ],

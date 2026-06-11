@@ -90,8 +90,9 @@ export function buildTicketGenerationPrompt(
   const outputStyleSection = formatAiOutputStyleInstruction(generationContext.aiOutputStyle)
 
   const contextSections = [
+    generationContext.qaStandardsSection,
     generationContext.projectContextSection,
-    generationContext.ticketGuidelinesSection,
+    generationContext.customRulesSection,
     outputStyleSection,
     historySection,
     feedbackSection,
@@ -110,7 +111,7 @@ export function buildTicketGenerationPrompt(
     'Generate a complete Jira-ready bug ticket JSON from the issue description below.',
     'Infer category, affected feature, environments, severity, and priority from the text.',
     contextSections.length > 0
-      ? 'Apply project knowledge, historical patterns, and feedback insights when consistent with the description.'
+      ? 'Apply QA standards, project knowledge, historical patterns, and feedback insights when consistent with the description.'
       : '',
     buildInputSection(ctx),
     buildQualityChecklist(),

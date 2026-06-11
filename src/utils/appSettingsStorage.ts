@@ -11,6 +11,10 @@ import type {
   VoiceLanguage,
   VoiceSettings,
 } from '../types/appSettings'
+import {
+  normalizeQaTicketStandards,
+  resolveEffectiveOutputStyle,
+} from '../../shared/qaTicketStandards'
 import { normalizeTicketTemplateSettings } from '../../shared/ticketTemplate'
 import { APP_SETTINGS_STORAGE_KEY } from '../types/appSettings'
 import { loadProjectKnowledge } from './qaContextStorage'
@@ -61,13 +65,21 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
   const jira: Partial<JiraSettings> = raw?.jira ?? {}
   const ticketDefaults: Partial<TicketDefaultSettings> = raw?.ticketDefaults ?? {}
   const ticketTemplate = normalizeTicketTemplateSettings(raw?.ticketTemplate)
+  const legacyGuidelines = normalizeString(
+    (raw?.ai as { ticketGuidelines?: string } | undefined)?.ticketGuidelines,
+  )
+  const qaTicketStandards = normalizeQaTicketStandards(
+    raw?.qaTicketStandards,
+    legacyGuidelines || undefined,
+  )
   const data: Partial<AppSettings['data']> = raw?.data ?? {}
 
-  return {
+  const outputStyle = normalizeEnum(ai.outputStyle, OUTPUT_STYLES, base.ai.outputStyle)
+
+  const settings: AppSettings = {
     ai: {
       projectContext: migrateProjectContext(raw ?? {}),
-      ticketGuidelines: normalizeString(ai.ticketGuidelines),
-      outputStyle: normalizeEnum(ai.outputStyle, OUTPUT_STYLES, base.ai.outputStyle),
+      outputStyle,
       autoGenerateAfterVoice: normalizeBoolean(
         ai.autoGenerateAfterVoice,
         base.ai.autoGenerateAfterVoice,
@@ -97,6 +109,7 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
       assignee: normalizeString(ticketDefaults.assignee).trim(),
     },
     ticketTemplate,
+    qaTicketStandards,
     data: {
       historyRetention: normalizeEnum(
         data.historyRetention,
@@ -105,6 +118,13 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
       ),
     },
   }
+
+  settings.ai.outputStyle = resolveEffectiveOutputStyle(
+    settings.qaTicketStandards.preset,
+    settings.ai.outputStyle,
+  )
+
+  return settings
 }
 
 export function loadAppSettings(): AppSettings {

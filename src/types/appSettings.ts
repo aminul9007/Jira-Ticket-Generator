@@ -1,5 +1,12 @@
+import type { QaTicketStandardsSettings } from '../../shared/qaTicketStandards'
 import type { TicketTemplateSettings } from '../../shared/ticketTemplate'
 
+export type {
+  QaGenerationOutputStyle,
+  QaStandardRuleKey,
+  QaStandardsPreset,
+  QaTicketStandardsSettings,
+} from '../../shared/qaTicketStandards'
 export type { TicketTemplateFieldKey, TicketTemplatePreset, TicketTemplateSettings } from '../../shared/ticketTemplate'
 
 export type AiOutputStyle = 'concise' | 'standard' | 'detailed'
@@ -14,8 +21,6 @@ export type DefaultIssueType = 'Bug' | 'Task' | 'Story'
 
 export interface AiSettings {
   projectContext: string
-  /** Project-specific ticket writing rules, terminology, and tone — injected into AI prompts. */
-  ticketGuidelines: string
   outputStyle: AiOutputStyle
   autoGenerateAfterVoice: boolean
 }
@@ -49,7 +54,13 @@ export interface AppSettings {
   jira: JiraSettings
   ticketDefaults: TicketDefaultSettings
   ticketTemplate: TicketTemplateSettings
+  qaTicketStandards: QaTicketStandardsSettings
   data: DataSettings
 }
 
 export const APP_SETTINGS_STORAGE_KEY = 'qa-bug-report-app-settings'
+
+/** @deprecated Legacy field — migrated to qaTicketStandards.customRules on load. */
+export interface LegacyAiSettings {
+  ticketGuidelines?: string
+}

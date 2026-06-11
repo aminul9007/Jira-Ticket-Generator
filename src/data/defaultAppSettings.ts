@@ -1,3 +1,4 @@
+import { createDefaultQaTicketStandards } from '../../shared/qaTicketStandards'
 import { createDefaultTicketTemplateSettings } from '../../shared/ticketTemplate'
 import type { AppSettings } from '../types/appSettings'
 
@@ -20,22 +21,15 @@ Severity Rules:
 - Medium = Functional issue with workaround
 - Low = Cosmetic/UI issue`
 
-export const TICKET_GUIDELINES_PLACEHOLDER = `Writing style for this project:
-- Use clear, professional QA language — no casual phrasing or filler words.
-- Titles must be complete thoughts (never end with "..." or ellipsis).
-- Name features exactly as they appear in the product (e.g. "Layer Panel", not "sidebar").
-- Summaries: start with user/business impact, then technical scope.
-- Steps: imperative verbs (Open, Navigate, Click, Enter, Observe).
-- Prefer "Unable to…" / "Fails to…" over vague "issue" or "problem".
+export const CUSTOM_QA_RULES_PLACEHOLDER = `Optional project-specific rules (applied after QA standards):
 
-Environment vocabulary:
-- "Production stage" means Production only (not Beta).
-- Use Canary / Beta / Production exactly as named above.`
+- Always mention the affected module (e.g. Layer Panel, Checkout).
+- Include browser and OS in the issue summary when known.
+- Use company severity definitions from the project context above.`
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   ai: {
     projectContext: '',
-    ticketGuidelines: '',
     outputStyle: 'standard',
     autoGenerateAfterVoice: true,
   },
@@ -56,6 +50,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     assignee: '',
   },
   ticketTemplate: createDefaultTicketTemplateSettings(),
+  qaTicketStandards: createDefaultQaTicketStandards(),
   data: {
     historyRetention: 50,
   },

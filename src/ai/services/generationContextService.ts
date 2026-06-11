@@ -7,9 +7,10 @@ import {
 } from '../../services/knowledge/knowledgeContextService'
 import {
   formatProjectContextForPrompt,
-  formatTicketGuidelinesForPrompt,
 } from '../../services/knowledge/projectContextPrompt'
+import { formatQaStandardsForPrompt } from '../../services/knowledge/qaStandardsPrompt'
 import { hasProjectContextContent } from '../../utils/projectContextFormat'
+import { resolveEffectiveOutputStyle } from '../../../shared/qaTicketStandards'
 import { loadAppSettings } from '../../utils/appSettingsStorage'
 import { isCustomProjectKnowledge, loadProjectKnowledge } from '../../utils/qaContextStorage'
 import { getTicketHistory } from '../../services/history/ticketHistoryService'
@@ -52,12 +53,16 @@ export function buildAiGenerationContext(
     })),
   )
 
+  const qaPrompt = formatQaStandardsForPrompt(appSettings.qaTicketStandards)
+
   return {
     projectContextSection: resolveProjectContextSection(),
-    ticketGuidelinesSection: formatTicketGuidelinesForPrompt(
-      appSettings.ai.ticketGuidelines,
+    qaStandardsSection: qaPrompt.standardsSection,
+    customRulesSection: qaPrompt.customRulesSection,
+    aiOutputStyle: resolveEffectiveOutputStyle(
+      appSettings.qaTicketStandards.preset,
+      appSettings.ai.outputStyle,
     ),
-    aiOutputStyle: appSettings.ai.outputStyle,
     similarTickets,
     feedbackSummary,
   }
