@@ -7,14 +7,19 @@ import {
   extractContext,
   mergeExtractedContext,
 } from '../utils/contextDetection/extractContext'
+import { normalizeContextTermsInText } from '../utils/contextDetection/fuzzyContextMatch'
 import { isBugReportFormComplete } from '../utils/validateForm'
 
 /** Synchronous voice payload — safe to pass to generate before React state flushes. */
-export function buildVoiceFormValues(issueDescription: string): BugReportFormValues {
+export function buildVoiceFormValues(
+  issueDescription: string,
+  options?: { finalizeTrailingWord?: boolean },
+): BugReportFormValues {
+  const normalized = normalizeContextTermsInText(issueDescription, options)
   return {
-    issueDescription,
-    environments: resolveEnvironmentsFromVoice(issueDescription),
-    qaContext: extractContext(issueDescription),
+    issueDescription: normalized,
+    environments: resolveEnvironmentsFromVoice(normalized),
+    qaContext: extractContext(normalized),
   }
 }
 
@@ -30,25 +35,30 @@ export function useBugReportForm() {
     if (!trimmed) return
 
     setValues((prev) => {
-      const extracted = extractContext(trimmed)
+      const normalized = normalizeContextTermsInText(trimmed, { finalizeTrailingWord: false })
+      const extracted = extractContext(normalized)
       const qaContext = mergeExtractedContext(prev.qaContext, extracted)
       return {
         ...prev,
+        issueDescription: normalized,
         qaContext,
-        environments: resolveEnvironmentsFromVoice(trimmed),
+        environments: resolveEnvironmentsFromVoice(normalized),
       }
     })
   }, [])
 
   const setIssueDescription = useCallback((issueDescription: string) => {
     setValues((prev) => {
-      const extracted = extractContext(issueDescription)
+      const normalized = normalizeContextTermsInText(issueDescription, {
+        finalizeTrailingWord: false,
+      })
+      const extracted = extractContext(normalized)
       const qaContext = mergeExtractedContext(prev.qaContext, extracted)
       return {
         ...prev,
-        issueDescription,
+        issueDescription: normalized,
         qaContext,
-        environments: resolveEnvironmentsFromVoice(issueDescription),
+        environments: resolveEnvironmentsFromVoice(normalized),
       }
     })
   }, [])
@@ -111,7 +121,7 @@ export function useBugReportForm() {
   }, [])
 
   const applyVoiceResult = useCallback((issueDescription: string) => {
-    const next = buildVoiceFormValues(issueDescription)
+    const next = buildVoiceFormValues(issueDescription, { finalizeTrailingWord: true })
     setValues(next)
     return next
   }, [])

@@ -1,7 +1,9 @@
 import type { DetectedField, DetectedOs } from '../../types/contextDetection'
 
+import { findContextMatchInText } from './fuzzyContextMatch'
+
 const OS_PATTERNS: { value: DetectedOs; pattern: RegExp }[] = [
-  { value: 'Windows', pattern: /\bwindows\b/i },
+  { value: 'Windows', pattern: /\b(windows|win32)\b/i },
   { value: 'macOS', pattern: /\b(mac\s?os|macos|osx|os x)\b/i },
   { value: 'Linux', pattern: /\blinux\b/i },
   { value: 'Android', pattern: /\bandroid\b/i },
@@ -16,6 +18,11 @@ export function detectOsFromText(text: string): DetectedField<DetectedOs> | null
     if (pattern.test(normalized)) {
       return { value, source: 'user' }
     }
+  }
+
+  const fuzzy = findContextMatchInText<DetectedOs>(normalized, 'os')
+  if (fuzzy) {
+    return { value: fuzzy.value, source: 'user' }
   }
 
   return null

@@ -41,6 +41,11 @@ describe('extractContext', () => {
     expect(ctx.browser).toEqual({ value: 'Firefox', source: 'user' })
   })
 
+  it('detects misheard browser names from voice transcripts', () => {
+    const ctx = extractContext('Button broken on suffer in production')
+    expect(ctx.browser).toEqual({ value: 'Safari', source: 'user' })
+  })
+
   it('mergeExtractedContext keeps user overrides', () => {
     const previous = extractContext('staging bug on safari')
     const userOverride = {

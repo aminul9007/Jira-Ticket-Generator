@@ -1,5 +1,7 @@
 import type { DetectedDevice, DetectedField } from '../../types/contextDetection'
 
+import { findContextMatchInText } from './fuzzyContextMatch'
+
 const DEVICE_PATTERNS: { value: DetectedDevice; pattern: RegExp }[] = [
   { value: 'Mobile', pattern: /\b(mobile|phone|iphone|android phone)\b/i },
   { value: 'Tablet', pattern: /\b(tablet|ipad)\b/i },
@@ -14,6 +16,11 @@ export function detectDeviceFromText(text: string): DetectedField<DetectedDevice
     if (pattern.test(normalized)) {
       return { value, source: 'user' }
     }
+  }
+
+  const fuzzy = findContextMatchInText<DetectedDevice>(normalized, 'device')
+  if (fuzzy) {
+    return { value: fuzzy.value, source: 'user' }
   }
 
   return null
