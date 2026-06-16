@@ -70,7 +70,7 @@ export function createUnknownContext(): ExtractedContext {
   }
 }
 
-/** Preserve user-edited fields when re-extracting from an updated transcript. */
+/** Preserve chip edits (source: user) when re-extracting from updated text. */
 export function mergeExtractedContext(
   previous: ExtractedContext,
   next: ExtractedContext,

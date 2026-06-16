@@ -22,10 +22,16 @@ describe('bug report form contract', () => {
       'On production checkout fails in Firefox on desktop',
     )
     expect(values.environments).toEqual(['Production'])
-    expect(values.environments).toEqual(['Production'])
-    expect(values.qaContext.environment).toEqual({ value: 'production', source: 'user' })
-    expect(values.qaContext.browser).toEqual({ value: 'Firefox', source: 'user' })
+    expect(values.qaContext.environment).toEqual({ value: 'production', source: 'auto-detected' })
+    expect(values.qaContext.browser).toEqual({ value: 'Firefox', source: 'auto-detected' })
+    expect(values.qaContext.device).toEqual({ value: 'Desktop', source: 'auto-detected' })
     expect(values.issueDescription).toContain('production')
+  })
+
+  it('buildVoiceFormValues leaves environments empty when not mentioned', () => {
+    const values = buildVoiceFormValues('Checkout button stays disabled')
+    expect(values.environments).toEqual([])
+    expect(values.qaContext.environment.value).toBe('unknown')
   })
 
   it('inferred fields live on ResolvedBugInput, not on form values', () => {

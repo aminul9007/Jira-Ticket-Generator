@@ -12,6 +12,7 @@
     "dev:share": "powershell -ExecutionPolicy Bypass -File ./scripts/restart-dev.ps1 -Lan",
     "lan:firewall": "powershell -ExecutionPolicy Bypass -File ./scripts/allow-lan-dev.ps1",
     "lan:diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/lan-diagnose.ps1",
+    "dev:lan:http": "powershell -ExecutionPolicy Bypass -File ./scripts/dev-lan-http.ps1",
     "dev:vite": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

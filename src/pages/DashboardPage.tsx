@@ -5,9 +5,11 @@ import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { TicketPreviewPanel } from '../components/ticket/TicketPreviewPanel'
 import { Toast } from '../components/ui/Toast'
+import { useAppSettings } from '../hooks/useAppSettings'
 import { useToast } from '../hooks/useToast'
 import { useBugReportAssistant } from '../hooks/useBugReportAssistant'
 import { useJiraIssueCreation } from '../hooks/useJiraIssueCreation'
+import { getMissingContextFields } from '../utils/contextDetection/getMissingContextFields'
 import type { RecentTicketRecord } from '../types/recentTicket'
 
 interface DashboardPageProps {
@@ -21,6 +23,7 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
   const { state: jiraCreation, createIssue, reset: resetJiraCreation } =
     useJiraIssueCreation()
   const { toast, showToast } = useToast()
+  const { settings } = useAppSettings()
 
   const onGenerate = useCallback(async () => {
     const success = await generateTicket()
@@ -74,20 +77,30 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             onIssueDescriptionChange={form.setIssueDescription}
             onVoiceTranscriptUpdate={form.syncContextFromTranscript}
             onVoiceComplete={(payload) => {
-              form.applyVoiceResult(payload.issueDescription)
+              const voiceValues = form.applyVoiceResult(payload.issueDescription)
+              const missing = getMissingContextFields(
+                voiceValues.qaContext,
+                voiceValues.environments,
+              )
+              if (settings.ai.autoGenerateAfterVoice && missing.length === 0) {
+                void generateTicket(voiceValues).then((success) => {
+                  if (success) {
+                    document
+                      .getElementById('ticket-preview')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                  }
+                })
+              }
             }}
             onContextFieldChange={form.setContextField}
             onContextFieldClear={form.clearContextField}
             onGenerate={onGenerate}
-            onVoiceAutoGenerate={async (payload) => {
-              const voiceValues = form.buildVoiceFormValues(payload.issueDescription)
-              const success = await generateTicket(voiceValues)
-              if (success) {
-                document
-                  .getElementById('ticket-preview')
-                  ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-              }
+            missingContextFields={form.missingContextFields}
+            onMissingContextAnswer={(field, input) => {
+              const matched = form.applyMissingContextAnswer(field, input)
+              return matched ? { matchedLabel: matched.matchedLabel } : null
             }}
+            onDismissMissingContext={form.dismissMissingContextPrompt}
           />
         </div>
 

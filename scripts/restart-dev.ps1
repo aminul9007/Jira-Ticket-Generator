@@ -83,6 +83,17 @@ Start-Process powershell `
     '-Command', "npm run $frontendScript"
   )
 
+if ($shareMode) {
+  Start-Sleep -Seconds 2
+  Start-Process powershell `
+    -WorkingDirectory $root `
+    -ArgumentList @(
+      '-NoExit',
+      '-ExecutionPolicy', 'Bypass',
+      '-Command', 'npm run dev:lan:http'
+    )
+}
+
 Write-Host '  Waiting for servers to start...' -ForegroundColor DarkGray
 $ready = $false
 for ($i = 0; $i -lt 15; $i++) {
@@ -107,6 +118,9 @@ Write-Host "  This PC:       ${protocol}://localhost:5173/" -ForegroundColor Whi
 Write-Host "  Other devices: ${protocol}://${lanIp}:5173/" -ForegroundColor Yellow
 Write-Host ''
 if ($shareMode) {
+  Write-Host '  Corporate proxy / 502 "does not speak TLS"?' -ForegroundColor Yellow
+  Write-Host "    Use HTTP instead: http://${lanIp}:5174/" -ForegroundColor Yellow
+  Write-Host ''
   Write-Host '  Voice on other devices:' -ForegroundColor Cyan
   Write-Host '    1. Open the HTTPS link above on their phone/PC' -ForegroundColor White
   Write-Host '    2. Accept the certificate warning (Advanced -> Proceed)' -ForegroundColor White

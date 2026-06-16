@@ -66,21 +66,21 @@ describe('detect*FromText fuzzy integration', () => {
   it('detects Safari from a misheard browser word', () => {
     expect(detectBrowserFromText('Checkout broken on suffer only')).toEqual({
       value: 'Safari',
-      source: 'user',
+      source: 'auto-detected',
     })
   })
 
   it('detects Mobile from a typo', () => {
     expect(detectDeviceFromText('Issue happens on moble')).toEqual({
       value: 'Mobile',
-      source: 'user',
+      source: 'auto-detected',
     })
   })
 
   it('detects Windows from a typo', () => {
     expect(detectOsFromText('Only on windoze laptops')).toEqual({
       value: 'Windows',
-      source: 'user',
+      source: 'auto-detected',
     })
   })
 })

@@ -73,6 +73,7 @@ if ($disabledCount -gt 0) {
 # 2. Allow dev ports on all network profiles.
 $portRules = @(
   @{ Name = 'Jira Ticket Generator Dev 5173'; Port = 5173; Description = 'Vite HTTPS dev server (LAN + voice)' },
+  @{ Name = 'Jira Ticket Generator Dev 5174'; Port = 5174; Description = 'Vite HTTP dev server (corporate proxy fallback)' },
   @{ Name = 'Jira Ticket Generator Dev 3001'; Port = 3001; Description = 'Jira API backend' }
 )
 

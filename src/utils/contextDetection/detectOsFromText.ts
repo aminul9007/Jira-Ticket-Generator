@@ -16,13 +16,13 @@ export function detectOsFromText(text: string): DetectedField<DetectedOs> | null
 
   for (const { value, pattern } of OS_PATTERNS) {
     if (pattern.test(normalized)) {
-      return { value, source: 'user' }
+      return { value, source: 'auto-detected' }
     }
   }
 
   const fuzzy = findContextMatchInText<DetectedOs>(normalized, 'os')
   if (fuzzy) {
-    return { value: fuzzy.value, source: 'user' }
+    return { value: fuzzy.value, source: 'auto-detected' }
   }
 
   return null

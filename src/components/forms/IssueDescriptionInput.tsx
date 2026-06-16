@@ -120,7 +120,7 @@ export function IssueDescriptionInput({
             </span>
           ) : (
             <span>
-              Type or tap the mic — say production, beta, or canary to set environment
+              Type or tap the mic — we'll ask for browser, OS, device, and environment if needed
             </span>
           )}
         </p>

@@ -15,7 +15,6 @@ function Stop-PortListener {
 }
 
 Stop-PortListener -Port 5173
-Stop-PortListener -Port 5174
 Start-Sleep -Seconds 1
 
 $lanIp = (
@@ -48,11 +47,11 @@ Write-Host ''
 Write-Host "  This PC:       https://localhost:5173" -ForegroundColor White
 Write-Host "  Other devices: https://${lanIp}:5173" -ForegroundColor Yellow
 Write-Host ''
-Write-Host '  IMPORTANT: Use HTTPS (not HTTP) when sharing with other devices.' -ForegroundColor Red
-Write-Host "  Example: https://${lanIp}:5173/" -ForegroundColor Yellow
+Write-Host '  Corporate proxy / 502 "does not speak TLS"?' -ForegroundColor Yellow
+Write-Host "    Use HTTP: http://${lanIp}:5174/" -ForegroundColor Yellow
 Write-Host ''
-Write-Host '  Corporate proxy? If you see squid-proxy errors on the other PC,' -ForegroundColor DarkGray
-Write-Host '  add 192.168.* to proxy bypass on THAT machine.' -ForegroundColor DarkGray
+Write-Host '  IMPORTANT: Use HTTPS (not HTTP) on port 5173 for voice on phones.' -ForegroundColor Red
+Write-Host "  Example: https://${lanIp}:5173/" -ForegroundColor Yellow
 Write-Host ''
 Write-Host '  Accept the self-signed certificate warning on first visit.' -ForegroundColor DarkGray
 Write-Host '  For simple HTTP sharing (no voice on phones), use: npm run dev' -ForegroundColor DarkGray

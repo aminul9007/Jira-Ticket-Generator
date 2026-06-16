@@ -18,7 +18,7 @@ export function detectEnvironmentFromText(
 
   for (const { value, pattern } of ENVIRONMENT_PATTERNS) {
     if (pattern.test(normalized)) {
-      return { value, source: 'user' }
+      return { value, source: 'auto-detected' }
     }
   }
 

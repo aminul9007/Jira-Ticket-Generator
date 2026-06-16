@@ -28,6 +28,9 @@ export function useBugReportAssistant() {
     applyVoiceResult,
     buildVoiceFormValues,
     syncContextFromTranscript,
+    missingContextFields,
+    applyMissingContextAnswer,
+    dismissMissingContextPrompt,
     reset: resetForm,
   } = useBugReportForm()
 
@@ -142,6 +145,9 @@ export function useBugReportAssistant() {
       applyVoiceResult,
       buildVoiceFormValues,
       syncContextFromTranscript,
+      missingContextFields,
+      applyMissingContextAnswer,
+      dismissMissingContextPrompt,
       reset: resetForm,
     },
     inputQuality,

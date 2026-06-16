@@ -10,6 +10,8 @@ import { ContextMetadataChips } from './ContextMetadataChips'
 import { EnvironmentMultiSelect } from './EnvironmentMultiSelect'
 import { InputQualityAlerts } from './InputQualityAlerts'
 import { IssueDescriptionInput } from './IssueDescriptionInput'
+import { MissingContextPrompt } from './MissingContextPrompt'
+import type { MissingContextField } from '../../utils/contextDetection/getMissingContextFields'
 
 interface BugReportFormProps {
   values: BugReportFormValues
@@ -27,6 +29,12 @@ interface BugReportFormProps {
   onContextFieldClear: (field: keyof ExtractedContext) => void
   onGenerate: () => void
   onVoiceAutoGenerate?: (payload: Pick<BugReportFormValues, 'issueDescription'>) => void
+  missingContextFields?: MissingContextField[]
+  onMissingContextAnswer?: (
+    field: MissingContextField,
+    input: string,
+  ) => { matchedLabel: string } | null
+  onDismissMissingContext?: () => void
 }
 
 const FormIcon = (
@@ -54,6 +62,9 @@ export function BugReportForm({
   onContextFieldClear,
   onGenerate,
   onVoiceAutoGenerate,
+  missingContextFields = [],
+  onMissingContextAnswer,
+  onDismissMissingContext,
 }: BugReportFormProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -71,6 +82,7 @@ export function BugReportForm({
   const showQualityHints = descriptionLength >= MIN_ISSUE_DESCRIPTION_LENGTH
 
   return (
+    <>
     <Card id="bug-report-form" variant="elevated" className="h-full">
       <CardHeader
         title="Quick Bug Report"
@@ -130,5 +142,14 @@ Example: On Production, checkout button stays disabled after entering a valid ad
         </div>
       </form>
     </Card>
+
+    {onMissingContextAnswer && onDismissMissingContext && (
+      <MissingContextPrompt
+        fields={missingContextFields}
+        onAnswer={onMissingContextAnswer}
+        onDismiss={onDismissMissingContext}
+      />
+    )}
+    </>
   )
 }

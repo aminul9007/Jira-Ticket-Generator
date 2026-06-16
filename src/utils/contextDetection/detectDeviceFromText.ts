@@ -14,13 +14,13 @@ export function detectDeviceFromText(text: string): DetectedField<DetectedDevice
 
   for (const { value, pattern } of DEVICE_PATTERNS) {
     if (pattern.test(normalized)) {
-      return { value, source: 'user' }
+      return { value, source: 'auto-detected' }
     }
   }
 
   const fuzzy = findContextMatchInText<DetectedDevice>(normalized, 'device')
   if (fuzzy) {
-    return { value: fuzzy.value, source: 'user' }
+    return { value: fuzzy.value, source: 'auto-detected' }
   }
 
   return null
