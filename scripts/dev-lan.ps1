@@ -49,7 +49,10 @@ Write-Host "  This PC:       https://localhost:5173" -ForegroundColor White
 Write-Host "  Other devices: https://${lanIp}:5173" -ForegroundColor Yellow
 Write-Host ''
 Write-Host '  IMPORTANT: Use HTTPS (not HTTP) when sharing with other devices.' -ForegroundColor Red
-Write-Host '  Example: https://192.168.0.73:5173/' -ForegroundColor Yellow
+Write-Host "  Example: https://${lanIp}:5173/" -ForegroundColor Yellow
+Write-Host ''
+Write-Host '  Corporate proxy? If you see squid-proxy errors on the other PC,' -ForegroundColor DarkGray
+Write-Host '  add 192.168.* to proxy bypass on THAT machine.' -ForegroundColor DarkGray
 Write-Host ''
 Write-Host '  Accept the self-signed certificate warning on first visit.' -ForegroundColor DarkGray
 Write-Host '  For simple HTTP sharing (no voice on phones), use: npm run dev' -ForegroundColor DarkGray
@@ -65,4 +68,5 @@ if (-not $firewallOk) {
 Set-Location $PSScriptRoot\..
 
 $env:VITE_DEV_HTTPS = 'true'
+$env:VITE_LAN_IP = $lanIp
 npm run dev:vite
