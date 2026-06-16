@@ -61,11 +61,6 @@ function normalizeWord(word: string): string {
   return word.toLowerCase().replace(/[^a-z0-9']/g, '')
 }
 
-function maxAllowedDistance(word: string, target: string): number {
-  const maxLen = Math.max(word.length, target.length)
-  return Math.ceil(maxLen / 2) + 1
-}
-
 function findCatalogEntry(value: ContextValue): ContextTermEntry | undefined {
   return CONTEXT_TERM_CATALOG.find((entry) => entry.value === value)
 }
@@ -76,8 +71,14 @@ function isCloseEnough(word: string, target: string): boolean {
     return false
   }
 
+  // Avoid substring-style false positives (e.g. "property" → "mobile").
+  if (Math.abs(word.length - target.length) > 2) {
+    return false
+  }
+
   const distance = levenshteinDistance(word, target)
-  return distance <= maxAllowedDistance(word, target) && distance < Math.max(word.length, target.length)
+  const maxDistance = Math.min(3, Math.floor(Math.min(word.length, target.length) / 2))
+  return distance <= maxDistance && distance < Math.max(word.length, target.length)
 }
 
 export function findFuzzyContextMatch(rawWord: string): FuzzyContextMatch | null {

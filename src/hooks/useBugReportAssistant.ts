@@ -29,8 +29,11 @@ export function useBugReportAssistant() {
     buildVoiceFormValues,
     syncContextFromTranscript,
     missingContextFields,
-    applyMissingContextAnswer,
+    applyContextCompletion,
+    prepareForGenerate,
+    completeContextCompletion,
     dismissMissingContextPrompt,
+    pendingGenerateAfterContext,
     reset: resetForm,
   } = useBugReportForm()
 
@@ -69,9 +72,6 @@ export function useBugReportAssistant() {
 
   const generateTicket = useCallback(
     async (overrideValues?: BugReportFormValues) => {
-      if (overrideValues) {
-        applyVoiceResult(overrideValues.issueDescription)
-      }
       const formValues = overrideValues ?? values
       if (activeHistoryId && editedTicket) {
         finalizeTicketHistory(activeHistoryId, editedTicket)
@@ -100,7 +100,6 @@ export function useBugReportAssistant() {
     loadTicket,
     saveTicket,
     markActive,
-    applyVoiceResult,
   ])
 
   const reopenRecentTicket = useCallback(
@@ -146,8 +145,11 @@ export function useBugReportAssistant() {
       buildVoiceFormValues,
       syncContextFromTranscript,
       missingContextFields,
-      applyMissingContextAnswer,
+      applyContextCompletion,
+      prepareForGenerate,
+      completeContextCompletion,
       dismissMissingContextPrompt,
+      pendingGenerateAfterContext,
       reset: resetForm,
     },
     inputQuality,

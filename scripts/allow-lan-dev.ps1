@@ -26,7 +26,7 @@ if (-not $Elevated -and -not (Test-IsAdmin)) {
   Write-Host '========================================' -ForegroundColor Cyan
   Write-Host ''
   Write-Host 'Windows will ask for Administrator permission.' -ForegroundColor Yellow
-  Write-Host 'Click YES - this only opens ports 5173 and 3001 for your Wi-Fi.' -ForegroundColor Yellow
+  Write-Host 'Click YES - this opens ports 5173, 5175, and 3001 for your Wi-Fi.' -ForegroundColor Yellow
   Write-Host ''
   Write-Host 'Without this, other PCs CANNOT connect to your dev server.' -ForegroundColor Red
   Write-Host ''
@@ -72,8 +72,9 @@ if ($disabledCount -gt 0) {
 
 # 2. Allow dev ports on all network profiles.
 $portRules = @(
-  @{ Name = 'Jira Ticket Generator Dev 5173'; Port = 5173; Description = 'Vite HTTPS dev server (LAN + voice)' },
-  @{ Name = 'Jira Ticket Generator Dev 5174'; Port = 5174; Description = 'Vite HTTP dev server (corporate proxy fallback)' },
+  @{ Name = 'Jira Ticket Generator Dev 5173'; Port = 5173; Description = 'Vite HTTP dev server (this PC + LAN)' },
+  @{ Name = 'Jira Ticket Generator Dev 5174'; Port = 5174; Description = 'Vite HTTP dev server (legacy fallback)' },
+  @{ Name = 'Jira Ticket Generator Dev 5175'; Port = 5175; Description = 'Vite HTTPS dev server (voice on phones)' },
   @{ Name = 'Jira Ticket Generator Dev 3001'; Port = 3001; Description = 'Jira API backend' }
 )
 

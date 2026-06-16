@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 const useHttps = process.env.VITE_DEV_HTTPS === 'true'
 const lanIp = process.env.VITE_LAN_IP?.trim()
+const devPort = Number(process.env.VITE_DEV_PORT ?? 5173)
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -14,15 +15,15 @@ export default defineConfig(({ mode }) => {
     plugins: [...(useHttps ? [basicSsl()] : []), react(), tailwindcss()],
     server: {
       host: '0.0.0.0',
-      port: 5173,
+      port: devPort,
       strictPort: true,
       // WebSocket HMR must use the LAN IP when other devices load the HTTPS page.
       hmr: useHttps && lanIp
         ? {
             host: lanIp,
             protocol: 'wss',
-            port: 5173,
-            clientPort: 5173,
+            port: devPort,
+            clientPort: devPort,
           }
         : true,
       proxy: {

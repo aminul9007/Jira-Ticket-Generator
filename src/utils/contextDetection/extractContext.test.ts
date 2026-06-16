@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { extractContext, mergeExtractedContext } from './extractContext'
-import { extractContextFromVoice } from './extractContextFromVoice'
+import { extractContextFromText, extractContextFromVoice } from './extractContextFromVoice'
 
 const WINDOWS_CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -43,7 +43,7 @@ describe('extractContext', () => {
   })
 
   it('detects misheard browser names from voice transcripts', () => {
-    const ctx = extractContext('Button broken on suffer in production')
+    const ctx = extractContextFromText('Button broken on suffer in production', { fuzzy: true })
     expect(ctx.browser).toEqual({ value: 'Safari', source: 'auto-detected' })
   })
 
@@ -60,7 +60,7 @@ describe('extractContext', () => {
   })
 
   it('mergeExtractedContext updates text-detected fields when typing changes them', () => {
-    const previous = extractContextFromVoice('broken on suffer in production')
+    const previous = extractContextFromVoice('broken on suffer in production', { fuzzy: true })
     const next = extractContextFromVoice(
       'property search button broken on chrome broser in desktop windows in production',
     )
@@ -69,5 +69,6 @@ describe('extractContext', () => {
     expect(merged.device).toEqual({ value: 'Desktop', source: 'auto-detected' })
     expect(merged.os).toEqual({ value: 'Windows', source: 'auto-detected' })
     expect(merged.environment).toEqual({ value: 'production', source: 'auto-detected' })
+    expect(merged.device.value).not.toBe('Mobile')
   })
 })

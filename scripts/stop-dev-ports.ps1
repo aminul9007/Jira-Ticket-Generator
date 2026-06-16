@@ -16,7 +16,8 @@ function Stop-PortListener {
 
 Stop-PortListener -Port 5173
 Stop-PortListener -Port 5174
+Stop-PortListener -Port 5175
 Stop-PortListener -Port 3001
 Start-Sleep -Seconds 1
 
-Write-Host 'Stopped listeners on ports 5173, 5174, and 3001 (if any were running).' -ForegroundColor Green
+Write-Host 'Stopped listeners on ports 5173, 5174, 5175, and 3001 (if any were running).' -ForegroundColor Green

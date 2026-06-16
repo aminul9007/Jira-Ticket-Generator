@@ -63,22 +63,24 @@ describe('normalizeContextTermsInText', () => {
 })
 
 describe('detect*FromText fuzzy integration', () => {
+  const fuzzy = { fuzzy: true as const }
+
   it('detects Safari from a misheard browser word', () => {
-    expect(detectBrowserFromText('Checkout broken on suffer only')).toEqual({
+    expect(detectBrowserFromText('Checkout broken on suffer only', fuzzy)).toEqual({
       value: 'Safari',
       source: 'auto-detected',
     })
   })
 
   it('detects Mobile from a typo', () => {
-    expect(detectDeviceFromText('Issue happens on moble')).toEqual({
+    expect(detectDeviceFromText('Issue happens on moble', fuzzy)).toEqual({
       value: 'Mobile',
       source: 'auto-detected',
     })
   })
 
   it('detects Windows from a typo', () => {
-    expect(detectOsFromText('Only on windoze laptops')).toEqual({
+    expect(detectOsFromText('Only on windoze laptops', fuzzy)).toEqual({
       value: 'Windows',
       source: 'auto-detected',
     })

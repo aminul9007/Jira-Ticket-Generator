@@ -26,13 +26,47 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
   const { settings } = useAppSettings()
 
   const onGenerate = useCallback(async () => {
-    const success = await generateTicket()
+    const { ready, values: prepared } = form.prepareForGenerate()
+    if (!ready) return
+
+    const success = await generateTicket(prepared)
     if (success) {
       document
         .getElementById('ticket-preview')
         ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
-  }, [generateTicket])
+  }, [form.prepareForGenerate, generateTicket])
+
+  const onContextCompletionContinue = useCallback(
+    (selections: Parameters<typeof form.completeContextCompletion>[0]) => {
+      const shouldGenerate = form.pendingGenerateAfterContext
+      const prepared = form.completeContextCompletion(selections)
+      if (shouldGenerate) {
+        void generateTicket(prepared).then((success) => {
+          if (success) {
+            document
+              .getElementById('ticket-preview')
+              ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          }
+        })
+      }
+    },
+    [form.completeContextCompletion, form.pendingGenerateAfterContext, generateTicket],
+  )
+
+  const onContextCompletionSkip = useCallback(() => {
+    const shouldGenerate = form.pendingGenerateAfterContext
+    form.dismissMissingContextPrompt()
+    if (shouldGenerate) {
+      void generateTicket(form.values).then((success) => {
+        if (success) {
+          document
+            .getElementById('ticket-preview')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }
+      })
+    }
+  }, [form.dismissMissingContextPrompt, form.pendingGenerateAfterContext, form.values, generateTicket])
 
   const onCopySuccess = useCallback(() => {
     showToast('Jira ticket copied to clipboard')
@@ -96,11 +130,8 @@ export function DashboardPage({ onOpenSettings }: DashboardPageProps) {
             onContextFieldClear={form.clearContextField}
             onGenerate={onGenerate}
             missingContextFields={form.missingContextFields}
-            onMissingContextAnswer={(field, input) => {
-              const matched = form.applyMissingContextAnswer(field, input)
-              return matched ? { matchedLabel: matched.matchedLabel } : null
-            }}
-            onDismissMissingContext={form.dismissMissingContextPrompt}
+            onContextCompletionContinue={onContextCompletionContinue}
+            onContextCompletionSkip={onContextCompletionSkip}
           />
         </div>
 

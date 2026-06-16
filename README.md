@@ -170,18 +170,25 @@ Other phones or PCs on the same Wi-Fi can use the app, including the microphone.
 npm run dev:share
 ```
 
-This stops old servers, opens Windows Firewall (Admin prompt once), and starts HTTPS on all interfaces.
+This stops old servers, opens Windows Firewall (Admin prompt once), and starts **HTTP on 5173** plus **HTTPS on 5175** for phone voice.
 
 | URL | Use |
 | --- | --- |
-| `https://localhost:5173/` | This PC |
-| `https://<your-lan-ip>:5173/` | Other devices (e.g. `https://192.168.0.73:5173/`) |
+| `http://localhost:5173/` | **This PC** — use this (no certificate errors) |
+| `http://<your-lan-ip>:5173/` | Other devices on Wi-Fi (HTTP) |
+| `https://<your-lan-ip>:5175/` | Phones/tablets for **voice** (accept cert warning) |
 
-**First-time firewall:** right-click `scripts/allow-lan-firewall.bat` → **Run as administrator** → click **Yes**.
+**Do not open `https://localhost:5173`** — port 5173 is HTTP only. HTTPS on 5173 causes `502 / self-signed certificate` behind corporate proxies.
 
-**On other devices:**
+**If you see `502 Bad Gateway` / `Certificate verify failed: self-signed certificate`:** you used an HTTPS URL. Switch to **http://localhost:5173/**
 
-1. Use **HTTPS** (not HTTP) — required for microphone access.
+```bash
+npm run dev:corp    # HTTP-only (no phone voice over LAN)
+```
+
+**On phones/tablets (voice over Wi-Fi):**
+
+1. Use **HTTPS on port 5175** (not 5173) — required for microphone access.
 2. Accept the self-signed certificate warning (Advanced → Proceed).
 3. Allow microphone when prompted.
 4. If you see a **squid-proxy** error, add `192.168.*` to proxy bypass on that machine (Settings → Network → Proxy).
@@ -251,7 +258,7 @@ Set `JIRA_MCP_MOCK=true` in `server/.env` to return a fake `QA-123` issue withou
 | `npm run dev:lan` | Start frontend (HTTPS only, for LAN voice) |
 | `npm run dev:share` | Stop → firewall → restart API + HTTPS frontend for LAN sharing |
 | `npm run dev:restart` | Stop and restart API + HTTP frontend |
-| `npm run dev:stop` | Kill processes on ports 5173, 5174, 3001 |
+| `npm run dev:stop` | Kill processes on ports 5173, 5174, 5175, 3001 |
 | `npm run lan:firewall` | Open Windows Firewall for ports 5173 and 3001 (Admin) |
 | `npm run lan:diagnose` | LAN connectivity and firewall checklist |
 | `npm run api:dev` | Start Jira API backend (port 3001) |

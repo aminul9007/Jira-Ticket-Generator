@@ -1,20 +1,22 @@
 import { useCallback, useState } from 'react'
 import type { BugReportFormValues, Environment } from '../types/bugReport'
 import type { ExtractedContext } from '../types/contextDetection'
+import type { DetectedEnvironment } from '../types/contextDetection'
 import { inferEnvironmentsFromText } from '../utils/inferBugDetails'
 import { mapDetectedEnvironmentToLegacy } from '../utils/contextDetection/mapDetectedEnvironment'
 import {
-  extractContext,
   mergeExtractedContext,
 } from '../utils/contextDetection/extractContext'
-import { extractContextFromVoice } from '../utils/contextDetection/extractContextFromVoice'
+import { createUnknownContext } from '../utils/contextDetection/extractContextFromText'
+import { applyTypingContextUpdate } from '../utils/contextDetection/applyTypingContextUpdate'
 import {
   getMissingContextFields,
   type MissingContextField,
 } from '../utils/contextDetection/getMissingContextFields'
 import { normalizeContextTermsInText } from '../utils/contextDetection/fuzzyContextMatch'
-import { matchContextFieldFromUserInput } from '../utils/contextDetection/matchContextFieldInput'
+import { resolveSmartContext } from '../utils/contextDetection/resolveSmartContext'
 import { isBugReportFormComplete } from '../utils/validateForm'
+import type { ContextCompletionSelections } from '../components/forms/ContextCompletionModal'
 
 /** Synchronous voice payload — safe to pass to generate before React state flushes. */
 export function buildVoiceFormValues(
@@ -22,7 +24,7 @@ export function buildVoiceFormValues(
   options?: { finalizeTrailingWord?: boolean },
 ): BugReportFormValues {
   const normalized = normalizeContextTermsInText(issueDescription, options)
-  const qaContext = extractContextFromVoice(normalized)
+  const qaContext = resolveSmartContext(normalized, { fuzzy: true, fillSession: true })
   const envDetected = qaContext.environment.value !== 'unknown'
   return {
     issueDescription: normalized,
@@ -33,43 +35,51 @@ export function buildVoiceFormValues(
   }
 }
 
+function resolveEnvironments(
+  issueDescription: string,
+  qaContext: ExtractedContext,
+  previous: Environment[],
+): Environment[] {
+  const inferred = inferEnvironmentsFromText(issueDescription)
+  if (inferred.length > 0) return inferred
+  if (qaContext.environment.value !== 'unknown') {
+    return mapDetectedEnvironmentToLegacy(qaContext.environment.value)
+  }
+  return previous
+}
+
+function finalizeFormValues(prev: BugReportFormValues): BugReportFormValues {
+  const resolved = resolveSmartContext(prev.issueDescription, {
+    fuzzy: false,
+    fillSession: true,
+    defaultEnvironments: prev.environments,
+  })
+  const qaContext = mergeExtractedContext(prev.qaContext, resolved)
+  return {
+    ...prev,
+    qaContext,
+    environments: resolveEnvironments(prev.issueDescription, qaContext, prev.environments),
+  }
+}
+
 export function useBugReportForm() {
   const [values, setValues] = useState<BugReportFormValues>(() => ({
     issueDescription: '',
     environments: [],
-    qaContext: extractContext(''),
+    qaContext: createUnknownContext(),
   }))
   const [missingContextFields, setMissingContextFields] = useState<MissingContextField[]>([])
+  const [pendingGenerateAfterContext, setPendingGenerateAfterContext] = useState(false)
 
   const syncContextFromTranscript = useCallback((transcript: string) => {
     const trimmed = transcript.trim()
     if (!trimmed) return
 
-    setValues((prev) => {
-      const extracted = extractContextFromVoice(trimmed)
-      const qaContext = mergeExtractedContext(prev.qaContext, extracted)
-      const inferred = inferEnvironmentsFromText(trimmed)
-      return {
-        ...prev,
-        issueDescription: trimmed,
-        qaContext,
-        environments: inferred.length > 0 ? inferred : prev.environments,
-      }
-    })
+    setValues((prev) => applyTypingContextUpdate(prev, trimmed))
   }, [])
 
   const setIssueDescription = useCallback((issueDescription: string) => {
-    setValues((prev) => {
-      const extracted = extractContextFromVoice(issueDescription)
-      const qaContext = mergeExtractedContext(prev.qaContext, extracted)
-      const inferred = inferEnvironmentsFromText(issueDescription)
-      return {
-        ...prev,
-        issueDescription,
-        qaContext,
-        environments: inferred.length > 0 ? inferred : prev.environments,
-      }
-    })
+    setValues((prev) => applyTypingContextUpdate(prev, issueDescription))
   }, [])
 
   const toggleEnvironment = useCallback((env: Environment) => {
@@ -133,55 +143,113 @@ export function useBugReportForm() {
     const next = buildVoiceFormValues(issueDescription, { finalizeTrailingWord: true })
     setValues(next)
     setMissingContextFields(getMissingContextFields(next.qaContext, next.environments))
+    setPendingGenerateAfterContext(false)
     return next
   }, [])
 
-  const applyMissingContextAnswer = useCallback((field: MissingContextField, input: string) => {
-    const matched = matchContextFieldFromUserInput(field, input)
-    if (!matched) return null
-
+  const applyContextCompletion = useCallback((selections: ContextCompletionSelections) => {
     setValues((prev) => {
       const qaContext = { ...prev.qaContext }
+      let environments = prev.environments
 
-      if (matched.environment) {
-        qaContext.environment = { value: matched.environment, source: 'user' }
+      if (selections.environment) {
+        qaContext.environment = {
+          value: selections.environment as DetectedEnvironment,
+          source: 'user',
+        }
+        environments = mapDetectedEnvironmentToLegacy(qaContext.environment.value)
       }
-      if (matched.browser) {
-        qaContext.browser = { value: matched.browser, source: 'user' }
+      if (selections.browser) {
+        qaContext.browser = {
+          value: selections.browser as ExtractedContext['browser']['value'],
+          source: 'user',
+        }
       }
-      if (matched.os) {
-        qaContext.os = { value: matched.os, source: 'user' }
+      if (selections.os) {
+        qaContext.os = {
+          value: selections.os as ExtractedContext['os']['value'],
+          source: 'user',
+        }
       }
-      if (matched.device) {
-        qaContext.device = { value: matched.device, source: 'user' }
+      if (selections.device) {
+        qaContext.device = {
+          value: selections.device as ExtractedContext['device']['value'],
+          source: 'user',
+        }
       }
 
-      return {
-        ...prev,
-        qaContext,
-        environments: matched.environments ?? prev.environments,
-      }
+      return { ...prev, qaContext, environments }
     })
-
-    setMissingContextFields((prev) => {
-      const remaining = prev.filter((f) => f !== field)
-      return remaining
-    })
-
-    return matched
+    setMissingContextFields([])
   }, [])
+
+  const prepareForGenerate = useCallback((): {
+    ready: boolean
+    values: BugReportFormValues
+  } => {
+    const nextValues = finalizeFormValues(values)
+    setValues(nextValues)
+    const missing = getMissingContextFields(nextValues.qaContext, nextValues.environments)
+    setMissingContextFields(missing)
+    const ready = missing.length === 0
+    setPendingGenerateAfterContext(!ready)
+    return { ready, values: nextValues }
+  }, [values])
+
+  const completeContextCompletion = useCallback(
+    (selections: ContextCompletionSelections): BugReportFormValues => {
+      const base = finalizeFormValues(values)
+      const qaContext = { ...base.qaContext }
+      let environments = base.environments
+
+      if (selections.environment) {
+        qaContext.environment = {
+          value: selections.environment as DetectedEnvironment,
+          source: 'user',
+        }
+        environments = mapDetectedEnvironmentToLegacy(qaContext.environment.value)
+      }
+      if (selections.browser) {
+        qaContext.browser = {
+          value: selections.browser as ExtractedContext['browser']['value'],
+          source: 'user',
+        }
+      }
+      if (selections.os) {
+        qaContext.os = {
+          value: selections.os as ExtractedContext['os']['value'],
+          source: 'user',
+        }
+      }
+      if (selections.device) {
+        qaContext.device = {
+          value: selections.device as ExtractedContext['device']['value'],
+          source: 'user',
+        }
+      }
+
+      const nextValues = { ...base, qaContext, environments }
+      setValues(nextValues)
+      setMissingContextFields([])
+      setPendingGenerateAfterContext(false)
+      return nextValues
+    },
+    [values],
+  )
 
   const dismissMissingContextPrompt = useCallback(() => {
     setMissingContextFields([])
+    setPendingGenerateAfterContext(false)
   }, [])
 
   const reset = useCallback(() => {
     setValues({
       issueDescription: '',
       environments: [],
-      qaContext: extractContext(''),
+      qaContext: createUnknownContext(),
     })
     setMissingContextFields([])
+    setPendingGenerateAfterContext(false)
   }, [])
 
   const isValid = isBugReportFormComplete(values)
@@ -190,13 +258,16 @@ export function useBugReportForm() {
     values,
     isValid,
     missingContextFields,
+    pendingGenerateAfterContext,
     setIssueDescription,
     setEnvironments,
     toggleEnvironment,
     setContextField,
     clearContextField,
     applyVoiceResult,
-    applyMissingContextAnswer,
+    applyContextCompletion,
+    prepareForGenerate,
+    completeContextCompletion,
     dismissMissingContextPrompt,
     buildVoiceFormValues,
     syncContextFromTranscript,

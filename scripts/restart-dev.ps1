@@ -53,8 +53,8 @@ if (-not $SkipFirewall) {
   $firewallOk = $true
 }
 
-$frontendScript = if ($shareMode) { 'dev:lan' } else { 'dev' }
-$protocol = if ($shareMode) { 'https' } else { 'http' }
+$frontendScript = 'dev'
+$protocol = 'http'
 
 . (Join-Path $PSScriptRoot 'get-lan-ip.ps1')
 $lanIp = Get-LanIPv4
@@ -90,7 +90,7 @@ if ($shareMode) {
     -ArgumentList @(
       '-NoExit',
       '-ExecutionPolicy', 'Bypass',
-      '-Command', 'npm run dev:lan:http'
+      '-Command', 'npm run dev:lan'
     )
 }
 
@@ -114,17 +114,17 @@ if ($ready) {
 }
 
 Write-Host ''
-Write-Host "  This PC:       ${protocol}://localhost:5173/" -ForegroundColor White
+Write-Host "  This PC:       ${protocol}://localhost:5173/" -ForegroundColor Green
 Write-Host "  Other devices: ${protocol}://${lanIp}:5173/" -ForegroundColor Yellow
 Write-Host ''
 if ($shareMode) {
-  Write-Host '  Corporate proxy / 502 "does not speak TLS"?' -ForegroundColor Yellow
-  Write-Host "    Use HTTP instead: http://${lanIp}:5174/" -ForegroundColor Yellow
+  Write-Host '  Voice on phones (HTTPS — accept cert warning on phone):' -ForegroundColor Cyan
+  Write-Host "    https://${lanIp}:5175/" -ForegroundColor Yellow
   Write-Host ''
-  Write-Host '  Voice on other devices:' -ForegroundColor Cyan
-  Write-Host '    1. Open the HTTPS link above on their phone/PC' -ForegroundColor White
-  Write-Host '    2. Accept the certificate warning (Advanced -> Proceed)' -ForegroundColor White
-  Write-Host '    3. Allow microphone when prompted' -ForegroundColor White
+  Write-Host '  Do NOT use https://localhost:5173 — port 5173 is HTTP only.' -ForegroundColor Yellow
+  Write-Host ''
+  Write-Host '  If you see 502 / "self-signed certificate":' -ForegroundColor Yellow
+  Write-Host '    You opened an HTTPS URL. Use http://localhost:5173/ instead.' -ForegroundColor White
   Write-Host ''
   Write-Host '  If other PC shows squid-proxy / Connection timed out:' -ForegroundColor Yellow
   Write-Host '    That PC uses a corporate proxy. On THAT machine add bypass for:' -ForegroundColor White
@@ -132,12 +132,16 @@ if ($shareMode) {
   Write-Host '    Or use a phone on the same Wi-Fi instead.' -ForegroundColor White
   Write-Host ''
   if (-not $firewallOk) {
-    Write-Host '  !! Run allow-lan-firewall.bat as Admin before sharing !!' -ForegroundColor Red
+    Write-Host ''
+    Write-Host '  NOTE: Servers still started. localhost works without firewall.' -ForegroundColor Cyan
+    Write-Host '  For LAN IP from other devices, run as Admin:' -ForegroundColor Yellow
+    Write-Host '    scripts\allow-lan-firewall.bat' -ForegroundColor White
     Write-Host ''
   }
 }
 Write-Host '  Troubleshoot: npm run lan:diagnose' -ForegroundColor DarkGray
 Write-Host ''
 
-if (-not $firewallOk) { exit 1 }
+# Do not fail the script if servers started — firewall is optional for localhost.
+if (-not $firewallOk -and -not $ready) { exit 1 }
 exit 0

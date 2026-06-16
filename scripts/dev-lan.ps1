@@ -1,4 +1,7 @@
-# Starts a single Vite dev server exposed on your LAN IP.
+# HTTPS dev server on port 5175 for voice on phones/tablets over LAN.
+# Port 5173 stays HTTP (no self-signed cert / proxy 502 errors on this PC).
+#
+#   npm run dev:lan
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -14,58 +17,32 @@ function Stop-PortListener {
   }
 }
 
-Stop-PortListener -Port 5173
+Stop-PortListener -Port 5175
 Start-Sleep -Seconds 1
 
-$lanIp = (
-  Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object {
-      $_.InterfaceAlias -notmatch 'Loopback|OpenVPN|VPN|Surfshark|TAP|TUN' -and
-      $_.IPAddress -notlike '169.254.*' -and
-      $_.IPAddress -notlike '10.12.*'
-    } |
-    Select-Object -First 1
-).IPAddress
-
+. (Join-Path $PSScriptRoot 'get-lan-ip.ps1')
+$lanIp = Get-LanIPv4
 if (-not $lanIp) {
   $lanIp = 'YOUR-PC-IP'
 }
 
-$nodeBlocks = Get-NetFirewallRule -DisplayName 'Node.js JavaScript Runtime' -ErrorAction SilentlyContinue |
-  Where-Object { $_.Direction -eq 'Inbound' -and $_.Action -eq 'Block' -and $_.Enabled -eq 'True' }
-
-$firewallOk = -not $nodeBlocks -and (
-  Get-NetFirewallRule -DisplayName 'Jira Ticket Generator Dev 5173' -ErrorAction SilentlyContinue |
-    Where-Object { $_.Enabled -eq 'True' -and $_.Action -eq 'Allow' }
-)
-
 Write-Host ''
 Write-Host '========================================' -ForegroundColor Cyan
-Write-Host '  Jira Ticket Generator - Dev Server' -ForegroundColor Cyan
+Write-Host '  HTTPS LAN server (port 5175)' -ForegroundColor Cyan
+Write-Host '  Voice on phones / tablets' -ForegroundColor Cyan
 Write-Host '========================================' -ForegroundColor Cyan
 Write-Host ''
-Write-Host "  This PC:       https://localhost:5173" -ForegroundColor White
-Write-Host "  Other devices: https://${lanIp}:5173" -ForegroundColor Yellow
+Write-Host "  Phone / tablet: https://${lanIp}:5175/" -ForegroundColor Yellow
 Write-Host ''
-Write-Host '  Corporate proxy / 502 "does not speak TLS"?' -ForegroundColor Yellow
-Write-Host "    Use HTTP: http://${lanIp}:5174/" -ForegroundColor Yellow
+Write-Host '  On this PC use HTTP instead (no cert errors):' -ForegroundColor White
+Write-Host '    http://localhost:5173/' -ForegroundColor Green
 Write-Host ''
-Write-Host '  IMPORTANT: Use HTTPS (not HTTP) on port 5173 for voice on phones.' -ForegroundColor Red
-Write-Host "  Example: https://${lanIp}:5173/" -ForegroundColor Yellow
+Write-Host '  Accept the self-signed certificate warning on the phone.' -ForegroundColor DarkGray
 Write-Host ''
-Write-Host '  Accept the self-signed certificate warning on first visit.' -ForegroundColor DarkGray
-Write-Host '  For simple HTTP sharing (no voice on phones), use: npm run dev' -ForegroundColor DarkGray
-Write-Host '  If other PCs cannot connect, run: npm run lan:diagnose' -ForegroundColor DarkGray
-Write-Host ''
-
-if (-not $firewallOk) {
-  Write-Host '  WARNING: LAN firewall not configured for other devices.' -ForegroundColor Red
-  Write-Host '  Run (will request Admin): npm run lan:firewall' -ForegroundColor Yellow
-  Write-Host ''
-}
 
 Set-Location $PSScriptRoot\..
 
 $env:VITE_DEV_HTTPS = 'true'
+$env:VITE_DEV_PORT = '5175'
 $env:VITE_LAN_IP = $lanIp
 npm run dev:vite
