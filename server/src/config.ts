@@ -8,9 +8,20 @@ function parseArgs(raw: string | undefined): string[] {
   return raw.split(',').map((part) => part.trim()).filter(Boolean)
 }
 
+function parseCorsOrigins(raw: string | undefined): string | string[] {
+  const origins = raw
+    ?.split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  if (!origins?.length) return 'http://localhost:5173'
+  if (origins.length === 1) return origins[0]
+  return origins
+}
+
 export const appConfig = {
   port: Number(process.env.PORT ?? 3001),
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  corsOrigin: parseCorsOrigins(process.env.CORS_ORIGIN),
   jiraDomain: process.env.JIRA_DOMAIN?.trim() ?? '',
   defaultProjectKey: process.env.JIRA_DEFAULT_PROJECT_KEY?.trim() ?? '',
   defaultIssueType: process.env.JIRA_DEFAULT_ISSUE_TYPE?.trim() || 'Bug',
