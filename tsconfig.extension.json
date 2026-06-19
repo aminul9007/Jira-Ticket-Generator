@@ -4,5 +4,19 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.extension.tsbuildinfo",
     "noEmit": true
   },
-  "include": ["src/extension/**/*"]
+  "include": [
+    "src/extension/**/*",
+    "shared/generation/**/*",
+    "shared/qaTicketStandards.ts",
+    "shared/ticketTemplate.ts",
+    "src/services/ticketGeneration/**/*",
+    "src/services/knowledge/**/*",
+    "src/services/memory/**/*",
+    "src/services/feedback/**/*",
+    "src/services/history/**/*",
+    "src/ai/**/*",
+    "src/types/**/*",
+    "src/utils/**/*",
+    "src/data/**/*"
+  ]
 }

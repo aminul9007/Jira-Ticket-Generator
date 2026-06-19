@@ -29,4 +29,13 @@ declare namespace chrome {
       addListener(callback: (command: string) => void): void
     }
   }
+
+  namespace storage {
+    namespace local {
+      function get(
+        keys: string | string[] | Record<string, unknown> | null,
+        callback: (items: Record<string, unknown>) => void,
+      ): void
+    }
+  }
 }

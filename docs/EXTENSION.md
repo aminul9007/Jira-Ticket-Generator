@@ -1,8 +1,8 @@
 # QA Bug Assistant — Chrome Extension (Phase 2)
 
-**Version:** `0.2.0` — Phase 2 Step 1 — Extension Foundation
+**Version:** `0.2.0` — Phase 2 Step 2 — AI Generation + Review
 
-Phase 2 Step 1 provides the browser extension foundation only. AI generation and Jira creation are not wired yet.
+Phase 2 Step 2 connects the popup to the existing `generateTicket()` pipeline. Jira creation is not wired yet.
 
 ## Build
 
@@ -31,7 +31,21 @@ npm run dev:extension
 - Width: 400px
 - Min height: 600px
 - Captures active tab URL, title, and timestamp on open
-- **Generate Ticket** shows **Coming Soon**
+- **Generate Ticket** calls the same `generateTicket()` service as the web app
+- Review screen allows editing title, summary, steps, expected/actual, severity, priority
+- Voice and Jira creation are not wired yet
+
+## AI generation flow
+
+```
+User description + captured tab context
+  → composeIssueDescription()
+  → buildFormValuesFromGenerationInput()
+  → generateTicket()  (same as web app)
+      → buildAiGenerationContext() with extension settings
+      → generateTicketWithAi() OR generateSeniorQaTicket()
+  → Review screen (local popup state)
+```
 
 ## Keyboard shortcut
 

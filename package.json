@@ -2,7 +2,7 @@
   "name": "jira-ticket-generator",
   "private": true,
   "version": "0.2.0",
-  "versionName": "Phase 2 Step 1 — Extension Foundation",
+  "versionName": "Phase 2 Step 2 — AI Generation + Review",
   "type": "module",
   "scripts": {
     "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/dev.ps1",

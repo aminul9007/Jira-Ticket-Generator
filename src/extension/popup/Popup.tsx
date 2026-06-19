@@ -1,71 +1,77 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { GeneratedTicket } from '../../types/bugReport'
+import { InputScreen } from '../components/InputScreen'
+import { ReviewScreen } from '../components/ReviewScreen'
 import { useBrowserContext } from '../hooks/useBrowserContext'
+import { useExtensionTicketGeneration } from '../hooks/useExtensionTicketGeneration'
 import './Popup.css'
 
+type PopupView = 'input' | 'review'
+
 export function Popup() {
+  const browserContext = useBrowserContext()
+  const { status, errorMessage, ticket, usedAi, generate, resetError } =
+    useExtensionTicketGeneration()
+  const [view, setView] = useState<PopupView>('input')
   const [description, setDescription] = useState('')
-  const { url, title, timestamp } = useBrowserContext()
+  const [reviewTicket, setReviewTicket] = useState<GeneratedTicket | null>(null)
+
+  useEffect(() => {
+    if (status === 'success' && ticket) {
+      setReviewTicket(ticket)
+      setView('review')
+    }
+  }, [status, ticket])
+
+  const handleGenerate = () => {
+    void generate(description, browserContext)
+  }
+
+  const handleBack = () => {
+    setView('input')
+  }
+
+  if (view === 'review' && reviewTicket) {
+    return (
+      <div className="popup">
+        <div className="popup__layout">
+          <header className="popup__header">
+            <h1 className="popup__title">QA Bug Assistant</h1>
+            <p className="popup__subtitle">Review and edit before creating in Jira</p>
+          </header>
+
+          <ReviewScreen
+            ticket={reviewTicket}
+            usedAi={usedAi}
+            onTicketChange={setReviewTicket}
+            onBack={handleBack}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="popup">
       <div className="popup__layout">
         <header className="popup__header">
           <h1 className="popup__title">QA Bug Assistant</h1>
-          <p className="popup__subtitle">Phase 2 foundation — generation coming soon</p>
+          <p className="popup__subtitle">Describe the bug — context is captured automatically</p>
         </header>
 
-        <section className="popup__section">
-          <label className="popup__label" htmlFor="voice-placeholder">
-            Voice input
-          </label>
-          <button
-            id="voice-placeholder"
-            type="button"
-            className="popup__voice-button"
-            disabled
-            aria-disabled="true"
-          >
-            Voice Button Placeholder
-          </button>
-        </section>
-
-        <section className="popup__section">
-          <label className="popup__label" htmlFor="issue-description">
-            Issue description
-          </label>
-          <textarea
-            id="issue-description"
-            className="popup__textarea"
-            placeholder="Describe the bug you found on this page…"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows={6}
-          />
-        </section>
-
-        <section className="popup__section">
-          <button type="button" className="popup__generate-button" disabled aria-disabled="true">
-            Coming Soon
-          </button>
-        </section>
-
-        <footer className="popup__footer">
-          <p className="popup__footer-title">Captured context</p>
-          <div className="popup__meta">
-            <p className="popup__meta-row">
-              <span className="popup__meta-label">Page</span>
-              <span className="popup__meta-value">{url || 'Unavailable'}</span>
-            </p>
-            <p className="popup__meta-row">
-              <span className="popup__meta-label">Title</span>
-              <span className="popup__meta-value">{title || 'Unavailable'}</span>
-            </p>
-            <p className="popup__meta-row">
-              <span className="popup__meta-label">Captured</span>
-              <span className="popup__meta-value">{timestamp || '—'}</span>
-            </p>
-          </div>
-        </footer>
+        <InputScreen
+          description={description}
+          browserContext={browserContext}
+          status={status === 'success' ? 'idle' : status}
+          errorMessage={errorMessage}
+          onDescriptionChange={(value) => {
+            setDescription(value)
+            if (status === 'error') {
+              resetError()
+            }
+          }}
+          onGenerate={handleGenerate}
+        />
       </div>
     </div>
   )

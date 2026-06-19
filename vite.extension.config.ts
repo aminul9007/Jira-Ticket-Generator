@@ -1,7 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 const rootDir = fileURLToPath(new URL('.', import.meta.url))
@@ -32,28 +32,32 @@ function extensionBuildPlugin() {
   }
 }
 
-export default defineConfig({
-  base: './',
-  publicDir: false,
-  plugins: [react(), extensionBuildPlugin()],
-  build: {
-    outDir: 'dist/extension',
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        popup: resolve(rootDir, 'src/extension/popup/index.html'),
-        background: resolve(rootDir, 'src/extension/background/background.ts'),
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === 'background') {
-            return 'background/background.js'
-          }
-          return 'popup/assets/[name]-[hash].js'
+export default defineConfig(({ mode }) => {
+  loadEnv(mode, rootDir, '')
+
+  return {
+    base: './',
+    publicDir: false,
+    plugins: [react(), extensionBuildPlugin()],
+    build: {
+      outDir: 'dist/extension',
+      emptyOutDir: true,
+      rollupOptions: {
+        input: {
+          popup: resolve(rootDir, 'src/extension/popup/index.html'),
+          background: resolve(rootDir, 'src/extension/background/background.ts'),
         },
-        chunkFileNames: 'popup/assets/[name]-[hash].js',
-        assetFileNames: 'popup/assets/[name]-[hash][extname]',
+        output: {
+          entryFileNames: (chunkInfo) => {
+            if (chunkInfo.name === 'background') {
+              return 'background/background.js'
+            }
+            return 'popup/assets/[name]-[hash].js'
+          },
+          chunkFileNames: 'popup/assets/[name]-[hash].js',
+          assetFileNames: 'popup/assets/[name]-[hash][extname]',
+        },
       },
     },
-  },
+  }
 })
