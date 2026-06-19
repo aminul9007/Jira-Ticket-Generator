@@ -36,12 +36,17 @@ function buildConnection(jira: JiraSettings): CreateJiraIssuePayload['connection
   return { domain, email, apiToken }
 }
 
+export interface BuildJiraCreatePayloadOptions {
+  reporter?: string
+}
+
 export function buildJiraCreatePayload(
   ticket: GeneratedTicket,
   qaContext: ExtractedContext,
   ticketDefaults: TicketDefaultSettings,
   jira: JiraSettings,
   template: TicketTemplateSettings = createDefaultTicketTemplateSettings(),
+  options?: BuildJiraCreatePayloadOptions,
 ): CreateJiraIssuePayload {
   const include = (field: Parameters<typeof isTemplateFieldEnabled>[1]) =>
     isTemplateFieldEnabled(template, field)
@@ -70,6 +75,7 @@ export function buildJiraCreatePayload(
     issueType: ticketDefaults.issueType,
     labels: ticketDefaults.labels.length > 0 ? ticketDefaults.labels : undefined,
     assignee: ticketDefaults.assignee.trim() || undefined,
+    reporter: options?.reporter?.trim() || undefined,
     connection: buildConnection(jira),
     template,
   }

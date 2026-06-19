@@ -33,11 +33,17 @@ function extensionBuildPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
-  loadEnv(mode, rootDir, '')
+  const env = loadEnv(mode, rootDir, '')
 
   return {
     base: './',
     publicDir: false,
+    envDir: rootDir,
+    define: {
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(
+        env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:3001',
+      ),
+    },
     plugins: [react(), extensionBuildPlugin()],
     build: {
       outDir: 'dist/extension',

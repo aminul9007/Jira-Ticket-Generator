@@ -26,6 +26,7 @@ const createIssueSchema = z.object({
   issueType: z.string().trim().optional(),
   labels: z.array(z.string()).optional(),
   assignee: z.string().trim().optional(),
+  reporter: z.string().trim().optional(),
   connection: z
     .object({
       domain: z.string().trim().min(1),

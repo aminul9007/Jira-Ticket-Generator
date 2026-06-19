@@ -9,7 +9,21 @@ export function createApp() {
 
   app.use(
     cors({
-      origin: appConfig.corsOrigin,
+      origin(origin, callback) {
+        if (!origin) {
+          callback(null, true)
+          return
+        }
+
+        const allowed = appConfig.corsOrigin
+        const allowedList = Array.isArray(allowed) ? allowed : [allowed]
+        if (allowedList.includes(origin) || origin.startsWith('chrome-extension://')) {
+          callback(null, true)
+          return
+        }
+
+        callback(new Error('Not allowed by CORS'))
+      },
       methods: ['GET', 'POST', 'OPTIONS'],
     }),
   )

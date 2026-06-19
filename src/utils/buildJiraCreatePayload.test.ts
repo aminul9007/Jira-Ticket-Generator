@@ -57,6 +57,19 @@ describe('buildJiraCreatePayload', () => {
     expect(payload.connection?.domain).toBe('company.atlassian.net')
   })
 
+  it('includes optional reporter when provided', () => {
+    const payload = buildJiraCreatePayload(
+      ticket,
+      qaContext,
+      DEFAULT_APP_SETTINGS.ticketDefaults,
+      DEFAULT_APP_SETTINGS.jira,
+      undefined,
+      { reporter: 'qa@company.com' },
+    )
+
+    expect(payload.reporter).toBe('qa@company.com')
+  })
+
   it('omits QA context fields when disabled in template', () => {
     const payload = buildJiraCreatePayload(
       ticket,

@@ -1,11 +1,22 @@
+import { useEffect, useState } from 'react'
 import { TICKET_PRIORITIES, TICKET_SEVERITIES } from '../../data/ticketOptions'
 import type { GeneratedTicket, TicketPriority, TicketSeverity } from '../../types/bugReport'
+import { loadExtensionAppSettings } from '../services/extensionSettingsService'
+import {
+  loadExtensionJiraDefaults,
+  saveExtensionJiraDefaults,
+} from '../services/extensionJiraDefaultsService'
+import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
+import { JiraFieldsSection } from './JiraFieldsSection'
 
 interface ReviewScreenProps {
   ticket: GeneratedTicket
   usedAi: boolean
   onTicketChange: (ticket: GeneratedTicket) => void
   onBack: () => void
+  jiraErrorMessage: string | null
+  isCreatingJira: boolean
+  onCreateJira: (jiraFields: ExtensionJiraDefaults) => void
 }
 
 function stepsToText(steps: string[]): string {
@@ -24,15 +35,43 @@ export function ReviewScreen({
   usedAi,
   onTicketChange,
   onBack,
+  jiraErrorMessage,
+  isCreatingJira,
+  onCreateJira,
 }: ReviewScreenProps) {
+  const [jiraDefaults, setJiraDefaults] = useState<ExtensionJiraDefaults | null>(null)
+
+  useEffect(() => {
+    void loadExtensionAppSettings().then((settings) => {
+      void loadExtensionJiraDefaults(settings.ticketDefaults).then(setJiraDefaults)
+    })
+  }, [])
+
   const updateField = <K extends keyof GeneratedTicket>(field: K, value: GeneratedTicket[K]) => {
     onTicketChange({ ...ticket, [field]: value })
   }
 
+  const updateJiraDefaults = (patch: Partial<ExtensionJiraDefaults>) => {
+    setJiraDefaults((current) => {
+      if (!current) return current
+      const next = { ...current, ...patch }
+      void saveExtensionJiraDefaults(next)
+      return next
+    })
+  }
+
+  const canCreateJira =
+    Boolean(jiraDefaults?.projectKey.trim()) && !isCreatingJira
+
   return (
     <>
       <div className="popup__review-header">
-        <button type="button" className="popup__back-button" onClick={onBack}>
+        <button
+          type="button"
+          className="popup__back-button"
+          onClick={onBack}
+          disabled={isCreatingJira}
+        >
           ← Back
         </button>
         <p className="popup__review-badge">{usedAi ? 'AI generated' : 'Rules generated'}</p>
@@ -47,6 +86,7 @@ export function ReviewScreen({
           className="popup__input"
           value={ticket.title}
           onChange={(event) => updateField('title', event.target.value)}
+          disabled={isCreatingJira}
         />
       </section>
 
@@ -60,6 +100,7 @@ export function ReviewScreen({
           value={ticket.issueSummary}
           onChange={(event) => updateField('issueSummary', event.target.value)}
           rows={4}
+          disabled={isCreatingJira}
         />
       </section>
 
@@ -73,6 +114,7 @@ export function ReviewScreen({
           value={stepsToText(ticket.stepsToReproduce)}
           onChange={(event) => updateField('stepsToReproduce', textToSteps(event.target.value))}
           rows={4}
+          disabled={isCreatingJira}
         />
       </section>
 
@@ -86,6 +128,7 @@ export function ReviewScreen({
           value={ticket.expectedResult}
           onChange={(event) => updateField('expectedResult', event.target.value)}
           rows={2}
+          disabled={isCreatingJira}
         />
       </section>
 
@@ -99,6 +142,7 @@ export function ReviewScreen({
           value={ticket.actualResult}
           onChange={(event) => updateField('actualResult', event.target.value)}
           rows={2}
+          disabled={isCreatingJira}
         />
       </section>
 
@@ -114,6 +158,7 @@ export function ReviewScreen({
             onChange={(event) =>
               updateField('severity', event.target.value as TicketSeverity)
             }
+            disabled={isCreatingJira}
           >
             {TICKET_SEVERITIES.map((severity) => (
               <option key={severity} value={severity}>
@@ -134,6 +179,7 @@ export function ReviewScreen({
             onChange={(event) =>
               updateField('priority', event.target.value as TicketPriority)
             }
+            disabled={isCreatingJira}
           >
             {TICKET_PRIORITIES.map((priority) => (
               <option key={priority} value={priority}>
@@ -142,6 +188,32 @@ export function ReviewScreen({
             ))}
           </select>
         </div>
+      </section>
+
+      {jiraDefaults && (
+        <JiraFieldsSection defaults={jiraDefaults} onChange={updateJiraDefaults} />
+      )}
+
+      {jiraErrorMessage && (
+        <p className="popup__error" role="alert">
+          {jiraErrorMessage}
+        </p>
+      )}
+
+      <section className="popup__section popup__section--sticky">
+        <button
+          type="button"
+          className="popup__generate-button popup__generate-button--active"
+          disabled={!canCreateJira}
+          aria-disabled={!canCreateJira}
+          onClick={() => {
+            if (jiraDefaults) {
+              onCreateJira(jiraDefaults)
+            }
+          }}
+        >
+          {isCreatingJira ? 'Creating Ticket...' : 'Create Jira'}
+        </button>
       </section>
     </>
   )

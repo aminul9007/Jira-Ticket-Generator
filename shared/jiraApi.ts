@@ -26,6 +26,7 @@ export interface CreateJiraIssuePayload {
   issueType?: string
   labels?: string[]
   assignee?: string
+  reporter?: string
   /** When set, the API uses these credentials for the MCP child process. */
   connection?: JiraConnectionConfig
   /** Controls which sections appear in the Jira issue description. */

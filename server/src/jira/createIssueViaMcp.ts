@@ -61,6 +61,10 @@ function buildToolArguments(payload: CreateJiraIssuePayload): Record<string, unk
     args.assignee = payload.assignee.trim()
   }
 
+  if (payload.reporter?.trim()) {
+    args.reporter = payload.reporter.trim()
+  }
+
   if (Object.keys(additionalFields).length > 0) {
     args.additional_fields = JSON.stringify(additionalFields)
   }
