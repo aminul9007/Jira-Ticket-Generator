@@ -37,7 +37,7 @@ function normalizeIssueType(value: unknown): ExtensionJiraDefaults['issueType'] 
   return EMPTY_EXTENSION_JIRA_DEFAULTS.issueType
 }
 
-function normalizeDefaults(raw: unknown): ExtensionJiraDefaults | null {
+export function normalizeExtensionJiraDefaults(raw: unknown): ExtensionJiraDefaults | null {
   if (!raw || typeof raw !== 'object') return null
 
   const record = raw as Partial<ExtensionJiraDefaults>
@@ -50,6 +50,10 @@ function normalizeDefaults(raw: unknown): ExtensionJiraDefaults | null {
     assignee: typeof record.assignee === 'string' ? record.assignee.trim() : '',
     reporter: typeof record.reporter === 'string' ? record.reporter.trim() : '',
   }
+}
+
+function normalizeDefaults(raw: unknown): ExtensionJiraDefaults | null {
+  return normalizeExtensionJiraDefaults(raw)
 }
 
 /** Load last-used Jira field selections, falling back to app ticket defaults. */

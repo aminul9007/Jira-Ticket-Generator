@@ -1,4 +1,5 @@
 import type { CreateJiraIssueResponse } from '../../../shared/jiraApi'
+import { LoadingButton } from './LoadingButton'
 
 interface SuccessScreenProps {
   result: CreateJiraIssueResponse
@@ -13,25 +14,45 @@ export function SuccessScreen({
 }: SuccessScreenProps) {
   return (
     <div className="popup__success">
+      <div className="popup__success-icon" aria-hidden="true">
+        ✓
+      </div>
       <p className="popup__success-title">Ticket Created Successfully</p>
-      <p className="popup__success-key">{result.issueKey}</p>
-      <p className="popup__success-url">{result.issueUrl}</p>
+
+      <dl className="popup__success-details">
+        <div className="popup__success-detail">
+          <dt>Ticket Key</dt>
+          <dd className="popup__success-key">{result.issueKey}</dd>
+        </div>
+        <div className="popup__success-detail">
+          <dt>Ticket Link</dt>
+          <dd>
+            <a
+              className="popup__success-link"
+              href={result.issueUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {result.issueUrl}
+            </a>
+          </dd>
+        </div>
+      </dl>
 
       <div className="popup__success-actions">
-        <button
-          type="button"
-          className="popup__generate-button popup__generate-button--active"
+        <LoadingButton
+          isLoading={false}
+          loadingLabel="Open Ticket"
+          idleLabel="Open Ticket"
           onClick={onOpenTicket}
-        >
-          Open Jira Ticket
-        </button>
-        <button
-          type="button"
-          className="popup__secondary-button"
+        />
+        <LoadingButton
+          isLoading={false}
+          loadingLabel="Create Another"
+          idleLabel="Create Another Ticket"
+          variant="secondary"
           onClick={onCreateAnother}
-        >
-          Create Another Ticket
-        </button>
+        />
       </div>
     </div>
   )

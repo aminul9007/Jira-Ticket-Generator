@@ -1,17 +1,17 @@
 /**
- * Phase 2 foundation — Manifest V3 background service worker placeholder.
- * Command handling and popup orchestration will be added in later steps.
+ * QA Bug Assistant — MV3 background service worker.
+ * Handles keyboard shortcut to open the popup when Chrome allows it.
  */
 
-console.debug('[QA Bug Assistant] background service worker loaded')
-
 chrome.runtime.onInstalled.addListener(() => {
-  console.debug('[QA Bug Assistant] extension installed or updated')
+  // No-op: reserved for future migration notices.
 })
 
 chrome.commands.onCommand.addListener((command) => {
-  if (command === 'open-assistant') {
-    // Phase 2 Step 2+: wire Ctrl+Shift+B to open the assistant popup.
-    console.debug('[QA Bug Assistant] open-assistant command received')
-  }
+  if (command !== 'open-assistant') return
+
+  void chrome.action.openPopup().catch(() => {
+    // Chrome may block programmatic popup open outside a direct user gesture.
+    // Fallback: click the toolbar icon, or set the shortcut at chrome://extensions/shortcuts
+  })
 })

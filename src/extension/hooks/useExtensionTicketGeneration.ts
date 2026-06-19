@@ -14,6 +14,7 @@ interface UseExtensionTicketGenerationResult {
   usedAi: boolean
   qaContext: ExtractedContext | null
   generate: (description: string, context: TicketContext) => Promise<void>
+  retry: (description: string, context: TicketContext) => Promise<void>
   resetError: () => void
 }
 
@@ -24,7 +25,7 @@ export function useExtensionTicketGeneration(): UseExtensionTicketGenerationResu
   const [usedAi, setUsedAi] = useState(false)
   const [qaContext, setQaContext] = useState<ExtractedContext | null>(null)
 
-  const generate = useCallback(async (description: string, context: TicketContext) => {
+  const runGenerate = useCallback(async (description: string, context: TicketContext) => {
     setStatus('loading')
     setErrorMessage(null)
 
@@ -36,13 +37,24 @@ export function useExtensionTicketGeneration(): UseExtensionTicketGenerationResu
       setQaContext(formValues.qaContext)
       setStatus('success')
     } catch {
-      setTicket(null)
-      setUsedAi(false)
-      setQaContext(null)
       setStatus('error')
-      setErrorMessage('Unable to generate ticket')
+      setErrorMessage('Unable to generate ticket. Check your connection and try again.')
     }
   }, [])
+
+  const generate = useCallback(
+    async (description: string, context: TicketContext) => {
+      await runGenerate(description, context)
+    },
+    [runGenerate],
+  )
+
+  const retry = useCallback(
+    async (description: string, context: TicketContext) => {
+      await runGenerate(description, context)
+    },
+    [runGenerate],
+  )
 
   const resetError = useCallback(() => {
     setStatus('idle')
@@ -56,6 +68,7 @@ export function useExtensionTicketGeneration(): UseExtensionTicketGenerationResu
     usedAi,
     qaContext,
     generate,
+    retry,
     resetError,
   }
 }

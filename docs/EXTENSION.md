@@ -1,8 +1,8 @@
-# QA Bug Assistant — Chrome Extension (Phase 2)
+# QA Bug Assistant — Chrome Extension (V1)
 
-**Version:** `0.2.0` — Phase 2 Step 3 — Jira Creation
+**Version:** `1.0.0` — Production-ready for daily QA use
 
-The extension popup generates tickets with the shared AI pipeline and creates Jira issues through the existing API backend.
+Target workflow: describe or dictate a bug → generate → review → create in Jira (~20–30 seconds).
 
 ## Build
 
@@ -12,7 +12,7 @@ npm run build:extension
 
 Output: `dist/extension/`
 
-Watch mode during development:
+Watch mode:
 
 ```bash
 npm run dev:extension
@@ -21,54 +21,48 @@ npm run dev:extension
 ## Load in Chrome
 
 1. Run `npm run build:extension`
-2. Start the API backend: `npm run api:dev` (or `npm run dev:local` for web + API)
-3. Open `chrome://extensions`
-4. Enable **Developer mode**
-5. Click **Load unpacked**
-6. Select the `dist/extension` folder
+2. Start the API backend: `npm run api:dev` (or `npm run dev:local`)
+3. Open `chrome://extensions` → **Developer mode** → **Load unpacked** → select `dist/extension`
+
+## Keyboard shortcut
+
+**Ctrl+Shift+B** (Mac: **Command+Shift+B**)
+
+Configure at `chrome://extensions/shortcuts`.
+
+### Shortcut behavior
+
+The background worker calls `chrome.action.openPopup()` when the command fires. Chrome may block programmatic popup opening in some cases (no active user gesture, popup already open, or browser policy).
+
+**Fallback:** Click the **QA Bug Assistant** toolbar icon, or re-bind the shortcut at `chrome://extensions/shortcuts`.
 
 ## Popup flow
 
 ```
-Input → Generate → Review → Create Jira → Success
+Input (type or voice) → Generate → Review → Create Jira → Success
 ```
 
-- Width: 400px, min height: 600px
-- Captures active tab URL, title, and timestamp on open
-- **Generate Ticket** calls the same `generateTicket()` service as the web app
-- Review screen allows editing ticket fields plus Jira project, issue type, assignee, and reporter
-- **Create Jira** calls the same `createJiraIssue()` service as the web app
-- Last-used Jira field selections are stored in `chrome.storage.local`
+## V1 polish features
 
-## Jira creation flow
-
-```
-Extension popup
-  → buildJiraCreatePayload()  (shared)
-  → createJiraIssue()         (shared)
-  → POST /api/jira/issues     (existing API)
-  → createIssueViaMcp()       (server)
-  → Jira Cloud
-```
-
-Set `VITE_API_BASE_URL` in `.env` if the API is not on `http://localhost:3001`.
-
-## Keyboard shortcut
-
-Suggested shortcut: **Ctrl+Shift+B** (Mac: **Command+Shift+B**)
-
-Configure under `chrome://extensions/shortcuts`.
+| Feature | Behavior |
+|---------|----------|
+| Auto-focus | Description textarea focused on open |
+| Draft persistence | Description, ticket, and Jira fields restored from `chrome.storage.local` |
+| Draft clear | Cleared only after successful Jira creation or **Create Another Ticket** |
+| Jira preferences | Project, issue type, assignee, reporter remembered |
+| Loading UX | Spinners + progress text during generate and Jira create |
+| Validation | Friendly messages before generate (description) and Jira create (project) |
+| Error recovery | **Retry** buttons preserve all form state |
+| Branding | Extension icons + consistent header |
 
 ## Permissions
 
-- `activeTab` — read URL/title of the active tab when the popup opens
-- `storage` — app settings and last-used Jira field selections
-- `host_permissions` — `http://localhost:3001/*` and `http://127.0.0.1:3001/*` for the API backend
-
-No `scripting`, `debugger`, or `webRequest`.
+- `activeTab` — page URL/title capture
+- `storage` — settings, drafts, Jira preferences
+- `host_permissions` — API backend (`localhost:3001`)
 
 ## Assumptions
 
-- Extension build is isolated from the web app Vite config (`vite.extension.config.ts`)
-- Jira credentials can live in extension settings (synced from web app settings key) or on the API server via `.env`
-- Icons use the Chrome default puzzle piece until a branded icon set is added
+- Voice dictation requires Chrome or Edge (Web Speech API)
+- Jira API backend must be running and reachable
+- Icons ship in `src/extension/icons/` and copy to `dist/extension/icons/` on build

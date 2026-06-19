@@ -8,15 +8,19 @@ import {
 } from '../services/extensionJiraDefaultsService'
 import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
 import { JiraFieldsSection } from './JiraFieldsSection'
+import { LoadingButton } from './LoadingButton'
 
 interface ReviewScreenProps {
   ticket: GeneratedTicket
   usedAi: boolean
   onTicketChange: (ticket: GeneratedTicket) => void
   onBack: () => void
+  initialJiraDefaults?: ExtensionJiraDefaults | null
+  onJiraDefaultsChange?: (defaults: ExtensionJiraDefaults) => void
   jiraErrorMessage: string | null
   isCreatingJira: boolean
   onCreateJira: (jiraFields: ExtensionJiraDefaults) => void
+  onRetryJira: () => void
 }
 
 function stepsToText(steps: string[]): string {
@@ -35,17 +39,28 @@ export function ReviewScreen({
   usedAi,
   onTicketChange,
   onBack,
+  initialJiraDefaults,
+  onJiraDefaultsChange,
   jiraErrorMessage,
   isCreatingJira,
   onCreateJira,
+  onRetryJira,
 }: ReviewScreenProps) {
-  const [jiraDefaults, setJiraDefaults] = useState<ExtensionJiraDefaults | null>(null)
+  const [jiraDefaults, setJiraDefaults] = useState<ExtensionJiraDefaults | null>(
+    initialJiraDefaults ?? null,
+  )
+  const [validationAttempted, setValidationAttempted] = useState(false)
 
   useEffect(() => {
+    if (initialJiraDefaults) {
+      setJiraDefaults(initialJiraDefaults)
+      return
+    }
+
     void loadExtensionAppSettings().then((settings) => {
       void loadExtensionJiraDefaults(settings.ticketDefaults).then(setJiraDefaults)
     })
-  }, [])
+  }, [initialJiraDefaults])
 
   const updateField = <K extends keyof GeneratedTicket>(field: K, value: GeneratedTicket[K]) => {
     onTicketChange({ ...ticket, [field]: value })
@@ -56,12 +71,19 @@ export function ReviewScreen({
       if (!current) return current
       const next = { ...current, ...patch }
       void saveExtensionJiraDefaults(next)
+      onJiraDefaultsChange?.(next)
       return next
     })
   }
 
-  const canCreateJira =
-    Boolean(jiraDefaults?.projectKey.trim()) && !isCreatingJira
+  const projectMissing = !jiraDefaults?.projectKey.trim()
+  const issueTypeMissing = !jiraDefaults?.issueType
+
+  const handleCreateClick = () => {
+    setValidationAttempted(true)
+    if (!jiraDefaults || projectMissing || issueTypeMissing) return
+    onCreateJira(jiraDefaults)
+  }
 
   return (
     <>
@@ -191,29 +213,42 @@ export function ReviewScreen({
       </section>
 
       {jiraDefaults && (
-        <JiraFieldsSection defaults={jiraDefaults} onChange={updateJiraDefaults} />
+        <JiraFieldsSection
+          defaults={jiraDefaults}
+          onChange={updateJiraDefaults}
+          projectError={
+            validationAttempted && projectMissing
+              ? 'Please enter a Jira project key.'
+              : null
+          }
+          issueTypeError={
+            validationAttempted && issueTypeMissing ? 'Please select an issue type.' : null
+          }
+        />
       )}
 
       {jiraErrorMessage && (
-        <p className="popup__error" role="alert">
-          {jiraErrorMessage}
-        </p>
+        <div className="popup__error-block" role="alert">
+          <p className="popup__error">{jiraErrorMessage}</p>
+          <button
+            type="button"
+            className="popup__retry-button"
+            disabled={isCreatingJira}
+            onClick={onRetryJira}
+          >
+            Retry Jira Creation
+          </button>
+        </div>
       )}
 
       <section className="popup__section popup__section--sticky">
-        <button
-          type="button"
-          className="popup__generate-button popup__generate-button--active"
-          disabled={!canCreateJira}
-          aria-disabled={!canCreateJira}
-          onClick={() => {
-            if (jiraDefaults) {
-              onCreateJira(jiraDefaults)
-            }
-          }}
-        >
-          {isCreatingJira ? 'Creating Ticket...' : 'Create Jira'}
-        </button>
+        <LoadingButton
+          isLoading={isCreatingJira}
+          loadingLabel="Creating ticket in Jira…"
+          idleLabel="Create Jira"
+          disabled={!jiraDefaults}
+          onClick={handleCreateClick}
+        />
       </section>
     </>
   )

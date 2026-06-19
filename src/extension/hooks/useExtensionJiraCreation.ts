@@ -18,7 +18,7 @@ function mapCreationError(error: unknown): string {
   if (error instanceof JiraCreateIssueError) {
     if (error.code === 'JIRA_AUTH_ERROR' || error.code === 'VALIDATION_ERROR') {
       if (error.message.toLowerCase().includes('project')) {
-        return 'Please select a Jira project key.'
+        return 'Please enter a Jira project key.'
       }
       return 'Please verify Jira configuration.'
     }
@@ -47,19 +47,28 @@ export function useExtensionJiraCreation() {
       qaContext: ExtractedContext,
       jiraFields: ExtensionJiraDefaults,
     ) => {
+      const projectKey = jiraFields.projectKey.trim()
+
+      if (!projectKey) {
+        setState({
+          status: 'error',
+          message: 'Please enter a Jira project key.',
+        })
+        return null
+      }
+
+      if (!jiraFields.issueType) {
+        setState({
+          status: 'error',
+          message: 'Please select an issue type.',
+        })
+        return null
+      }
+
       setState({ status: 'creating' })
 
       try {
         const settings = await loadExtensionAppSettings()
-        const projectKey = jiraFields.projectKey.trim()
-
-        if (!projectKey) {
-          setState({
-            status: 'error',
-            message: 'Please select a Jira project key.',
-          })
-          return null
-        }
 
         const mergedDefaults = {
           ...settings.ticketDefaults,

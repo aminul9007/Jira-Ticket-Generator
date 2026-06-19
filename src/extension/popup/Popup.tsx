@@ -1,12 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { GeneratedTicket } from '../../types/bugReport'
 import type { ExtractedContext } from '../../types/contextDetection'
 import { InputScreen } from '../components/InputScreen'
+import { PopupHeader } from '../components/PopupHeader'
 import { ReviewScreen } from '../components/ReviewScreen'
 import { SuccessScreen } from '../components/SuccessScreen'
 import { useBrowserContext } from '../hooks/useBrowserContext'
 import { useExtensionJiraCreation } from '../hooks/useExtensionJiraCreation'
 import { useExtensionTicketGeneration } from '../hooks/useExtensionTicketGeneration'
+import {
+  clearExtensionDraft,
+  loadExtensionDraft,
+  saveExtensionDraft,
+} from '../services/extensionDraftService'
 import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
 import './Popup.css'
 
@@ -14,32 +20,93 @@ type PopupView = 'input' | 'review' | 'success'
 
 export function Popup() {
   const browserContext = useBrowserContext()
-  const { status, errorMessage, ticket, usedAi, qaContext, generate, resetError } =
-    useExtensionTicketGeneration()
+  const {
+    status,
+    errorMessage,
+    ticket,
+    usedAi,
+    qaContext,
+    generate,
+    retry,
+    resetError,
+  } = useExtensionTicketGeneration()
   const { state: jiraState, createIssue, reset: resetJiraCreation } =
     useExtensionJiraCreation()
 
+  const [hydrated, setHydrated] = useState(false)
   const [view, setView] = useState<PopupView>('input')
   const [description, setDescription] = useState('')
   const [reviewTicket, setReviewTicket] = useState<GeneratedTicket | null>(null)
   const [reviewQaContext, setReviewQaContext] = useState<ExtractedContext | null>(null)
+  const [draftUsedAi, setDraftUsedAi] = useState(false)
+  const [jiraDefaults, setJiraDefaults] = useState<ExtensionJiraDefaults | null>(null)
+  const lastJiraFieldsRef = useRef<ExtensionJiraDefaults | null>(null)
 
   useEffect(() => {
-    if (status === 'success' && ticket && qaContext) {
-      setReviewTicket(ticket)
-      setReviewQaContext(qaContext)
-      setView('review')
-    }
-  }, [status, ticket, qaContext])
+    void loadExtensionDraft().then((draft) => {
+      setDescription(draft.description)
+      setDraftUsedAi(draft.usedAi)
+      setJiraDefaults(draft.jiraDefaults)
+
+      if (draft.ticket && draft.qaContext && draft.view === 'review') {
+        setReviewTicket(draft.ticket)
+        setReviewQaContext(draft.qaContext)
+        setView('review')
+      }
+
+      setHydrated(true)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+
+    const timer = window.setTimeout(() => {
+      void saveExtensionDraft({
+        description,
+        view: view === 'success' ? 'review' : view,
+        ticket: reviewTicket,
+        qaContext: reviewQaContext,
+        usedAi: reviewTicket ? (ticket ? usedAi : draftUsedAi) : false,
+        jiraDefaults,
+      })
+    }, 200)
+
+    return () => window.clearTimeout(timer)
+  }, [
+    hydrated,
+    description,
+    view,
+    reviewTicket,
+    reviewQaContext,
+    ticket,
+    usedAi,
+    draftUsedAi,
+    jiraDefaults,
+  ])
+
+  useEffect(() => {
+    if (!hydrated || status !== 'success' || !ticket || !qaContext) return
+
+    setReviewTicket(ticket)
+    setReviewQaContext(qaContext)
+    setDraftUsedAi(usedAi)
+    setView('review')
+  }, [hydrated, status, ticket, qaContext, usedAi])
 
   useEffect(() => {
     if (jiraState.status === 'success') {
+      void clearExtensionDraft()
       setView('success')
     }
   }, [jiraState.status])
 
   const handleGenerate = () => {
     void generate(description, browserContext)
+  }
+
+  const handleRetryGenerate = () => {
+    void retry(description, browserContext)
   }
 
   const handleBack = () => {
@@ -49,26 +116,49 @@ export function Popup() {
 
   const handleCreateJira = (jiraFields: ExtensionJiraDefaults) => {
     if (!reviewTicket || !reviewQaContext) return
+    lastJiraFieldsRef.current = jiraFields
+    setJiraDefaults(jiraFields)
     resetJiraCreation()
     void createIssue(reviewTicket, reviewQaContext, jiraFields)
   }
 
+  const handleRetryJira = () => {
+    if (!reviewTicket || !reviewQaContext || !lastJiraFieldsRef.current) return
+    resetJiraCreation()
+    void createIssue(reviewTicket, reviewQaContext, lastJiraFieldsRef.current)
+  }
+
   const handleCreateAnother = () => {
     resetJiraCreation()
+    resetError()
     setReviewTicket(null)
     setReviewQaContext(null)
+    setJiraDefaults(null)
+    setDraftUsedAi(false)
     setDescription('')
+    lastJiraFieldsRef.current = null
     setView('input')
+    void clearExtensionDraft()
+  }
+
+  if (!hydrated) {
+    return (
+      <div className="popup">
+        <div className="popup__layout popup__layout--loading">
+          <PopupHeader subtitle="Loading your draft…" />
+          <div className="popup__loading-state" role="status" aria-live="polite">
+            <span className="popup__spinner popup__spinner--large" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (view === 'success' && jiraState.status === 'success') {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <header className="popup__header">
-            <h1 className="popup__title">QA Bug Assistant</h1>
-            <p className="popup__subtitle">Your ticket is ready in Jira</p>
-          </header>
+          <PopupHeader subtitle="Your ticket is ready in Jira" />
 
           <SuccessScreen
             result={jiraState.result}
@@ -86,22 +176,22 @@ export function Popup() {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <header className="popup__header">
-            <h1 className="popup__title">QA Bug Assistant</h1>
-            <p className="popup__subtitle">Review and edit before creating in Jira</p>
-          </header>
+          <PopupHeader subtitle="Review and edit before creating in Jira" />
 
           <div className="popup__scroll">
             <ReviewScreen
               ticket={reviewTicket}
-              usedAi={usedAi}
+              usedAi={ticket ? usedAi : draftUsedAi}
               onTicketChange={setReviewTicket}
               onBack={handleBack}
+              initialJiraDefaults={jiraDefaults}
+              onJiraDefaultsChange={setJiraDefaults}
               jiraErrorMessage={
                 jiraState.status === 'error' ? jiraState.message : null
               }
               isCreatingJira={jiraState.status === 'creating'}
               onCreateJira={handleCreateJira}
+              onRetryJira={handleRetryJira}
             />
           </div>
         </div>
@@ -112,10 +202,7 @@ export function Popup() {
   return (
     <div className="popup">
       <div className="popup__layout">
-        <header className="popup__header">
-          <h1 className="popup__title">QA Bug Assistant</h1>
-          <p className="popup__subtitle">Describe the bug — context is captured automatically</p>
-        </header>
+        <PopupHeader subtitle="Describe the bug — context is captured automatically" />
 
         <InputScreen
           description={description}
@@ -129,6 +216,7 @@ export function Popup() {
             }
           }}
           onGenerate={handleGenerate}
+          onRetry={handleRetryGenerate}
         />
       </div>
     </div>

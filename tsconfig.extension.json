@@ -17,6 +17,7 @@
     "src/ai/**/*",
     "src/types/**/*",
     "src/utils/**/*",
-    "src/data/**/*"
+    "src/data/**/*",
+    "src/hooks/useVoiceSession.ts"
   ]
 }

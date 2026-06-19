@@ -13,6 +13,10 @@ declare namespace chrome {
     ): void
   }
 
+  namespace action {
+    function openPopup(): Promise<void>
+  }
+
   namespace runtime {
     const id: string | undefined
     const lastError: { message?: string } | undefined
@@ -41,6 +45,8 @@ declare namespace chrome {
         items: Record<string, unknown>,
         callback?: () => void,
       ): void
+
+      function remove(keys: string | string[], callback?: () => void): void
     }
   }
 }

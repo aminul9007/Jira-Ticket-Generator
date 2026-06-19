@@ -1,8 +1,8 @@
 {
   "name": "jira-ticket-generator",
   "private": true,
-  "version": "0.2.0",
-  "versionName": "Phase 2 Step 3 — Jira Creation",
+  "version": "1.0.0",
+  "versionName": "V1 — Production Ready",
   "type": "module",
   "scripts": {
     "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
