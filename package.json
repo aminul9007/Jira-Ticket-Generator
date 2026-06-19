@@ -1,8 +1,8 @@
 {
   "name": "jira-ticket-generator",
   "private": true,
-  "version": "1.1.0",
-  "versionName": "V1 RC — Release Preparation",
+  "version": "1.2.0",
+  "versionName": "V1 Release",
   "type": "module",
   "scripts": {
     "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
@@ -18,7 +18,9 @@
     "dev:lan:http": "powershell -ExecutionPolicy Bypass -File ./scripts/dev-lan-http.ps1",
     "dev:vite": "vite",
     "build": "tsc -b && vite build",
-    "extension:build": "tsc -p tsconfig.extension.json && vite build --config vite.extension.config.ts",
+    "extension:build": "tsc -p tsconfig.extension.json && vite build --config vite.extension.config.ts --mode production",
+    "extension:verify": "node scripts/verify-extension-build.mjs",
+    "extension:release": "npm run test && npm run extension:build && npm run extension:verify",
     "build:extension": "npm run extension:build",
     "dev:extension": "vite build --config vite.extension.config.ts --watch",
     "lint": "eslint .",

@@ -6,21 +6,16 @@ import { cleanVoiceTranscript } from '../../utils/cleanVoiceTranscript'
 import { MIN_ISSUE_DESCRIPTION_LENGTH } from '../../utils/validateForm'
 import { getSpeechRecognitionConstructor } from '../../utils/voiceTranscript'
 import { loadExtensionAppSettings } from '../services/extensionSettingsService'
+import type { ExtensionVoiceStatus } from '../types/extensionState'
 
 const UNSUPPORTED_BROWSER_MESSAGE = 'Voice input is not supported in this browser.'
 const COMPLETED_FLASH_MS = 2000
 const MAX_DESCRIPTION_LENGTH = 2000
 
-export type ExtensionVoiceDisplayStatus =
-  | 'idle'
-  | 'listening'
-  | 'processing'
-  | 'completed'
-  | 'error'
-
 interface UseExtensionIssueDescriptionVoiceOptions {
   description: string
   onDescriptionChange: (value: string) => void
+  onVoiceStatusChange?: (status: ExtensionVoiceStatus, transcript?: string) => void
 }
 
 function mergeBaseWithSpoken(base: string, spoken: string): string {
@@ -35,6 +30,7 @@ function mergeBaseWithSpoken(base: string, spoken: string): string {
 export function useExtensionIssueDescriptionVoice({
   description,
   onDescriptionChange,
+  onVoiceStatusChange,
 }: UseExtensionIssueDescriptionVoiceOptions) {
   const [voiceSettings, setVoiceSettings] = useState<VoiceSettings>(
     DEFAULT_APP_SETTINGS.voice,
@@ -63,19 +59,25 @@ export function useExtensionIssueDescriptionVoice({
       )
 
       onDescriptionChange(merged)
+      onVoiceStatusChange?.('processing', merged)
 
       if (merged.length < MIN_ISSUE_DESCRIPTION_LENGTH) {
         setFlowError(
           `Speak at least ${MIN_ISSUE_DESCRIPTION_LENGTH} characters worth of detail, then try again.`,
         )
+        onVoiceStatusChange?.('error', merged)
         return
       }
 
       setFlowError(null)
       setCompletedFlash(true)
-      window.setTimeout(() => setCompletedFlash(false), COMPLETED_FLASH_MS)
+      onVoiceStatusChange?.('completed', merged)
+      window.setTimeout(() => {
+        setCompletedFlash(false)
+        onVoiceStatusChange?.('idle', merged)
+      }, COMPLETED_FLASH_MS)
     },
-    [onDescriptionChange],
+    [onDescriptionChange, onVoiceStatusChange],
   )
 
   const handleTranscriptUpdate = useCallback(
@@ -85,8 +87,9 @@ export function useExtensionIssueDescriptionVoice({
         MAX_DESCRIPTION_LENGTH,
       )
       onDescriptionChange(merged)
+      onVoiceStatusChange?.('listening', merged)
     },
-    [onDescriptionChange],
+    [onDescriptionChange, onVoiceStatusChange],
   )
 
   const session = useVoiceSession({
@@ -97,9 +100,16 @@ export function useExtensionIssueDescriptionVoice({
     maxLength: MAX_DESCRIPTION_LENGTH,
   })
 
+  useEffect(() => {
+    return () => {
+      session.resetSession()
+    }
+  }, [session.resetSession])
+
   const startRecording = useCallback(() => {
     if (!speechSupported) {
       setFlowError(UNSUPPORTED_BROWSER_MESSAGE)
+      onVoiceStatusChange?.('error')
       return
     }
 
@@ -107,18 +117,20 @@ export function useExtensionIssueDescriptionVoice({
 
     setFlowError(null)
     baseAtStartRef.current = description
+    onVoiceStatusChange?.('listening', description)
     session.startSpeaking()
-  }, [description, session, speechSupported])
+  }, [description, onVoiceStatusChange, session, speechSupported])
 
   const stopRecording = useCallback(() => {
+    onVoiceStatusChange?.('processing', description)
     session.stopSpeaking()
-  }, [session])
+  }, [description, onVoiceStatusChange, session])
 
   const displayError =
     flowError ??
     (session.error && !speechSupported ? UNSUPPORTED_BROWSER_MESSAGE : session.error)
 
-  const displayStatus: ExtensionVoiceDisplayStatus = useMemo(() => {
+  const displayStatus: ExtensionVoiceStatus = useMemo(() => {
     if (displayError) return 'error'
     if (session.isFinalizing) return 'processing'
     if (session.isListening) return 'listening'

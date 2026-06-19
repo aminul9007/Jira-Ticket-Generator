@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TicketContext } from '../../../shared/generation/types'
+import type { ExtensionVoiceStatus } from '../types/extensionState'
 import { MIN_ISSUE_DESCRIPTION_LENGTH } from '../../utils/validateForm'
 import { useExtensionIssueDescriptionVoice } from '../hooks/useExtensionIssueDescriptionVoice'
 import { LoadingButton } from './LoadingButton'
@@ -10,6 +11,7 @@ interface InputScreenProps {
   status: 'idle' | 'loading' | 'error'
   errorMessage: string | null
   onDescriptionChange: (value: string) => void
+  onVoiceStatusChange?: (status: ExtensionVoiceStatus, transcript?: string) => void
   onGenerate: () => void
   onRetry: () => void
 }
@@ -20,6 +22,7 @@ export function InputScreen({
   status,
   errorMessage,
   onDescriptionChange,
+  onVoiceStatusChange,
   onGenerate,
   onRetry,
 }: InputScreenProps) {
@@ -29,6 +32,7 @@ export function InputScreen({
   const voice = useExtensionIssueDescriptionVoice({
     description,
     onDescriptionChange,
+    onVoiceStatusChange,
   })
 
   const isVoiceBusy = voice.isListening || voice.isProcessing

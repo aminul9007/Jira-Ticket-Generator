@@ -54,6 +54,7 @@ describe('extensionDraftService', () => {
     await saveExtensionDraft({
       description: 'Button does nothing on dashboard',
       view: 'review',
+      workflowView: 'review',
       ticket: sampleTicket,
       qaContext: {
         environment: { value: 'production', source: 'auto-detected' },
@@ -68,6 +69,8 @@ describe('extensionDraftService', () => {
         assignee: 'dev@company.com',
         reporter: '',
       },
+      voiceTranscript: 'Button does nothing on dashboard',
+      updatedAt: Date.now(),
     })
 
     const draft = await loadExtensionDraft()
@@ -81,10 +84,13 @@ describe('extensionDraftService', () => {
     await saveExtensionDraft({
       description: 'Saved draft',
       view: 'input',
+      workflowView: 'input',
       ticket: null,
       qaContext: null,
       usedAi: false,
       jiraDefaults: null,
+      voiceTranscript: '',
+      updatedAt: Date.now(),
     })
 
     await clearExtensionDraft()

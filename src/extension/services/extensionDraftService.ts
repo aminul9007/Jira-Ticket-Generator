@@ -5,8 +5,8 @@ import {
   type ExtensionDraft,
   type ExtensionDraftView,
 } from '../types/extensionDraft'
-import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
 import { normalizeExtensionJiraDefaults } from './extensionJiraDefaultsService'
+import { logger } from '../utils/logger'
 
 const EXTENSION_DRAFT_KEY = 'qa-bug-assistant-extension-draft'
 
@@ -78,17 +78,24 @@ function normalizeDraft(raw: unknown): ExtensionDraft | null {
   const ticket = isGeneratedTicket(record.ticket) ? record.ticket : null
   const qaContext = isExtractedContext(record.qaContext) ? record.qaContext : null
   const view = normalizeDraftView(record.view)
+  const workflowView = normalizeDraftView(record.workflowView ?? record.view)
   const jiraDefaults = record.jiraDefaults
     ? normalizeExtensionJiraDefaults(record.jiraDefaults)
     : null
 
+  const description = typeof record.description === 'string' ? record.description : ''
+  const voiceTranscript =
+    typeof record.voiceTranscript === 'string' ? record.voiceTranscript : description
+
   return {
-    description: typeof record.description === 'string' ? record.description : '',
+    description,
     view: ticket && qaContext ? view : 'input',
+    workflowView: ticket && qaContext ? workflowView : 'input',
     ticket,
     qaContext,
     usedAi: Boolean(record.usedAi),
     jiraDefaults,
+    voiceTranscript,
     updatedAt: typeof record.updatedAt === 'number' ? record.updatedAt : 0,
   }
 }
@@ -98,56 +105,39 @@ export async function loadExtensionDraft(): Promise<ExtensionDraft> {
     const stored = await readStorage()
     const parsed = normalizeDraft(stored[EXTENSION_DRAFT_KEY])
     if (parsed) return parsed
-  } catch {
-    // Fall back to empty draft when storage is unavailable.
+  } catch (error) {
+    logger.warn('Failed to load extension draft', error)
   }
 
   return { ...EMPTY_EXTENSION_DRAFT }
 }
 
-export interface SaveExtensionDraftInput {
-  description: string
-  view: ExtensionDraftView
-  ticket: GeneratedTicket | null
-  qaContext: ExtractedContext | null
-  usedAi: boolean
-  jiraDefaults: ExtensionJiraDefaults | null
-}
-
-export async function saveExtensionDraft(input: SaveExtensionDraftInput): Promise<void> {
-  const draft: ExtensionDraft = {
-    description: input.description,
-    view: input.view,
-    ticket: input.ticket,
-    qaContext: input.qaContext,
-    usedAi: input.usedAi,
-    jiraDefaults: input.jiraDefaults
-      ? normalizeExtensionJiraDefaults(input.jiraDefaults)
-      : null,
-    updatedAt: Date.now(),
-  }
+export async function saveExtensionDraft(draft: ExtensionDraft): Promise<void> {
+  const normalized = normalizeDraft(draft)
+  if (!normalized) return
 
   const isEmpty =
-    !draft.description.trim() &&
-    !draft.ticket &&
-    !draft.qaContext &&
-    !draft.jiraDefaults
+    !normalized.description.trim() &&
+    !normalized.ticket &&
+    !normalized.qaContext &&
+    !normalized.jiraDefaults &&
+    !normalized.voiceTranscript.trim()
 
   try {
     if (isEmpty) {
       await removeStorage()
       return
     }
-    await writeStorage(draft)
-  } catch {
-    // Non-fatal — popup can continue without persistence.
+    await writeStorage(normalized)
+  } catch (error) {
+    logger.warn('Failed to save extension draft', error)
   }
 }
 
 export async function clearExtensionDraft(): Promise<void> {
   try {
     await removeStorage()
-  } catch {
-    // Non-fatal.
+  } catch (error) {
+    logger.warn('Failed to clear extension draft', error)
   }
 }

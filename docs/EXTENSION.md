@@ -1,25 +1,15 @@
 # QA Bug Assistant — Chrome Extension
 
-**Version:** `1.1.0` — see [docs/extension/README.md](./extension/README.md) for full documentation.
+**Version:** `1.2.0` — V1 Release
 
-## Build
+Production build for Chrome **Load unpacked**.
+
+## Release build
 
 ```bash
-npm run extension:build
+npm run extension:release
 ```
 
-Output: **`dist-extension/`** — load directly in Chrome as an unpacked extension.
+Output: **`dist-extension/`**
 
-## Quick load
-
-1. `npm run extension:build`
-2. `npm run api:dev` (or `npm run dev:local`)
-3. Chrome → `chrome://extensions` → Load unpacked → `dist-extension/`
-
-## Docs
-
-- [Installation](./extension/installation.md)
-- [Configuration](./extension/configuration.md)
-- [Jira Setup](./extension/jira-setup.md)
-- [Voice Usage](./extension/voice-usage.md)
-- [Troubleshooting](./extension/troubleshooting.md)
+See [docs/extension/RELEASE.md](./extension/RELEASE.md) for load instructions and QA checklist.

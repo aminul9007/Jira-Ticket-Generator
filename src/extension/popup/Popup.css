@@ -149,6 +149,10 @@
   color: #6b7280;
 }
 
+.popup__error-boundary {
+  padding: 12px 0;
+}
+
 .popup__brand-icon {
   flex-shrink: 0;
   border-radius: 8px;

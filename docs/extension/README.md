@@ -2,7 +2,7 @@
 
 Production-ready Chrome extension for fast QA bug reporting with AI ticket generation and Jira creation.
 
-**Version:** `1.1.0` — V1 RC — Release Preparation
+**Version:** `1.2.0` — V1 Release
 
 ## Quick start
 
@@ -45,9 +45,13 @@ Extension popup
 
 | Script | Output |
 |--------|--------|
+| `npm run extension:release` | Test + build + verify (recommended) |
 | `npm run extension:build` | `dist-extension/` |
+| `npm run extension:verify` | Validate release folder |
 | `npm run build:extension` | Alias for `extension:build` |
 | `npm run dev:extension` | Watch mode rebuild |
+
+See [RELEASE.md](./RELEASE.md) for Chrome load instructions and QA checklist.
 
 ## Keyboard shortcut
 
