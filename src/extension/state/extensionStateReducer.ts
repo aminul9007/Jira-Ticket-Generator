@@ -14,6 +14,7 @@ import {
 export type ExtensionStateAction =
   | { type: 'HYDRATE'; draft: ExtensionDraft }
   | { type: 'SET_DESCRIPTION'; description: string }
+  | { type: 'SET_INCLUDE_PAGE_TITLE'; includePageTitle: boolean }
   | { type: 'SET_VIEW'; view: ExtensionView }
   | { type: 'SET_WORKFLOW_VIEW'; workflowView: ExtensionWorkflowView }
   | { type: 'OPEN_SETTINGS' }
@@ -51,7 +52,10 @@ export function extensionStateReducer(
       return {
         ...INITIAL_EXTENSION_STATE,
         hydrated: true,
-        input: { description },
+        input: {
+          description,
+          includePageTitle: action.draft.includePageTitle ?? true,
+        },
         ticket: {
           generated: action.draft.ticket,
           qaContext: action.draft.qaContext,
@@ -73,11 +77,17 @@ export function extensionStateReducer(
     case 'SET_DESCRIPTION':
       return {
         ...state,
-        input: { description: action.description },
+        input: { ...state.input, description: action.description },
         voice: {
           ...state.voice,
           transcript: action.description,
         },
+      }
+
+    case 'SET_INCLUDE_PAGE_TITLE':
+      return {
+        ...state,
+        input: { ...state.input, includePageTitle: action.includePageTitle },
       }
 
     case 'SET_VIEW':
@@ -258,6 +268,7 @@ export function extensionStateToDraft(state: ExtensionState): ExtensionDraft {
     usedAi: state.ticket.usedAi,
     jiraDefaults: state.jiraConfig,
     voiceTranscript: state.voice.transcript || state.input.description,
+    includePageTitle: state.input.includePageTitle,
     updatedAt: Date.now(),
   }
 }

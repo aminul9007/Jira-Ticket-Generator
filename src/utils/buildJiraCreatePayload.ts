@@ -28,13 +28,7 @@ function formatEnvironment(
   return fromTicket || fromDetection
 }
 
-function buildConnection(jira: JiraSettings): CreateJiraIssuePayload['connection'] {
-  const domain = jira.domain.trim()
-  const email = jira.email.trim()
-  const apiToken = jira.apiToken.trim()
-  if (!domain || !email || !apiToken) return undefined
-  return { domain, email, apiToken }
-}
+import { buildJiraConnectionConfig } from './buildJiraConnectionConfig'
 
 export interface BuildJiraCreatePayloadOptions {
   reporter?: string
@@ -76,7 +70,7 @@ export function buildJiraCreatePayload(
     labels: ticketDefaults.labels.length > 0 ? ticketDefaults.labels : undefined,
     assignee: ticketDefaults.assignee.trim() || undefined,
     reporter: options?.reporter?.trim() || undefined,
-    connection: buildConnection(jira),
+    connection: buildJiraConnectionConfig(jira),
     template,
   }
 }

@@ -1,7 +1,7 @@
 import type { CreateJiraIssuePayload, CreateJiraIssueResponse } from '../../../shared/jiraApi'
 import type { TicketGenerationInput } from '../../../shared/generation/types'
 import type { TicketGenerationResult } from '../../services/ticketGeneration'
-import { createJiraIssue } from '../../services/jira/createJiraIssue'
+import { createExtensionJiraIssue } from './extensionJiraApi'
 import { withApiResilience } from '../utils/apiResilience'
 import { generateExtensionTicket } from './generateExtensionTicket'
 
@@ -18,7 +18,7 @@ export function resilientGenerateExtensionTicket(
 export function resilientCreateJiraIssue(
   payload: CreateJiraIssuePayload,
 ): Promise<CreateJiraIssueResponse> {
-  return withApiResilience(() => createJiraIssue(payload), {
+  return withApiResilience(() => createExtensionJiraIssue(payload), {
     label: 'Jira creation',
     timeoutMs: 30_000,
     maxAttempts: 2,

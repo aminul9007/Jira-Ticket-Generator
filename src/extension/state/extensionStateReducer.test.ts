@@ -31,4 +31,13 @@ describe('extensionStateReducer', () => {
     state = extensionStateReducer(state, { type: 'CLOSE_SETTINGS' })
     expect(state.ui.view).toBe('review')
   })
+
+  it('toggles includePageTitle preference', () => {
+    const state = extensionStateReducer(INITIAL_EXTENSION_STATE, {
+      type: 'SET_INCLUDE_PAGE_TITLE',
+      includePageTitle: false,
+    })
+
+    expect(state.input.includePageTitle).toBe(false)
+  })
 })

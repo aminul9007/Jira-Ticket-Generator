@@ -3,6 +3,7 @@ import type { DefaultIssueType } from '../../types/appSettings'
 import { formatExtensionVersionLabel } from '../config/extensionVersion'
 import { getApiBaseUrl } from '../config/extensionConfig'
 import { LoadingButton } from './LoadingButton'
+import { ShortcutSettingsSection } from './ShortcutSettingsSection'
 import {
   clearExtensionDraftsAndPreferences,
   resetExtensionPreferencesOnly,
@@ -108,6 +109,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         <h2 className="popup__footer-title">Jira Settings</h2>
         <p className="popup__settings-hint">
           Credentials are stored locally and sent to your API backend when creating issues.
+          Leave blank to use the same <code>server/.env</code> credentials as the web app.
         </p>
 
         <label className="popup__label" htmlFor="settings-jira-domain">
@@ -149,7 +151,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           <LoadingButton
             isLoading={testingConnection}
             loadingLabel="Testing…"
-            idleLabel="Test Connection"
+            idleLabel="Test API & MCP Connection"
             variant="secondary"
             onClick={() => void handleTestConnection()}
           />
@@ -163,6 +165,11 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
               role="status"
             >
               {connectionMessage}
+            </p>
+          )}
+          {connectionOk && connectionMessage && (
+            <p className="popup__settings-hint" role="note">
+              Issue creation uses the same API backend and Jira MCP server as the web app.
             </p>
           )}
         </div>
@@ -261,6 +268,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           <option value="15">15 seconds of silence</option>
         </select>
       </section>
+
+      <ShortcutSettingsSection />
 
       <section className="popup__settings-section">
         <h2 className="popup__footer-title">Extension Settings</h2>

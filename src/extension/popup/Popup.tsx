@@ -16,6 +16,7 @@ export function Popup() {
     isGenerating,
     isCreatingJira,
     setDescription,
+    setIncludePageTitle,
     setVoiceStatus,
     updateTicket,
     setJiraConfig,
@@ -128,9 +129,11 @@ export function Popup() {
         <InputScreen
           description={state.input.description}
           browserContext={browserContext}
+          includePageTitle={state.input.includePageTitle}
           status={isGenerating ? 'loading' : generationStatus}
           errorMessage={state.ui.generation.errorMessage}
           onDescriptionChange={setDescription}
+          onIncludePageTitleChange={setIncludePageTitle}
           onVoiceStatusChange={setVoiceStatus}
           onGenerate={() => void generateTicket()}
           onRetry={() => void retryGenerate()}

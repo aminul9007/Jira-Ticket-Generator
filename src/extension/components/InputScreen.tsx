@@ -8,9 +8,11 @@ import { LoadingButton } from './LoadingButton'
 interface InputScreenProps {
   description: string
   browserContext: TicketContext
+  includePageTitle: boolean
   status: 'idle' | 'loading' | 'error'
   errorMessage: string | null
   onDescriptionChange: (value: string) => void
+  onIncludePageTitleChange: (include: boolean) => void
   onVoiceStatusChange?: (status: ExtensionVoiceStatus, transcript?: string) => void
   onGenerate: () => void
   onRetry: () => void
@@ -19,9 +21,11 @@ interface InputScreenProps {
 export function InputScreen({
   description,
   browserContext,
+  includePageTitle,
   status,
   errorMessage,
   onDescriptionChange,
+  onIncludePageTitleChange,
   onVoiceStatusChange,
   onGenerate,
   onRetry,
@@ -177,6 +181,18 @@ export function InputScreen({
             <span className="popup__meta-label">Title</span>
             <span className="popup__meta-value">{browserContext.title || 'Unavailable'}</span>
           </p>
+          {browserContext.title ? (
+            <label className="popup__context-toggle" htmlFor="include-page-title">
+              <input
+                id="include-page-title"
+                type="checkbox"
+                checked={includePageTitle}
+                disabled={isLoading}
+                onChange={(event) => onIncludePageTitleChange(event.target.checked)}
+              />
+              <span>Include page title in ticket</span>
+            </label>
+          ) : null}
           <p className="popup__meta-row">
             <span className="popup__meta-label">Captured</span>
             <span className="popup__meta-value">{browserContext.timestamp || '—'}</span>

@@ -96,6 +96,7 @@ function normalizeDraft(raw: unknown): ExtensionDraft | null {
     usedAi: Boolean(record.usedAi),
     jiraDefaults,
     voiceTranscript,
+    includePageTitle: record.includePageTitle !== false,
     updatedAt: typeof record.updatedAt === 'number' ? record.updatedAt : 0,
   }
 }

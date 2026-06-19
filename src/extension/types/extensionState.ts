@@ -20,6 +20,8 @@ export type ExtensionVoiceStatus =
 
 export interface ExtensionInputState {
   description: string
+  /** When true, the active tab title is appended to the generated ticket. */
+  includePageTitle: boolean
 }
 
 export interface ExtensionTicketState {
@@ -66,7 +68,7 @@ export interface ExtensionState {
 
 export const INITIAL_EXTENSION_STATE: ExtensionState = {
   hydrated: false,
-  input: { description: '' },
+  input: { description: '', includePageTitle: true },
   ticket: { generated: null, qaContext: null, usedAi: false },
   jiraConfig: null,
   voice: { status: 'idle', transcript: '' },

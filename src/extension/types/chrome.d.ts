@@ -5,11 +5,17 @@ declare namespace chrome {
     interface Tab {
       url?: string
       title?: string
+      id?: number
     }
 
     function query(
       queryInfo: { active?: boolean; currentWindow?: boolean },
       callback: (tabs: Tab[]) => void,
+    ): void
+
+    function create(
+      createProperties: { url: string },
+      callback?: (tab: Tab) => void,
     ): void
   }
 
@@ -29,6 +35,14 @@ declare namespace chrome {
   }
 
   namespace commands {
+    interface Command {
+      name?: string
+      description?: string
+      shortcut?: string
+    }
+
+    function getAll(callback: (commands: Command[]) => void): void
+
     const onCommand: {
       addListener(callback: (command: string) => void): void
     }

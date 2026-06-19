@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import { appConfig } from './config.js'
 import { ApiError } from './errors.js'
+import { configRouter } from './routes/config.js'
 import { jiraRouter } from './routes/jira.js'
 
 export function createApp() {
@@ -33,6 +34,7 @@ export function createApp() {
     res.json({ status: 'ok' })
   })
 
+  app.use('/api/config', configRouter)
   app.use('/api/jira', jiraRouter)
 
   app.use((_req, res) => {

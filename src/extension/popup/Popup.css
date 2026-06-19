@@ -149,6 +149,63 @@
   color: #6b7280;
 }
 
+.popup__shortcut-card {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #dbe1ec;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.popup__shortcut-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.popup__shortcut-value {
+  margin: 0;
+}
+
+.popup__shortcut-unassigned {
+  font-size: 12px;
+  color: #92400e;
+}
+
+.popup__shortcut-list {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.popup__shortcut-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #eef2f7;
+  font-size: 12px;
+  color: #4a5568;
+}
+
+.popup__kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid #cdd5e4;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #0c1222;
+  white-space: nowrap;
+}
+
+.popup__loading-state--inline {
+  min-height: 40px;
+}
+
 .popup__error-boundary {
   padding: 12px 0;
 }
@@ -508,6 +565,21 @@
 .popup__meta-value {
   display: block;
   margin-top: 2px;
+}
+
+.popup__context-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #4a5568;
+  cursor: pointer;
+}
+
+.popup__context-toggle input {
+  margin-top: 2px;
+  accent-color: #5b4fe8;
 }
 
 .popup__layout {

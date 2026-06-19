@@ -13,6 +13,7 @@ export interface ExtensionDraft {
   usedAi: boolean
   jiraDefaults: ExtensionJiraDefaults | null
   voiceTranscript: string
+  includePageTitle: boolean
   updatedAt: number
 }
 
@@ -25,5 +26,6 @@ export const EMPTY_EXTENSION_DRAFT: ExtensionDraft = {
   usedAi: false,
   jiraDefaults: null,
   voiceTranscript: '',
+  includePageTitle: true,
   updatedAt: 0,
 }

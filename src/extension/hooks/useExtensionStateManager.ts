@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { applyTicketContextOptions } from '../../../shared/generation/applyTicketContextOptions'
 import type { TicketContext } from '../../../shared/generation/types'
 import { buildFormValuesFromGenerationInput } from '../../services/ticketGeneration/buildFormValuesFromInput'
 import { buildJiraCreatePayload } from '../../utils/buildJiraCreatePayload'
@@ -8,6 +9,8 @@ import {
   runExtensionHealthChecks,
   type HealthWarning,
 } from '../services/extensionHealthService'
+import { syncExtensionSettingsFromServer } from '../services/extensionBootstrapService'
+import { resolveExtensionApiBaseUrl } from '../config/extensionConfig'
 import { loadExtensionAppSettings } from '../services/extensionSettingsService'
 import { saveExtensionJiraDefaults } from '../services/extensionJiraDefaultsService'
 import {
@@ -26,6 +29,7 @@ import {
 import { INITIAL_EXTENSION_STATE, type ExtensionVoiceStatus } from '../types/extensionState'
 import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
 import { RequestLock } from '../utils/requestLock'
+import { JiraCreateIssueError } from '../../services/jira/createJiraIssue'
 import { logger } from '../utils/logger'
 
 export function useExtensionStateManager(browserContext: TicketContext) {
@@ -39,9 +43,11 @@ export function useExtensionStateManager(browserContext: TicketContext) {
     analytics.track('popup_opened')
 
     void (async () => {
+      await resolveExtensionApiBaseUrl()
+      const syncedSettings = await syncExtensionSettingsFromServer()
       const [draft, warnings] = await Promise.all([
         loadExtensionDraft(),
-        runExtensionHealthChecks(),
+        runExtensionHealthChecks(syncedSettings ?? undefined),
       ])
       dispatch({ type: 'HYDRATE', draft })
       setHealthWarnings(warnings)
@@ -93,7 +99,10 @@ export function useExtensionStateManager(browserContext: TicketContext) {
       dispatch({ type: 'GENERATION_START' })
 
       try {
-        const input = { description: state.input.description, context: browserContext }
+        const context = applyTicketContextOptions(browserContext, {
+          includePageTitle: state.input.includePageTitle,
+        })
+        const input = { description: state.input.description, context }
         const formValues = buildFormValuesFromGenerationInput(input)
         const result = await resilientGenerateExtensionTicket(input)
 
@@ -112,7 +121,7 @@ export function useExtensionStateManager(browserContext: TicketContext) {
         })
       }
     })
-  }, [browserContext, state.input.description])
+  }, [browserContext, state.input.description, state.input.includePageTitle])
 
   const createJiraTicket = useCallback(
     async (jiraFields: ExtensionJiraDefaults) => {
@@ -163,9 +172,13 @@ export function useExtensionStateManager(browserContext: TicketContext) {
           analytics.track('jira_created')
         } catch (error) {
           logger.error('Jira creation failed', error)
+          const message =
+            error instanceof JiraCreateIssueError
+              ? error.message
+              : 'Unable to create Jira ticket. Check your connection and try again.'
           dispatch({
             type: 'JIRA_ERROR',
-            message: 'Unable to create Jira ticket. Check your connection and try again.',
+            message,
           })
         }
       })
@@ -211,6 +224,9 @@ export function useExtensionStateManager(browserContext: TicketContext) {
     isGenerating,
     isCreatingJira,
     setDescription,
+    setIncludePageTitle: (includePageTitle: boolean) => {
+      dispatch({ type: 'SET_INCLUDE_PAGE_TITLE', includePageTitle })
+    },
     setVoiceStatus,
     updateTicket: (ticket: NonNullable<typeof state.ticket.generated>) => {
       dispatch({ type: 'UPDATE_TICKET', ticket })

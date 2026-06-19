@@ -70,6 +70,7 @@ describe('extensionDraftService', () => {
         reporter: '',
       },
       voiceTranscript: 'Button does nothing on dashboard',
+      includePageTitle: false,
       updatedAt: Date.now(),
     })
 
@@ -78,6 +79,7 @@ describe('extensionDraftService', () => {
     expect(draft.view).toBe('review')
     expect(draft.ticket?.title).toBe('Login broken')
     expect(draft.jiraDefaults?.projectKey).toBe('QA')
+    expect(draft.includePageTitle).toBe(false)
   })
 
   it('clears draft after successful workflow reset', async () => {
@@ -90,6 +92,7 @@ describe('extensionDraftService', () => {
       usedAi: false,
       jiraDefaults: null,
       voiceTranscript: '',
+      includePageTitle: true,
       updatedAt: Date.now(),
     })
 

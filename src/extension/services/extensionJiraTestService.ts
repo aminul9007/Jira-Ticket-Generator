@@ -1,27 +1,29 @@
 import type { JiraSettings } from '../../types/appSettings'
-import {
-  testJiraConnection,
-  validateJiraSettingsFields,
-} from '../../services/jira/testJiraConnection'
+import { buildJiraConnectionConfig } from '../../utils/buildJiraConnectionConfig'
+import { testExtensionMcpConnection } from './extensionJiraApi'
 
 export interface ExtensionJiraTestResult {
   ok: boolean
-  message: 'Connected Successfully' | 'Unable to Connect'
+  message: string
+  usesServerCredentials: boolean
 }
 
-/** User-friendly Jira connection test for the extension settings page. */
+/** Test Jira MCP via the same API backend as the web application. */
 export async function testExtensionJiraConnection(
   jira: JiraSettings,
 ): Promise<ExtensionJiraTestResult> {
-  const fieldError = validateJiraSettingsFields(jira)
-  if (fieldError) {
-    return { ok: false, message: 'Unable to Connect' }
-  }
+  const connection = buildJiraConnectionConfig(jira)
+  const status = await testExtensionMcpConnection(connection)
+  const ok = status.connected && status.hasCreateTool
 
-  const result = await testJiraConnection(jira)
-  if (result.status === 'success') {
-    return { ok: true, message: 'Connected Successfully' }
+  return {
+    ok,
+    message: status.message,
+    usesServerCredentials: !connection,
   }
+}
 
-  return { ok: false, message: 'Unable to Connect' }
+export async function isExtensionJiraReady(jira: JiraSettings): Promise<boolean> {
+  const result = await testExtensionJiraConnection(jira)
+  return result.ok
 }
