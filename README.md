@@ -1,110 +1,238 @@
 # QA Bug Report Assistant
 
-A modern web app that helps QA engineers create Jira-ready bug tickets in under one minute — with voice dictation, AI-assisted generation, and one-click issue creation via Jira MCP.
+A QA-focused toolkit for creating **Jira-ready bug tickets in under one minute**. Describe a bug by typing or voice, let AI structure the ticket, review and edit, then create the issue in **Jira Cloud** via MCP.
 
-## Tech stack
+The project has two clients that share the same backend and generation logic:
 
-### Frontend
+| Client | Purpose |
+|--------|---------|
+| **Web app** | Full dashboard — history, settings, templates, LAN sharing |
+| **Chrome extension** | Capture bugs from any tab — page URL/title, popup workflow |
 
-| Layer | Technology |
-| ----- | ---------- |
-| UI framework | **React 19** |
-| Language | **TypeScript 6** |
-| Build tool | **Vite 8** |
-| Styling | **Tailwind CSS v4** (`@tailwindcss/vite` plugin) |
-| Dev HTTPS (LAN) | `@vitejs/plugin-basic-ssl` |
-| State & settings | React Context + `localStorage` |
-| Voice input | **Web Speech API** (`SpeechRecognition` / `webkitSpeechRecognition`) |
-| Testing | **Vitest** |
+**Version:** `1.2.0` (V1 Release)
 
-### Backend API (`server/`)
+---
 
-| Layer | Technology |
-| ----- | ---------- |
-| Runtime | **Node.js** (ES modules) |
-| Framework | **Express 5** |
-| Language | **TypeScript 6** |
-| Dev runner | **tsx** (watch mode) |
-| Validation | **Zod** |
-| CORS | `cors` middleware |
-| Config | `dotenv` (`.env`) |
-| Testing | **Vitest** + **Supertest** |
+## Table of contents
 
-### Jira integration
+1. [What it does](#what-it-does)
+2. [Architecture](#architecture)
+3. [Project structure](#project-structure)
+4. [Tech stack](#tech-stack)
+5. [Prerequisites](#prerequisites)
+6. [Quick start](#quick-start)
+7. [Chrome extension](#chrome-extension)
+8. [Configuration](#configuration)
+9. [Documentation](#documentation)
+10. [Scripts reference](#scripts-reference)
+11. [Testing](#testing)
+12. [Security](#security)
+13. [Out of scope](#out-of-scope)
 
-| Layer | Technology |
-| ----- | ---------- |
-| Protocol | **Model Context Protocol (MCP)** — stdio transport |
-| MCP SDK | `@modelcontextprotocol/sdk` |
-| MCP server | **mcp-atlassian** (Python, spawned as child process) |
-| Target | **Jira Cloud REST API** |
+---
 
-### AI providers (frontend)
+## What it does
 
-| Provider | Technology |
-| -------- | ---------- |
-| Local (recommended) | **llama.cpp** — OpenAI-compatible HTTP API (`llama-server`) |
-| Cloud (optional) | **OpenAI** Chat Completions API |
-| Default model | Qwen 2.5 3B Instruct (GGUF via llama.cpp) |
+### End-to-end workflow
 
-### Tooling & scripts
+```
+Describe bug (type or voice)
+        ↓
+AI + rules engine → structured ticket
+        ↓
+Review & edit (title, steps, severity, Jira fields)
+        ↓
+Create issue in Jira Cloud (via API + MCP)
+```
 
-| Tool | Purpose |
-| ---- | ------- |
-| **ESLint 10** | Linting (TypeScript ESLint, React Hooks) |
-| **PowerShell scripts** | Dev server lifecycle, LAN sharing, Windows Firewall |
-| **Shared types** | `shared/` — API contracts used by frontend and backend |
+### Web app features
+
+- Voice dictation (Web Speech API) with environment detection
+- AI ticket generation (local **llama.cpp** or **OpenAI**)
+- Editable preview, title suggestions, confidence score
+- QA context detection (browser, OS, device)
+- Ticket history, templates, QA standards engine
+- One-click Jira creation from the dashboard
+
+### Chrome extension features
+
+- Popup on any page — captures **URL**, **title**, timestamp
+- Optional **include/exclude page title** in the ticket
+- Same AI generation and Jira creation as the web app
+- Draft persistence across popup closes
+- Keyboard shortcut: **Ctrl+Shift+B** (customizable in Settings)
+- Auto-syncs Jira domain and project from `server/.env`
+
+---
 
 ## Architecture
 
-```
-Browser (React + Vite, port 5173)
-    │
-    ├─► AI provider (llama.cpp or OpenAI) — ticket generation
-    ├─► Web Speech API — voice dictation
-    ├─► localStorage — settings, history, theme
-    │
-    └─► POST /api/jira/*  (Vite dev proxy → port 3001)
-            │
-            ▼
-        Node.js API (Express, port 3001)
-            │
-            └─► MCP stdio → mcp-atlassian → Jira Cloud
+### System overview
+
+```mermaid
+flowchart TB
+  subgraph clients [Clients]
+    WEB[Web App<br/>React + Vite :5173]
+    EXT[Chrome Extension<br/>MV3 popup]
+  end
+
+  subgraph local [Local services]
+    AI[AI Provider<br/>llama.cpp or OpenAI]
+    API[Node API<br/>Express :3001]
+    MCP[mcp-atlassian<br/>stdio MCP]
+  end
+
+  subgraph cloud [Cloud]
+    JIRA[Jira Cloud REST API]
+  end
+
+  WEB -->|ticket generation| AI
+  EXT -->|ticket generation| AI
+  WEB -->|POST /api/jira/*| API
+  EXT -->|POST /api/jira/*| API
+  EXT -->|GET /api/config/bootstrap| API
+  API -->|MCP stdio| MCP
+  MCP --> JIRA
 ```
 
-Credentials (Jira API token, MCP env) stay on the **server** — never in the browser.
+### Request flow — Jira issue creation
+
+```
+Browser / Extension
+    │  POST /api/jira/issues  (ticket payload + optional connection)
+    ▼
+Express API (server/)
+    │  validate payload (Zod)
+    │  build MCP tool arguments
+    ▼
+MCP Client (stdio transport)
+    │  spawn mcp-atlassian child process
+    │  call jira_create_issue
+    ▼
+Jira Cloud
+    │  returns issue key + URL
+    ▼
+201 { issueKey, issueUrl }
+```
+
+**Credentials never live in the frontend bundle.** Jira API tokens are read from `server/.env` or sent per-request to the API only (extension/web Settings).
+
+### Shared code
+
+Both clients reuse the same modules where possible:
+
+| Shared module | Used for |
+|---------------|----------|
+| `shared/jiraApi.ts` | API contract (create issue, MCP test) |
+| `shared/generation/` | Browser context, issue description composition |
+| `src/services/ticketGeneration/` | AI + rules-based ticket generation |
+| `src/utils/buildJiraCreatePayload.ts` | Jira create payload from ticket + settings |
+
+The extension adds MV3-specific layers under `src/extension/` (popup, `chrome.storage`, health checks, bootstrap sync).
+
+### Data storage
+
+| Data | Web app | Extension |
+|------|---------|-----------|
+| Settings | `localStorage` | `chrome.storage.local` |
+| Drafts / history | `localStorage` | `chrome.storage.local` |
+| Jira credentials (preferred) | `server/.env` | `server/.env` (auto-synced) |
+| Theme | `localStorage` | N/A |
+
+---
 
 ## Project structure
 
 ```
-├── src/                        # React frontend
-│   ├── ai/                     # Prompts, providers (llama.cpp, OpenAI), JSON schema
-│   ├── components/             # UI, forms, ticket preview, settings, history
-│   ├── hooks/                  # Voice, form, Jira creation, theme
-│   ├── pages/                  # Dashboard, Settings
-│   ├── services/               # Ticket generation, Jira client, history, memory
-│   ├── utils/                  # Context detection, voice transcript, Jira formatting
-│   └── types/
-├── server/                     # Node.js API
+jira-ticket-generator/
+│
+├── src/                          # React web application
+│   ├── ai/                       # Prompts, providers (llama.cpp, OpenAI), schemas
+│   ├── components/               # UI — forms, ticket preview, settings, history
+│   ├── hooks/                    # Voice, form state, Jira creation, theme
+│   ├── pages/                    # Dashboard, Settings
+│   ├── services/                 # Ticket generation, Jira client, history, memory
+│   ├── utils/                    # Context detection, voice, Jira formatting
+│   └── extension/                # Chrome extension (MV3)
+│       ├── popup/                # React popup UI
+│       ├── background/           # Service worker (shortcuts)
+│       ├── components/           # Input, Review, Settings, Success screens
+│       ├── services/             # Bootstrap sync, Jira API, drafts, health
+│       ├── state/                # Unified extension state reducer
+│       └── manifest/             # manifest.json template
+│
+├── server/                       # Node.js API backend
 │   └── src/
-│       ├── routes/jira.ts      # POST /issues, MCP test
-│       ├── jira/               # Payload validation, MCP issue creation
-│       └── mcp/                # MCP connection helpers
-├── shared/                     # Shared TypeScript types (jiraApi, qaTicketStandards)
-├── scripts/                    # Dev, LAN share, firewall, llama.cpp helpers
-└── docs/                       # Jira MCP setup guide
+│       ├── routes/
+│       │   ├── jira.ts           # POST /issues, POST /mcp/test
+│       │   └── config.ts         # GET /bootstrap (extension sync)
+│       ├── jira/                 # Payload validation, MCP issue creation
+│       ├── mcp/                  # MCP stdio client, connection test
+│       ├── app.ts                # Express app + CORS
+│       └── config.ts             # Environment config
+│
+├── shared/                       # Types shared by web, extension, and API
+│   ├── jiraApi.ts                # Create issue + MCP status contracts
+│   ├── extensionBootstrap.ts     # Extension bootstrap response type
+│   ├── generation/               # TicketContext, composeIssueDescription
+│   ├── qaTicketStandards.ts
+│   └── ticketTemplate.ts
+│
+├── scripts/                      # Dev lifecycle (PowerShell), MCP setup, verify
+├── docs/                         # Detailed guides (see Documentation)
+├── dist-extension/               # Extension build output (gitignored)
+└── vite.extension.config.ts      # Extension-specific Vite config
 ```
 
-## Getting started
+---
 
-### Prerequisites
+## Tech stack
 
-- **Node.js** 20+
-- **npm**
-- (Optional) **Python** + `pip install mcp-atlassian` for Jira issue creation
-- (Optional) **llama.cpp** for local AI — [download](https://llama-cpp.com/download/)
+### Frontend (web + extension popup)
 
-### Install & run (local)
+| Layer | Technology |
+|-------|------------|
+| UI | React 19, TypeScript 6 |
+| Build | Vite 8 |
+| Styling | Tailwind CSS v4 (web app) |
+| Voice | Web Speech API |
+| Testing | Vitest |
+
+### Backend API (`server/`)
+
+| Layer | Technology |
+|-------|------------|
+| Runtime | Node.js (ES modules) |
+| Framework | Express 5 |
+| Validation | Zod |
+| Testing | Vitest + Supertest |
+
+### Integrations
+
+| Integration | Technology |
+|-------------|------------|
+| Jira | MCP stdio → **mcp-atlassian** → Jira Cloud |
+| AI (local) | **llama.cpp** (OpenAI-compatible HTTP API) |
+| AI (cloud) | OpenAI Chat Completions |
+| Extension | Chrome Manifest V3 |
+
+---
+
+## Prerequisites
+
+| Requirement | Required for |
+|-------------|--------------|
+| **Node.js 20+** | Web app, API, extension build |
+| **npm** | All installs and scripts |
+| **Python + mcp-atlassian** | Jira issue creation (`npm run mcp:install`) |
+| **llama.cpp** (optional) | Local AI without OpenAI |
+| **Chrome** | Extension (Load unpacked) |
+
+---
+
+## Quick start
+
+### Option A — Web app only (no Jira)
 
 ```bash
 npm install
@@ -113,166 +241,213 @@ npm run dev
 
 Open **http://localhost:5173**
 
-### Full stack (frontend + Jira API)
+Ticket generation works if AI is configured (llama.cpp or OpenAI). Jira creation requires the API (Option B).
+
+### Option B — Full stack (web app + Jira)
+
+**Terminal 1 — API:**
 
 ```bash
 npm run api:install
-cp server/.env.example server/.env   # configure Jira + MCP
-npm run api:dev                       # terminal 1 — API on port 3001
-npm run dev                           # terminal 2 — frontend on port 5173
+cp server/.env.example server/.env    # add Jira + MCP credentials
+npm run mcp:install                   # pip install mcp-atlassian
+npm run api:dev                       # http://localhost:3001
 ```
 
-Or restart both in one step:
+**Terminal 2 — Frontend:**
+
+```bash
+npm install
+npm run dev                           # http://localhost:5173
+```
+
+Or restart both:
 
 ```bash
 npm run dev:restart
 ```
 
-Full Jira MCP setup: [docs/JIRA_MCP_SETUP.md](docs/JIRA_MCP_SETUP.md)
+Verify Jira: **Settings → Jira Integration → Test API & MCP connection**
 
-### Local AI with llama.cpp (recommended)
+Detailed setup: [docs/JIRA_MCP_SETUP.md](docs/JIRA_MCP_SETUP.md)
 
-1. Download [llama.cpp](https://llama-cpp.com/download/) and add `llama-server` to your PATH.
-2. Place your model at `D:\Software\qwen2.5-3b-instruct-q4_k_m.gguf` (or set `LLAMACPP_MODEL_PATH`).
-3. Start the model server (terminal 1):
+### Option C — Local AI (llama.cpp)
+
+1. Install [llama.cpp](https://llama-cpp.com/download/) and add `llama-server` to PATH.
+2. Start the model server:
 
 ```bash
 npm run llama:server
 ```
 
-4. Copy `.env.example` → `.env.local` and run the app (terminal 2):
+3. Copy `.env.example` → `.env.local`:
 
-```bash
-npm run dev
-```
-
-`.env.local` for local Qwen:
-
-```bash
+```env
 VITE_AI_PROVIDER=llama-cpp
 VITE_LLAMACPP_BASE_URL=http://127.0.0.1:8080/v1
 VITE_LLAMACPP_MODEL=qwen2.5-3b-instruct
 ```
 
-### Optional OpenAI (cloud)
+4. Run `npm run dev` (and `npm run api:dev` if using Jira).
+
+---
+
+## Chrome extension
+
+### Build and load
 
 ```bash
-VITE_AI_PROVIDER=openai
-VITE_OPENAI_API_KEY=sk-...
-VITE_OPENAI_MODEL=gpt-4o-mini
+npm run extension:release    # test + build + verify (recommended)
 ```
 
-## Share on LAN (other devices + voice)
+Output: **`dist-extension/`**
 
-Other phones or PCs on the same Wi-Fi can use the app, including the microphone.
+1. Start API: `npm run api:dev`
+2. Open [chrome://extensions/](chrome://extensions/) → **Developer mode**
+3. **Load unpacked** → select `dist-extension/`
+
+Pre-built zip (optional): `qa-bug-assistant-extension-v1.2.0.zip`
+
+### Extension + Jira
+
+The extension uses the **same API and `server/.env`** as the web app:
+
+- Jira token stays on the server (not in the extension bundle)
+- On popup open, domain/email/project sync from `GET /api/config/bootstrap`
+- Leave Jira fields blank in extension Settings if `server/.env` is configured
+
+**Daily workflow:**
 
 ```bash
-npm run dev:share
+npm run api:dev    # keep running
+# use extension from any tab
 ```
 
-This stops old servers, opens Windows Firewall (Admin prompt once), and starts **HTTP on 5173** plus **HTTPS on 5175** for phone voice.
+Extension docs: [docs/extension/README.md](docs/extension/README.md)
 
-| URL | Use |
-| --- | --- |
-| `http://localhost:5173/` | **This PC** — use this (no certificate errors) |
-| `http://<your-lan-ip>:5173/` | Other devices on Wi-Fi (HTTP) |
-| `https://<your-lan-ip>:5175/` | Phones/tablets for **voice** (accept cert warning) |
+---
 
-**Do not open `https://localhost:5173`** — port 5173 is HTTP only. HTTPS on 5173 causes `502 / self-signed certificate` behind corporate proxies.
+## Configuration
 
-**If you see `502 Bad Gateway` / `Certificate verify failed: self-signed certificate`:** you used an HTTPS URL. Switch to **http://localhost:5173/**
+### API server (`server/.env`)
 
-```bash
-npm run dev:corp    # HTTP-only (no phone voice over LAN)
-```
+| Variable | Description |
+|----------|-------------|
+| `JIRA_URL` | e.g. `https://company.atlassian.net` |
+| `JIRA_USERNAME` | Atlassian account email |
+| `JIRA_API_TOKEN` | From [id.atlassian.com](https://id.atlassian.com) |
+| `JIRA_DOMAIN` | e.g. `company.atlassian.net` (browse URLs) |
+| `JIRA_DEFAULT_PROJECT_KEY` | Default project (e.g. `QA`) |
+| `MCP_SERVER_COMMAND` | Default: `mcp-atlassian` |
+| `JIRA_MCP_MOCK` | `true` = fake `QA-123` without MCP |
 
-**On phones/tablets (voice over Wi-Fi):**
+### Web app (`.env.local`)
 
-1. Use **HTTPS on port 5175** (not 5173) — required for microphone access.
-2. Accept the self-signed certificate warning (Advanced → Proceed).
-3. Allow microphone when prompted.
-4. If you see a **squid-proxy** error, add `192.168.*` to proxy bypass on that machine (Settings → Network → Proxy).
+| Variable | Description |
+|----------|-------------|
+| `VITE_AI_PROVIDER` | `llama-cpp`, `openai`, or `auto` |
+| `VITE_LLAMACPP_*` | Local model server URL and model name |
+| `VITE_OPENAI_*` | OpenAI API key and model |
+| `VITE_API_BASE_URL` | API origin (empty = Vite proxy to `:3001`) |
 
-```bash
-npm run lan:diagnose    # check firewall, ports, and LAN IP
-npm run dev:stop        # stop all dev servers
-```
+### Web Settings (dashboard)
 
-## Voice dictation
+AI, voice, Jira credentials, ticket defaults, templates, QA standards, history retention — persisted in `localStorage`.
 
-Use the **microphone** on the Issue Description field to dictate your bug (Chrome / Edge). Tap again to stop; text and **Environment** chips update automatically.
+### Extension Settings (popup)
 
-- Say **production**, **beta**, **staging**, or **canary** — otherwise all three are selected.
-- **Fuzzy context detection** corrects misheard words (e.g. "suffer" → Safari) for browser, OS, and device.
-- Enable **auto-generate after voice** in Settings to create a ticket when you stop speaking.
+Jira (optional override), ticket defaults, voice, keyboard shortcut, API URL — persisted in `chrome.storage.local`.
 
-> Voice on phones/tablets over Wi-Fi requires **HTTPS** (`npm run dev:share`).
+---
 
-## Settings
+## Documentation
 
-Open **Settings** from the dashboard:
+| Document | Description |
+|----------|-------------|
+| [docs/README.md](docs/README.md) | Documentation index |
+| [docs/JIRA_MCP_SETUP.md](docs/JIRA_MCP_SETUP.md) | Jira MCP server setup |
+| [docs/EXTENSION.md](docs/EXTENSION.md) | Extension overview |
+| [docs/extension/README.md](docs/extension/README.md) | Extension guides hub |
+| [docs/extension/installation.md](docs/extension/installation.md) | Load unpacked in Chrome |
+| [docs/extension/jira-setup.md](docs/extension/jira-setup.md) | Extension Jira connection |
+| [docs/extension/configuration.md](docs/extension/configuration.md) | Extension settings |
+| [docs/extension/RELEASE.md](docs/extension/RELEASE.md) | Release build & QA checklist |
+| [docs/extension/troubleshooting.md](docs/extension/troubleshooting.md) | Common issues |
 
-| Section | Options |
-| ------- | ------- |
-| **AI** | Project context, output style, auto-generate after voice |
-| **Voice** | Language, silence timeout, live transcript |
-| **Jira** | Domain, email, API token, connection test |
-| **Ticket Defaults** | Project key, issue type, labels, assignee |
-| **Ticket Template** | Choose which fields appear in previews and created issues |
-| **QA Standards** | Structured ticket standards engine |
-| **Data** | History retention, export JSON, clear history |
+---
 
-All settings persist in `localStorage`. Theme (Light / Dark / System) is also persisted.
+## Scripts reference
 
-## Ticket generation features
-
-- **3 Jira title suggestions** + recommended primary title
-- **Confidence score** (0–100) from input completeness
-- **Pre-generation hints** for missing environment, feature/page, or reproduction details
-- **Context metadata** — browser, OS, device from voice or typed input (with fuzzy matching)
-- **Senior QA output:** summary, steps, expected/actual, severity, priority, severity reasoning
-- **Collapsible root causes** for developers
-- **Jira wiki export** block in preview
-- **Recent tickets** (last 20) with search and filters in `localStorage`
-- **Editable ticket preview** before export or Jira creation
-
-## Jira issue creation (MCP)
-
-Create issues in Jira Cloud from the ticket preview. Set defaults in **Settings → Ticket Defaults**, generate a ticket, then click **Create Jira Ticket**.
-
-```bash
-npm run api:install
-npm run mcp:install          # installs mcp-atlassian (Python)
-cp server/.env.example server/.env
-npm run api:dev
-npm run dev
-```
-
-Set `JIRA_MCP_MOCK=true` in `server/.env` to return a fake `QA-123` issue without calling MCP.
-
-## Scripts
+### Development
 
 | Command | Description |
-| ------- | ----------- |
-| `npm run dev` | Start frontend (HTTP, LAN-friendly) |
-| `npm run dev:lan` | Start frontend (HTTPS only, for LAN voice) |
-| `npm run dev:share` | Stop → firewall → restart API + HTTPS frontend for LAN sharing |
-| `npm run dev:restart` | Stop and restart API + HTTP frontend |
-| `npm run dev:stop` | Kill processes on ports 5173, 5174, 5175, 3001 |
-| `npm run lan:firewall` | Open Windows Firewall for ports 5173 and 3001 (Admin) |
-| `npm run lan:diagnose` | LAN connectivity and firewall checklist |
-| `npm run api:dev` | Start Jira API backend (port 3001) |
-| `npm run api:install` | Install API server dependencies |
-| `npm run api:test` | Run API unit tests |
-| `npm run mcp:install` | Install Python mcp-atlassian package |
-| `npm run llama:server` | Start local llama.cpp with Qwen GGUF |
-| `npm run build` | Typecheck + production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run frontend unit tests |
+|---------|-------------|
+| `npm run dev` | Start web app (HTTP, port 5173) |
+| `npm run dev:restart` | Restart API + web app |
+| `npm run dev:share` | LAN sharing (HTTP + HTTPS for voice) |
+| `npm run dev:stop` | Stop ports 5173, 5174, 5175, 3001 |
+| `npm run api:dev` | Start Jira API (port 3001) |
+| `npm run llama:server` | Start local llama.cpp |
+
+### Extension
+
+| Command | Description |
+|---------|-------------|
+| `npm run extension:release` | Test + build + verify → `dist-extension/` |
+| `npm run extension:build` | Production extension build |
+| `npm run extension:verify` | Validate `dist-extension/` |
+| `npm run dev:extension` | Watch mode rebuild |
+
+### Quality & build
+
+| Command | Description |
+|---------|-------------|
+| `npm run test` | Frontend + extension unit tests |
+| `npm run api:test` | API server tests |
+| `npm run lint` | ESLint |
+| `npm run build` | Web app production build |
+
+### Setup helpers
+
+| Command | Description |
+|---------|-------------|
+| `npm run api:install` | Install `server/` dependencies |
+| `npm run mcp:install` | Install Python `mcp-atlassian` |
+| `npm run lan:diagnose` | LAN / firewall checklist |
+
+---
+
+## Testing
+
+```bash
+npm run test          # 121+ frontend/extension tests
+npm run api:test      # API route + MCP tests
+npm run extension:release   # full extension pipeline
+```
+
+Mock Jira (no MCP): set `JIRA_MCP_MOCK=true` in `server/.env`.
+
+---
+
+## Security
+
+- **Jira API tokens** belong in `server/.env` — never in `VITE_*` variables or committed files
+- The browser sends ticket content and optional credentials to **your local API only**
+- Extension `host_permissions` are limited to the API origin (`localhost:3001` by default)
+- CORS allows `chrome-extension://` origins for the extension popup
+- Rotate tokens regularly; use minimum Jira permissions
+
+---
 
 ## Out of scope
 
-- Authentication / multi-user accounts
-- Hosting the Jira MCP server itself (use an external MCP process)
-- Jira Server / Data Center (Jira Cloud only via mcp-atlassian)
+- User authentication / multi-tenant accounts
+- Hosting the MCP server in-process (external `mcp-atlassian` process)
+- Jira Server / Data Center (Jira Cloud only)
+- Chrome Web Store packaging (use Load unpacked or zip for now)
+
+---
+
+## License
+
+Private project — internal use.
