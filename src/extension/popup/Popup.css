@@ -12,6 +12,10 @@
 }
 
 .popup__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -19,6 +23,130 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+}
+
+.popup__settings-button {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #cdd5e4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #4a5568;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.popup__settings-button:hover {
+  border-color: #5b4fe8;
+  color: #5b4fe8;
+}
+
+.popup__health-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  background: #fffbeb;
+}
+
+.popup__health-banner-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.popup__health-banner-message {
+  margin: 0;
+  font-size: 11px;
+  color: #92400e;
+}
+
+.popup__health-banner-message + .popup__health-banner-message {
+  margin-top: 4px;
+}
+
+.popup__health-banner-link {
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #5b4fe8;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.popup__health-banner-dismiss {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #92400e;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.popup__settings {
+  padding-bottom: 16px;
+}
+
+.popup__settings-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e4e8f1;
+}
+
+.popup__settings-section--footer {
+  border-bottom: none;
+}
+
+.popup__settings-hint {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.popup__settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.popup__settings-actions--stack {
+  margin-top: 8px;
+}
+
+.popup__settings-status {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.popup__settings-status--success {
+  color: #047857;
+}
+
+.popup__settings-status--error {
+  color: #b91c1c;
+}
+
+.popup__settings-status--neutral {
+  color: #4a5568;
+}
+
+.popup__settings-version {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: #6b7280;
 }
 
 .popup__brand-icon {

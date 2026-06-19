@@ -18,6 +18,7 @@
     "src/types/**/*",
     "src/utils/**/*",
     "src/data/**/*",
-    "src/hooks/useVoiceSession.ts"
+    "src/hooks/useVoiceSession.ts",
+    "src/utils/appSettingsStorage.ts"
   ]
 }

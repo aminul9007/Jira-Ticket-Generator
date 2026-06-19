@@ -1,22 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 import type { GeneratedTicket } from '../../types/bugReport'
 import type { ExtractedContext } from '../../types/contextDetection'
+import { HealthBanner } from '../components/HealthBanner'
 import { InputScreen } from '../components/InputScreen'
 import { PopupHeader } from '../components/PopupHeader'
 import { ReviewScreen } from '../components/ReviewScreen'
+import { SettingsScreen } from '../components/SettingsScreen'
 import { SuccessScreen } from '../components/SuccessScreen'
 import { useBrowserContext } from '../hooks/useBrowserContext'
 import { useExtensionJiraCreation } from '../hooks/useExtensionJiraCreation'
 import { useExtensionTicketGeneration } from '../hooks/useExtensionTicketGeneration'
+import { analytics } from '../services/analytics'
 import {
   clearExtensionDraft,
   loadExtensionDraft,
   saveExtensionDraft,
 } from '../services/extensionDraftService'
+import {
+  runExtensionHealthChecks,
+  type HealthWarning,
+} from '../services/extensionHealthService'
 import type { ExtensionJiraDefaults } from '../types/extensionJiraDefaults'
 import './Popup.css'
 
-type PopupView = 'input' | 'review' | 'success'
+type PopupView = 'input' | 'review' | 'success' | 'settings'
 
 export function Popup() {
   const browserContext = useBrowserContext()
@@ -40,10 +47,14 @@ export function Popup() {
   const [reviewQaContext, setReviewQaContext] = useState<ExtractedContext | null>(null)
   const [draftUsedAi, setDraftUsedAi] = useState(false)
   const [jiraDefaults, setJiraDefaults] = useState<ExtensionJiraDefaults | null>(null)
+  const [healthWarnings, setHealthWarnings] = useState<HealthWarning[]>([])
+  const [healthDismissed, setHealthDismissed] = useState(false)
   const lastJiraFieldsRef = useRef<ExtensionJiraDefaults | null>(null)
 
   useEffect(() => {
-    void loadExtensionDraft().then((draft) => {
+    analytics.track('popup_opened')
+
+    void loadExtensionDraft().then(async (draft) => {
       setDescription(draft.description)
       setDraftUsedAi(draft.usedAi)
       setJiraDefaults(draft.jiraDefaults)
@@ -54,6 +65,8 @@ export function Popup() {
         setView('review')
       }
 
+      const warnings = await runExtensionHealthChecks()
+      setHealthWarnings(warnings)
       setHydrated(true)
     })
   }, [])
@@ -64,7 +77,7 @@ export function Popup() {
     const timer = window.setTimeout(() => {
       void saveExtensionDraft({
         description,
-        view: view === 'success' ? 'review' : view,
+        view: view === 'success' || view === 'settings' ? 'input' : view,
         ticket: reviewTicket,
         qaContext: reviewQaContext,
         usedAi: reviewTicket ? (ticket ? usedAi : draftUsedAi) : false,
@@ -92,12 +105,14 @@ export function Popup() {
     setReviewQaContext(qaContext)
     setDraftUsedAi(usedAi)
     setView('review')
+    analytics.track('ticket_generated', { usedAi })
   }, [hydrated, status, ticket, qaContext, usedAi])
 
   useEffect(() => {
     if (jiraState.status === 'success') {
       void clearExtensionDraft()
       setView('success')
+      analytics.track('jira_created')
     }
   }, [jiraState.status])
 
@@ -112,6 +127,17 @@ export function Popup() {
   const handleBack = () => {
     resetJiraCreation()
     setView('input')
+  }
+
+  const handleOpenSettings = () => {
+    analytics.track('settings_opened')
+    setView('settings')
+  }
+
+  const handleCloseSettings = () => {
+    setView('input')
+    void runExtensionHealthChecks().then(setHealthWarnings)
+    setHealthDismissed(false)
   }
 
   const handleCreateJira = (jiraFields: ExtensionJiraDefaults) => {
@@ -141,6 +167,8 @@ export function Popup() {
     void clearExtensionDraft()
   }
 
+  const visibleWarnings = healthDismissed ? [] : healthWarnings
+
   if (!hydrated) {
     return (
       <div className="popup">
@@ -154,11 +182,24 @@ export function Popup() {
     )
   }
 
+  if (view === 'settings') {
+    return (
+      <div className="popup">
+        <div className="popup__layout">
+          <PopupHeader subtitle="Configure Jira, defaults, and voice" />
+          <div className="popup__scroll">
+            <SettingsScreen onBack={handleCloseSettings} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (view === 'success' && jiraState.status === 'success') {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <PopupHeader subtitle="Your ticket is ready in Jira" />
+          <PopupHeader subtitle="Your ticket is ready in Jira" onOpenSettings={handleOpenSettings} />
 
           <SuccessScreen
             result={jiraState.result}
@@ -176,7 +217,16 @@ export function Popup() {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <PopupHeader subtitle="Review and edit before creating in Jira" />
+          <PopupHeader
+            subtitle="Review and edit before creating in Jira"
+            onOpenSettings={handleOpenSettings}
+          />
+
+          <HealthBanner
+            warnings={visibleWarnings}
+            onDismiss={() => setHealthDismissed(true)}
+            onOpenSettings={handleOpenSettings}
+          />
 
           <div className="popup__scroll">
             <ReviewScreen
@@ -202,7 +252,16 @@ export function Popup() {
   return (
     <div className="popup">
       <div className="popup__layout">
-        <PopupHeader subtitle="Describe the bug — context is captured automatically" />
+        <PopupHeader
+          subtitle="Describe the bug — context is captured automatically"
+          onOpenSettings={handleOpenSettings}
+        />
+
+        <HealthBanner
+          warnings={visibleWarnings}
+          onDismiss={() => setHealthDismissed(true)}
+          onOpenSettings={handleOpenSettings}
+        />
 
         <InputScreen
           description={description}

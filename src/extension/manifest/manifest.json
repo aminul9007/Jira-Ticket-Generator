@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "QA Bug Assistant",
-  "version": "1.0.0",
-  "version_name": "V1 — Production Ready",
+  "version": "1.1.0",
+  "version_name": "V1 RC — Release Preparation",
   "description": "Capture bugs and generate Jira-ready tickets in seconds.",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["http://localhost:3001/*", "http://127.0.0.1:3001/*"],

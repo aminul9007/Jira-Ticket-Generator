@@ -1,8 +1,9 @@
 interface PopupHeaderProps {
   subtitle: string
+  onOpenSettings?: () => void
 }
 
-export function PopupHeader({ subtitle }: PopupHeaderProps) {
+export function PopupHeader({ subtitle, onOpenSettings }: PopupHeaderProps) {
   return (
     <header className="popup__header">
       <div className="popup__brand">
@@ -18,6 +19,17 @@ export function PopupHeader({ subtitle }: PopupHeaderProps) {
           <p className="popup__subtitle">{subtitle}</p>
         </div>
       </div>
+      {onOpenSettings && (
+        <button
+          type="button"
+          className="popup__settings-button"
+          aria-label="Open settings"
+          title="Settings"
+          onClick={onOpenSettings}
+        >
+          ⚙
+        </button>
+      )}
     </header>
   )
 }

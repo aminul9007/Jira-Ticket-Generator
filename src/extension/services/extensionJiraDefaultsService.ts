@@ -95,3 +95,15 @@ export async function saveExtensionJiraDefaults(
     // Non-fatal — creation can still succeed without persisting defaults.
   }
 }
+
+export async function clearExtensionJiraDefaults(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.remove(EXTENSION_JIRA_DEFAULTS_KEY, () => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message))
+        return
+      }
+      resolve()
+    })
+  })
+}
