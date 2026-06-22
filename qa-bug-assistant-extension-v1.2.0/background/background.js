@@ -1,0 +1,1 @@
+import{t as e}from"../popup/assets/logger-CJiUvn7u.js";chrome.runtime.onInstalled.addListener(()=>{e.info(`Extension installed or updated`)}),chrome.commands.onCommand.addListener(t=>{t===`open-assistant`&&chrome.action.openPopup().catch(()=>{e.warn(`Could not open popup from keyboard shortcut — use the toolbar icon instead`)})});
