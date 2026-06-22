@@ -45,7 +45,7 @@ describe('inferBugDetails', () => {
 
   it('extracts short title from first sentence', () => {
     expect(extractShortTitle('Pay button broken on Safari.\nMore details here.')).toBe(
-      'Pay button broken on Safari.',
+      'Pay button is broken in Safari',
     )
   })
 

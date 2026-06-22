@@ -6,6 +6,7 @@ import {
 import type { Environment, GeneratedTicket, ValidatedBugReportFormValues } from '../../types/bugReport'
 import { isBugCategory, isEnvironment, mergeEnvironments } from '../../utils/inferBugDetails'
 import { cleanTitleText } from '../../utils/titleText'
+import { polishIssueTitle } from '../../utils/polishIssueTitle'
 import { normalizeAiPayloadKeys } from './normalizeAiPayload'
 
 const SEVERITY_SET = new Set<string>(TICKET_SEVERITIES)
@@ -91,7 +92,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
   }
 
   const titles = (data.titleSuggestions as string[])
-    .map((t) => cleanTitleText(t))
+    .map((t) => polishIssueTitle(cleanTitleText(t)))
     .filter(Boolean)
 
   while (titles.length < 3) {
@@ -106,7 +107,7 @@ export function validateAiTicketResponse(raw: unknown): AiValidationResult {
       affectedFeaturePage: String(data.affectedFeaturePage).trim(),
       environments,
       titleSuggestions: titles.slice(0, 3),
-      title: cleanTitleText(String(data.title)),
+      title: polishIssueTitle(cleanTitleText(String(data.title))),
       issueSummary: String(data.issueSummary).trim(),
       stepsToReproduce: (data.stepsToReproduce as string[]).map((s) => s.trim()),
       expectedResult: String(data.expectedResult).trim(),
@@ -124,9 +125,12 @@ export function normalizeAiResponse(
   raw: AiTicketResponse,
   values: ValidatedBugReportFormValues,
 ): GeneratedTicket {
-  const titles = raw.titleSuggestions.slice(0, 3) as [string, string, string]
-  const recommended =
-    titles.includes(raw.title) ? raw.title : titles[0] ?? raw.title
+  const titles = raw.titleSuggestions
+    .slice(0, 3)
+    .map((title) => polishIssueTitle(title)) as [string, string, string]
+  const recommended = polishIssueTitle(
+    titles.includes(raw.title) ? raw.title : titles[0] ?? raw.title,
+  )
 
   const featureLabel = raw.affectedFeaturePage.trim()
   const feature =

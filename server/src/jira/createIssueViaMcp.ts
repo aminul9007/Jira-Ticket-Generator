@@ -49,6 +49,10 @@ function buildToolArguments(payload: CreateJiraIssuePayload): Record<string, unk
   if (jiraPriority) {
     additionalFields.priority = { name: jiraPriority }
   }
+  // mcp-atlassian create_issue rejects top-level `reporter` — pass via additional_fields.
+  if (payload.reporter?.trim()) {
+    additionalFields.reporter = payload.reporter.trim()
+  }
 
   const args: Record<string, unknown> = {
     project_key: projectKey,
@@ -61,15 +65,16 @@ function buildToolArguments(payload: CreateJiraIssuePayload): Record<string, unk
     args.assignee = payload.assignee.trim()
   }
 
-  if (payload.reporter?.trim()) {
-    args.reporter = payload.reporter.trim()
-  }
-
   if (Object.keys(additionalFields).length > 0) {
     args.additional_fields = JSON.stringify(additionalFields)
   }
 
   return args
+}
+
+/** Exported for unit tests — maps API payload to mcp-atlassian tool arguments. */
+export function buildMcpCreateIssueArgs(payload: CreateJiraIssuePayload): Record<string, unknown> {
+  return buildToolArguments(payload)
 }
 
 export async function createIssueViaMcp(

@@ -1,5 +1,6 @@
 import type { ResolvedBugInput } from '../../types/bugReport'
-import { trimTitleAtWord } from '../../utils/titleText'
+import { cleanTitleText, trimTitleAtWord } from '../../utils/titleText'
+import { polishIssueTitle } from '../../utils/polishIssueTitle'
 import { CATEGORY_PREFIX } from './categoryConfig'
 
 const JIRA_TITLE_MAX = 200
@@ -14,7 +15,7 @@ export function buildTitleSuggestions(
   values: ResolvedBugInput,
 ): [string, string, string] {
   const prefix = CATEGORY_PREFIX[values.category]
-  const shortTitle = values.shortTitle
+  const shortTitle = polishIssueTitle(values.shortTitle)
   const feature = values.affectedFeaturePage.trim() || null
   const env = envTag(values)
 
@@ -28,8 +29,8 @@ export function buildTitleSuggestions(
 
   const categoryShort = values.category.replace(' Bug', '').replace(' Issue', '')
   const option3 = feature
-    ? `[${categoryShort}][${env}] ${feature}: ${shortTitle}`
-    : `[${categoryShort}][${env}] ${shortTitle}`
+    ? `[${categoryShort}] ${feature}: ${shortTitle}`
+    : `[${categoryShort}] ${shortTitle}`
 
   return [
     trimTitleAtWord(option1, JIRA_TITLE_MAX),

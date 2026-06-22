@@ -166,6 +166,26 @@
 
 .popup__shortcut-value {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.popup__shortcut-suggested {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.popup__shortcut-status {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.popup__kbd--active {
+  font-size: 13px;
+  padding: 4px 10px;
 }
 
 .popup__shortcut-unassigned {

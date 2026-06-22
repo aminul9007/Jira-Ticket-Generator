@@ -23,7 +23,7 @@ Return ONLY valid JSON. Do NOT explain anything. Do NOT include markdown or back
 - stepsToReproduce: imperative mood, one clear action per step.
 
 ### Core ticket fields (required)
-- title — concise but COMPLETE (max ~15 words); clear symptom; no vague words; no ellipsis
+- title — concise, formal QA phrasing (max ~12 words); subject + clear symptom; include environment, browser, OS, or device only when stated in the description, using natural grammar (e.g. "on Production in Chrome on Windows"); no ellipsis
 - issueSummary — 2–4 polished sentences on impact and scope (field name is issueSummary)
 - stepsToReproduce — actionable, reproducible steps from user action; add missing steps only when logically required (do NOT invent system behavior)
 - expectedResult — expected behavior

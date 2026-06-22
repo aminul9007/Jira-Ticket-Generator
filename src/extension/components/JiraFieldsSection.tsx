@@ -87,10 +87,11 @@ export function JiraFieldsSection({
         <input
           id="jira-reporter"
           className="popup__input"
-          placeholder="Optional account ID or email"
+          placeholder="Email or display name (optional)"
           value={defaults.reporter}
           onChange={(event) => onChange({ reporter: event.target.value })}
         />
+        <p className="popup__settings-hint">Leave blank to use your Jira account as reporter.</p>
       </div>
     </section>
   )

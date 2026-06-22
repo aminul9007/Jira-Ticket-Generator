@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
-  getOpenAssistantShortcut,
-  loadExtensionCommands,
+  getEffectiveAssistantShortcut,
   openExtensionShortcutSettings,
-  type ExtensionCommandInfo,
+  type EffectiveAssistantShortcut,
 } from '../services/extensionShortcutService'
 import { logger } from '../utils/logger'
 
 interface UseExtensionShortcutsResult {
   loaded: boolean
-  commands: ExtensionCommandInfo[]
-  openAssistant: ExtensionCommandInfo | null
+  effectiveShortcut: EffectiveAssistantShortcut | null
   errorMessage: string | null
   refresh: () => Promise<void>
   openShortcutSettings: () => Promise<void>
@@ -18,18 +16,15 @@ interface UseExtensionShortcutsResult {
 
 export function useExtensionShortcuts(): UseExtensionShortcutsResult {
   const [loaded, setLoaded] = useState(false)
-  const [commands, setCommands] = useState<ExtensionCommandInfo[]>([])
-  const [openAssistant, setOpenAssistant] = useState<ExtensionCommandInfo | null>(null)
+  const [effectiveShortcut, setEffectiveShortcut] = useState<EffectiveAssistantShortcut | null>(
+    null,
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     try {
-      const [allCommands, assistantCommand] = await Promise.all([
-        loadExtensionCommands(),
-        getOpenAssistantShortcut(),
-      ])
-      setCommands(allCommands)
-      setOpenAssistant(assistantCommand)
+      const shortcut = await getEffectiveAssistantShortcut()
+      setEffectiveShortcut(shortcut)
       setErrorMessage(null)
     } catch (error) {
       logger.warn('Failed to load extension shortcuts', error)
@@ -57,8 +52,7 @@ export function useExtensionShortcuts(): UseExtensionShortcutsResult {
 
   return {
     loaded,
-    commands,
-    openAssistant,
+    effectiveShortcut,
     errorMessage,
     refresh,
     openShortcutSettings,

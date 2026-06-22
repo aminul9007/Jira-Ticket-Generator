@@ -7,6 +7,7 @@ import type {
 import { BUG_CATEGORIES, ENVIRONMENTS } from '../data/constants'
 import { normalizeEnvironmentPhrases } from './normalizeEnvironmentText'
 import { cleanTitleText, trimTitleAtWord } from './titleText'
+import { polishIssueTitle } from './polishIssueTitle'
 
 export function isBugCategory(value: string): value is BugCategory {
   return (BUG_CATEGORIES as readonly string[]).includes(value)
@@ -99,7 +100,7 @@ export function extractShortTitle(description: string): string {
   const trimmed = description.trim()
   const firstLine = trimmed.split(/\n+/)[0]?.trim() ?? trimmed
   const sentence = firstLine.split(/(?<=[.!?])\s+/)[0]?.trim() ?? firstLine
-  return trimTitleAtWord(cleanTitleText(sentence), 100)
+  return trimTitleAtWord(polishIssueTitle(sentence), 100)
 }
 
 export function resolveBugInput(
