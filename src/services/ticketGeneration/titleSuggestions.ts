@@ -1,5 +1,5 @@
 import type { ResolvedBugInput } from '../../types/bugReport'
-import { cleanTitleText, trimTitleAtWord } from '../../utils/titleText'
+import { trimTitleAtWord } from '../../utils/titleText'
 import { polishIssueTitle } from '../../utils/polishIssueTitle'
 import { CATEGORY_PREFIX } from './categoryConfig'
 

@@ -6,7 +6,7 @@ import type {
 } from '../types/bugReport'
 import { BUG_CATEGORIES, ENVIRONMENTS } from '../data/constants'
 import { normalizeEnvironmentPhrases } from './normalizeEnvironmentText'
-import { cleanTitleText, trimTitleAtWord } from './titleText'
+import { trimTitleAtWord } from './titleText'
 import { polishIssueTitle } from './polishIssueTitle'
 
 export function isBugCategory(value: string): value is BugCategory {
