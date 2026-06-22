@@ -200,6 +200,8 @@ export function useExtensionStateManager(browserContext: TicketContext) {
     setHealthWarnings(await runExtensionHealthChecks())
   }, [])
 
+  const startNewTicket = createAnother
+
   const openSettings = useCallback(() => {
     analytics.track('settings_opened')
     dispatch({ type: 'OPEN_SETTINGS' })
@@ -239,6 +241,7 @@ export function useExtensionStateManager(browserContext: TicketContext) {
     createJiraTicket,
     retryJira,
     createAnother,
+    startNewTicket,
     openSettings,
     closeSettings,
     dismissHealth: () => dispatch({ type: 'DISMISS_HEALTH' }),

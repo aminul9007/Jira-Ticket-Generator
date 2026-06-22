@@ -1,9 +1,10 @@
 interface PopupHeaderProps {
   subtitle: string
   onOpenSettings?: () => void
+  onCreateTicket?: () => void
 }
 
-export function PopupHeader({ subtitle, onOpenSettings }: PopupHeaderProps) {
+export function PopupHeader({ subtitle, onOpenSettings, onCreateTicket }: PopupHeaderProps) {
   return (
     <header className="popup__header">
       <div className="popup__brand">
@@ -19,16 +20,29 @@ export function PopupHeader({ subtitle, onOpenSettings }: PopupHeaderProps) {
           <p className="popup__subtitle">{subtitle}</p>
         </div>
       </div>
-      {onOpenSettings && (
-        <button
-          type="button"
-          className="popup__settings-button"
-          aria-label="Open settings"
-          title="Settings"
-          onClick={onOpenSettings}
-        >
-          ⚙
-        </button>
+      {(onOpenSettings || onCreateTicket) && (
+        <div className="popup__header-side">
+          {onOpenSettings && (
+            <button
+              type="button"
+              className="popup__settings-button"
+              aria-label="Open settings"
+              title="Settings"
+              onClick={onOpenSettings}
+            >
+              ⚙
+            </button>
+          )}
+          {onCreateTicket && (
+            <button
+              type="button"
+              className="popup__new-ticket-button"
+              onClick={onCreateTicket}
+            >
+              New ticket
+            </button>
+          )}
+        </div>
       )}
     </header>
   )

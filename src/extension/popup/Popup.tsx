@@ -29,6 +29,7 @@ export function Popup() {
     closeSettings,
     dismissHealth,
     goBackToInput,
+    startNewTicket,
   } = useExtensionStateManager(browserContext)
 
   if (!state.hydrated) {
@@ -61,7 +62,10 @@ export function Popup() {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <PopupHeader subtitle="Your ticket is ready in Jira" onOpenSettings={openSettings} />
+          <PopupHeader
+            subtitle="Your ticket is ready in Jira"
+            onOpenSettings={openSettings}
+          />
 
           <SuccessScreen
             result={state.ui.jira.result}
@@ -118,6 +122,7 @@ export function Popup() {
         <PopupHeader
           subtitle="Describe the bug — context is captured automatically"
           onOpenSettings={openSettings}
+          onCreateTicket={() => void startNewTicket()}
         />
 
         <HealthBanner

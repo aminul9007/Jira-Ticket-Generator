@@ -36,20 +36,14 @@ export function ShortcutSettingsSection() {
                   {formatShortcutLabel(effectiveShortcut.shortcut)}
                 </kbd>
               ) : (
-                <>
-                  <span className="popup__shortcut-unassigned">Not assigned</span>
-                  <span className="popup__shortcut-suggested">
-                    Suggested:{' '}
-                    <kbd className="popup__kbd">
-                      {formatShortcutLabel(effectiveShortcut.shortcut)}
-                    </kbd>
-                  </span>
-                </>
+                <span className="popup__shortcut-unassigned">Not assigned</span>
               )}
             </p>
-            <p className="popup__shortcut-status" role="status">
-              {effectiveShortcut.statusMessage}
-            </p>
+            {effectiveShortcut.statusMessage ? (
+              <p className="popup__shortcut-status" role="status">
+                {effectiveShortcut.statusMessage}
+              </p>
+            ) : null}
           </div>
 
           <div className="popup__settings-actions popup__settings-actions--stack">

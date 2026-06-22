@@ -87,7 +87,6 @@ export function resolveEffectiveAssistantShortcut(
 ): EffectiveAssistantShortcut {
   const openAssistant = commands.find((command) => command.name === OPEN_ASSISTANT_COMMAND)
   const executeAction = commands.find((command) => command.name === EXECUTE_ACTION_COMMAND)
-  const suggested = getSuggestedShortcutHint()
 
   if (openAssistant?.isAssigned) {
     return {
@@ -112,10 +111,10 @@ export function resolveEffectiveAssistantShortcut(
 
   return {
     label: OPEN_ASSISTANT_COMMAND_LABEL,
-    shortcut: suggested,
+    shortcut: '',
     isAssigned: false,
     source: 'none',
-    statusMessage: `No shortcut assigned yet. Click Customize Shortcut and set ${formatShortcutLabel(suggested)} (or any keys you prefer).`,
+    statusMessage: 'No shortcut assigned yet. Click Customize Shortcut to choose a key combination.',
   }
 }
 

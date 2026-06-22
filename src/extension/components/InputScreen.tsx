@@ -175,11 +175,24 @@ export function InputScreen({
         <div className="popup__meta">
           <p className="popup__meta-row">
             <span className="popup__meta-label">Page</span>
-            <span className="popup__meta-value">{browserContext.url || 'Unavailable'}</span>
+            {browserContext.url ? (
+              <a
+                className="popup__meta-value popup__meta-value--link"
+                href={browserContext.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {browserContext.url}
+              </a>
+            ) : (
+              <span className="popup__meta-value">Unavailable</span>
+            )}
           </p>
           <p className="popup__meta-row">
             <span className="popup__meta-label">Title</span>
-            <span className="popup__meta-value">{browserContext.title || 'Unavailable'}</span>
+            <span className="popup__meta-value popup__meta-value--title">
+              {browserContext.title || 'Unavailable'}
+            </span>
           </p>
           {browserContext.title ? (
             <label className="popup__context-toggle" htmlFor="include-page-title">

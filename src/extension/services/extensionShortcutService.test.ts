@@ -55,12 +55,13 @@ describe('resolveEffectiveAssistantShortcut', () => {
     expect(result.source).toBe('_execute_action')
   })
 
-  it('returns suggested shortcut when nothing is assigned', () => {
+  it('returns empty shortcut when nothing is assigned', () => {
     const result = resolveEffectiveAssistantShortcut([openAssistant, executeAction])
 
     expect(result.isAssigned).toBe(false)
     expect(result.source).toBe('none')
-    expect(result.shortcut).toBe('Ctrl+Shift+B')
+    expect(result.shortcut).toBe('')
     expect(result.statusMessage).toContain('No shortcut assigned yet')
+    expect(result.statusMessage).not.toContain('Ctrl')
   })
 })

@@ -26,6 +26,34 @@
   min-width: 0;
 }
 
+.popup__header-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.popup__new-ticket-button {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #cdd5e4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4a5568;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.popup__new-ticket-button:hover {
+  border-color: #5b4fe8;
+  color: #5b4fe8;
+}
+
 .popup__settings-button {
   flex-shrink: 0;
   width: 36px;
@@ -166,14 +194,6 @@
 
 .popup__shortcut-value {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.popup__shortcut-suggested {
-  font-size: 11px;
-  color: #6b7280;
 }
 
 .popup__shortcut-status {
@@ -585,6 +605,23 @@
 .popup__meta-value {
   display: block;
   margin-top: 2px;
+}
+
+.popup__meta-value--link {
+  color: #5b4fe8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.popup__meta-value--link:hover {
+  color: #4a3ed4;
+}
+
+.popup__meta-value--title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0c1222;
+  line-height: 1.4;
 }
 
 .popup__context-toggle {
