@@ -13,6 +13,7 @@ export interface ExtensionConfig {
 
 declare const __EXTENSION_API_BASE_URL__: string | undefined
 declare const __EXTENSION_IS_DEV__: boolean | undefined
+declare const __EXTENSION_VERBOSE_LOGGING__: boolean | undefined
 
 const RESOLVED_API_URL_KEY = 'qa-bug-assistant-resolved-api-url'
 const FALLBACK_API_URLS = ['http://localhost:3001', 'http://127.0.0.1:3001']
@@ -38,12 +39,21 @@ function readIsDev(): boolean {
   return import.meta.env.DEV
 }
 
+function readVerboseLogging(): boolean {
+  if (typeof __EXTENSION_VERBOSE_LOGGING__ === 'boolean') {
+    return __EXTENSION_VERBOSE_LOGGING__
+  }
+
+  return true
+}
+
 export const extensionConfig: ExtensionConfig = {
   apiBaseUrl: readApiBaseUrl(),
   isDev: readIsDev(),
   features: {
     analytics: false,
-    verboseLogging: readIsDev(),
+    // Keep info-level diagnostics available in production extension builds.
+    verboseLogging: readVerboseLogging(),
   },
 }
 

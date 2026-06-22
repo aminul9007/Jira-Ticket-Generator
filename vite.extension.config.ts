@@ -72,6 +72,7 @@ export default defineConfig(({ mode }) => {
     define: {
       __EXTENSION_API_BASE_URL__: JSON.stringify(apiBaseUrl),
       __EXTENSION_IS_DEV__: JSON.stringify(mode !== 'production'),
+      __EXTENSION_VERBOSE_LOGGING__: JSON.stringify(true),
       __EXTENSION_VERSION__: JSON.stringify(version),
       __EXTENSION_VERSION_NAME__: JSON.stringify(versionName),
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),

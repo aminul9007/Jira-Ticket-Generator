@@ -3,18 +3,20 @@ import { extensionConfig } from '../config/extensionConfig'
 type LogLevel = 'info' | 'warn' | 'error'
 
 function shouldLog(level: LogLevel): boolean {
-  if (level === 'error') return true
+  if (level === 'error' || level === 'warn') return true
   return extensionConfig.isDev || extensionConfig.features.verboseLogging
 }
 
 function write(level: LogLevel, message: string, context?: unknown): void {
   if (!shouldLog(level)) return
 
-  const prefix = `[QA Bug Assistant]`
+  const prefix = '[QA Bug Assistant]'
   if (context !== undefined) {
+    // Prefix must stay the first console argument for readable DevTools output.
     console[level](prefix, message, context)
     return
   }
+
   console[level](prefix, message)
 }
 
