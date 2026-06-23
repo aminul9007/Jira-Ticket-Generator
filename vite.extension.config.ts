@@ -49,7 +49,7 @@ function extensionBuildPlugin(outDirName: string) {
       const iconsDir = resolve(outDir, 'icons')
       const sourceIconsDir = resolve(rootDir, 'src/extension/icons')
       mkdirSync(iconsDir, { recursive: true })
-      for (const size of ['16', '32', '48', '128']) {
+      for (const size of ['16', '32', '48', '128', '512']) {
         copyFileSync(
           resolve(sourceIconsDir, `icon-${size}.png`),
           resolve(iconsDir, `icon-${size}.png`),

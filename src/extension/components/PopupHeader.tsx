@@ -10,7 +10,7 @@ export function PopupHeader({ subtitle, onOpenSettings, onCreateTicket }: PopupH
       <div className="popup__brand">
         <img
           className="popup__brand-icon"
-          src={chrome.runtime.getURL('icons/icon-32.png')}
+          src={chrome.runtime.getURL('icons/icon-128.png')}
           alt=""
           width={28}
           height={28}
