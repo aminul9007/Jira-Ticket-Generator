@@ -9,7 +9,7 @@ The project has two clients that share the same backend and generation logic:
 | **Web app** | Full dashboard — history, settings, templates, LAN sharing |
 | **Chrome extension** | Capture bugs from any tab — page URL/title, popup workflow |
 
-**Version:** `1.2.1`
+**Version:** `1.2.2`
 
 ---
 
@@ -310,7 +310,7 @@ Output: **`dist-extension/`**
 2. Open [chrome://extensions/](chrome://extensions/) → **Developer mode**
 3. **Load unpacked** → select `dist-extension/`
 
-Pre-built zip (optional): `qa-bug-assistant-extension-v1.2.1.zip`
+Pre-built zip (optional): `qa-bug-assistant-extension-v1.2.2.zip`
 
 ### Extension + Jira
 
@@ -458,6 +458,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for full release notes.
 
 | Version | Summary |
 |---------|---------|
+| **1.2.2** | Attribution footer on web and extension, LinkedIn author links, footer spacing polish |
 | **1.2.1** | About page, ⓘ info controls, semver version display, copyright footer, graphify diagrams, and Cursor agent skill |
 | **1.2.0** | Production extension release — Jira via MCP, bootstrap sync, draft persistence, keyboard shortcut, title polish |
 | **1.1.x** | Extension popup workflow, settings, health checks, and shared generation with web app |

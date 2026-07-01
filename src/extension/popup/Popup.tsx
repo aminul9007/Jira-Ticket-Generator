@@ -2,6 +2,7 @@ import { useBrowserContext } from '../hooks/useBrowserContext'
 import { useExtensionStateManager } from '../hooks/useExtensionStateManager'
 import { HealthBanner } from '../components/HealthBanner'
 import { InputScreen } from '../components/InputScreen'
+import { PopupFrame } from '../components/PopupFrame'
 import { PopupHeader } from '../components/PopupHeader'
 import { ReviewScreen } from '../components/ReviewScreen'
 import { SettingsScreen } from '../components/SettingsScreen'
@@ -35,87 +36,86 @@ export function Popup() {
 
   if (!state.hydrated) {
     return (
-      <div className="popup">
-        <div className="popup__layout popup__layout--loading">
-          <PopupHeader subtitle="Loading your draft…" />
-          <div className="popup__loading-state" role="status" aria-live="polite">
-            <span className="popup__spinner popup__spinner--large" aria-hidden="true" />
-          </div>
+      <PopupFrame
+        header={<PopupHeader subtitle="Loading your draft…" />}
+      >
+        <div className="popup__loading-state" role="status" aria-live="polite">
+          <span className="popup__spinner popup__spinner--large" aria-hidden="true" />
         </div>
-      </div>
+      </PopupFrame>
     )
   }
 
   if (state.ui.view === 'settings') {
     return (
-      <div className="popup">
-        <div className="popup__layout">
+      <PopupFrame
+        scroll
+        header={
           <PopupHeader
             subtitle="Configure Jira, defaults, and voice"
             onOpenAbout={openExtensionAboutPage}
           />
-          <div className="popup__scroll">
-            <SettingsScreen onBack={() => void closeSettings()} />
-          </div>
-        </div>
-      </div>
+        }
+      >
+        <SettingsScreen onBack={() => void closeSettings()} />
+      </PopupFrame>
     )
   }
 
   if (state.ui.view === 'success' && state.ui.jira.result) {
     return (
-      <div className="popup">
-        <div className="popup__layout">
+      <PopupFrame
+        header={
           <PopupHeader
             subtitle="Your ticket is ready in Jira"
             onOpenAbout={openExtensionAboutPage}
             onOpenSettings={openSettings}
           />
-
-          <SuccessScreen
-            result={state.ui.jira.result}
-            onOpenTicket={() => {
-              window.open(state.ui.jira.result!.issueUrl, '_blank', 'noopener,noreferrer')
-            }}
-            onCreateAnother={() => void createAnother()}
-          />
-        </div>
-      </div>
+        }
+      >
+        <SuccessScreen
+          result={state.ui.jira.result}
+          onOpenTicket={() => {
+            window.open(state.ui.jira.result!.issueUrl, '_blank', 'noopener,noreferrer')
+          }}
+          onCreateAnother={() => void createAnother()}
+        />
+      </PopupFrame>
     )
   }
 
   if (state.ui.view === 'review' && state.ticket.generated) {
     return (
-      <div className="popup">
-        <div className="popup__layout">
+      <PopupFrame
+        scroll
+        header={
           <PopupHeader
             subtitle="Review and edit before creating in Jira"
             onOpenAbout={openExtensionAboutPage}
             onOpenSettings={openSettings}
           />
-
+        }
+      >
+        <>
           <HealthBanner
             warnings={healthWarnings}
             onDismiss={dismissHealth}
             onOpenSettings={openSettings}
           />
-
-          <div className="popup__scroll">
-            <ReviewScreen
-              ticket={state.ticket.generated}
-              usedAi={state.ticket.usedAi}
-              onTicketChange={updateTicket}
-              onBack={goBackToInput}
-              initialJiraDefaults={state.jiraConfig}
-              onJiraDefaultsChange={setJiraConfig}
-              jiraErrorMessage={state.ui.jira.errorMessage}
-              isCreatingJira={isCreatingJira}
-              onCreateJira={(fields) => void createJiraTicket(fields)}
-              onRetryJira={() => void retryJira()}
-            />
-          </div>
-        </div>
-      </div>
+          <ReviewScreen
+            ticket={state.ticket.generated}
+            usedAi={state.ticket.usedAi}
+            onTicketChange={updateTicket}
+            onBack={goBackToInput}
+            initialJiraDefaults={state.jiraConfig}
+            onJiraDefaultsChange={setJiraConfig}
+            jiraErrorMessage={state.ui.jira.errorMessage}
+            isCreatingJira={isCreatingJira}
+            onCreateJira={(fields) => void createJiraTicket(fields)}
+            onRetryJira={() => void retryJira()}
+          />
+        </>
+      </PopupFrame>
     )
   }
 
@@ -123,21 +123,22 @@ export function Popup() {
     state.ui.generation.status === 'success' ? 'idle' : state.ui.generation.status
 
   return (
-    <div className="popup">
-      <div className="popup__layout">
+    <PopupFrame
+      header={
         <PopupHeader
           subtitle="Describe the bug — context is captured automatically"
           onOpenAbout={openExtensionAboutPage}
           onOpenSettings={openSettings}
           onCreateTicket={() => void startNewTicket()}
         />
-
+      }
+    >
+      <>
         <HealthBanner
           warnings={healthWarnings}
           onDismiss={dismissHealth}
           onOpenSettings={openSettings}
         />
-
         <InputScreen
           description={state.input.description}
           browserContext={browserContext}
@@ -150,7 +151,7 @@ export function Popup() {
           onGenerate={() => void generateTicket()}
           onRetry={() => void retryGenerate()}
         />
-      </div>
-    </div>
+      </>
+    </PopupFrame>
   )
 }

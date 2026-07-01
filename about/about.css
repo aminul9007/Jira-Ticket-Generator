@@ -248,6 +248,26 @@ body {
   color: var(--color-text);
 }
 
+.about-footer__link {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.about-footer__link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.about-footer__link--muted {
+  color: var(--color-muted);
+}
+
+.about-footer__link--muted:hover {
+  color: var(--color-accent);
+}
+
 .about-footer__copy {
   font-size: 11px;
   color: var(--color-muted);

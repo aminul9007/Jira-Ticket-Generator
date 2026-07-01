@@ -73,3 +73,4 @@ Reload extension at `chrome://extensions/` after extension changes.
 - Dev workflows: [workflows.md](workflows.md)
 - User docs: [docs/README.md](../../docs/README.md)
 - About UI: [about/about.html](../../about/about.html)
+- Release commits: [.cursor/skills/git-release-commit/SKILL.md](../git-release-commit/SKILL.md)

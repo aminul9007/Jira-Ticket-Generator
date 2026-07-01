@@ -16,14 +16,16 @@ if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
   displayVersion(manifest.version)
 } else {
   const metaVersion = document.querySelector('meta[name="app-version"]')?.getAttribute('content')
-  displayVersion(metaVersion?.trim() || '1.2.1')
+  displayVersion(metaVersion?.trim() || '1.2.2')
 }
 
-backBtn.addEventListener('click', () => {
-  if (window.history.length > 1) {
-    window.history.back()
-    return
-  }
+if (backBtn) {
+  backBtn.addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back()
+      return
+    }
 
-  window.close()
-})
+    window.close()
+  })
+}

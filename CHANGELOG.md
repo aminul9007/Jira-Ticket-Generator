@@ -5,6 +5,25 @@ Version numbers follow [semver](https://semver.org/) (`major.minor.patch`), matc
 
 ---
 
+## [1.2.2] — 2026-07-01
+
+### Added
+
+- **Attribution footer** on web dashboard and every extension popup screen (`PopupFrame`, `PopupAttributionFooter`)
+- Shared **`AuthorLink`** component — links Md Aminul Islam to LinkedIn
+- **`git-release-commit`** Cursor skill — release commit and versioning checklist
+
+### Changed
+
+- About page footer — author name links to LinkedIn (credit + copyright lines)
+- Tighter extension footer spacing; popup height follows content
+
+### Fixed
+
+- `about.js` — null guard before `backBtn.addEventListener`
+
+---
+
 ## [1.2.1] — 2026-06-17
 
 ### Added
