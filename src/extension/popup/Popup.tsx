@@ -6,6 +6,7 @@ import { PopupHeader } from '../components/PopupHeader'
 import { ReviewScreen } from '../components/ReviewScreen'
 import { SettingsScreen } from '../components/SettingsScreen'
 import { SuccessScreen } from '../components/SuccessScreen'
+import { openExtensionAboutPage } from '../services/extensionAboutService'
 import './Popup.css'
 
 export function Popup() {
@@ -49,7 +50,10 @@ export function Popup() {
     return (
       <div className="popup">
         <div className="popup__layout">
-          <PopupHeader subtitle="Configure Jira, defaults, and voice" />
+          <PopupHeader
+            subtitle="Configure Jira, defaults, and voice"
+            onOpenAbout={openExtensionAboutPage}
+          />
           <div className="popup__scroll">
             <SettingsScreen onBack={() => void closeSettings()} />
           </div>
@@ -64,6 +68,7 @@ export function Popup() {
         <div className="popup__layout">
           <PopupHeader
             subtitle="Your ticket is ready in Jira"
+            onOpenAbout={openExtensionAboutPage}
             onOpenSettings={openSettings}
           />
 
@@ -85,6 +90,7 @@ export function Popup() {
         <div className="popup__layout">
           <PopupHeader
             subtitle="Review and edit before creating in Jira"
+            onOpenAbout={openExtensionAboutPage}
             onOpenSettings={openSettings}
           />
 
@@ -121,6 +127,7 @@ export function Popup() {
       <div className="popup__layout">
         <PopupHeader
           subtitle="Describe the bug — context is captured automatically"
+          onOpenAbout={openExtensionAboutPage}
           onOpenSettings={openSettings}
           onCreateTicket={() => void startNewTicket()}
         />

@@ -2,6 +2,10 @@ import { defineConfig, loadEnv } from 'vite'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath } from 'node:url'
+import { aboutStaticPlugin } from './scripts/viteAboutPlugin'
+
+const rootDir = fileURLToPath(new URL('.', import.meta.url))
 
 const useHttps = process.env.VITE_DEV_HTTPS === 'true'
 const lanIp = process.env.VITE_LAN_IP?.trim()
@@ -12,7 +16,7 @@ export default defineConfig(({ mode }) => {
   loadEnv(mode, process.cwd(), '')
 
   return {
-    plugins: [...(useHttps ? [basicSsl()] : []), react(), tailwindcss()],
+    plugins: [...(useHttps ? [basicSsl()] : []), react(), tailwindcss(), aboutStaticPlugin(rootDir)],
     server: {
       host: '0.0.0.0',
       port: devPort,

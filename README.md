@@ -9,7 +9,7 @@ The project has two clients that share the same backend and generation logic:
 | **Web app** | Full dashboard — history, settings, templates, LAN sharing |
 | **Chrome extension** | Capture bugs from any tab — page URL/title, popup workflow |
 
-**Version:** `1.2.0` (V1 Release)
+**Version:** `1.2.1`
 
 ---
 
@@ -28,6 +28,7 @@ The project has two clients that share the same backend and generation logic:
 11. [Testing](#testing)
 12. [Security](#security)
 13. [Out of scope](#out-of-scope)
+14. [Version history](#version-history)
 
 ---
 
@@ -178,6 +179,9 @@ jira-ticket-generator/
 │   ├── qaTicketStandards.ts
 │   └── ticketTemplate.ts
 │
+├── about/                        # About page (web + extension)
+├── graphify/                     # Mermaid architecture diagrams
+├── .cursor/skills/qa-bug-assistant/  # Agent skill (architecture, workflows)
 ├── scripts/                      # Dev lifecycle (PowerShell), MCP setup, verify
 ├── docs/                         # Detailed guides (see Documentation)
 ├── dist-extension/               # Extension build output (gitignored)
@@ -306,7 +310,7 @@ Output: **`dist-extension/`**
 2. Open [chrome://extensions/](chrome://extensions/) → **Developer mode**
 3. **Load unpacked** → select `dist-extension/`
 
-Pre-built zip (optional): `qa-bug-assistant-extension-v1.2.0.zip`
+Pre-built zip (optional): `qa-bug-assistant-extension-v1.2.1.zip`
 
 ### Extension + Jira
 
@@ -445,6 +449,19 @@ Mock Jira (no MCP): set `JIRA_MCP_MOCK=true` in `server/.env`.
 - Hosting the MCP server in-process (external `mcp-atlassian` process)
 - Jira Server / Data Center (Jira Cloud only)
 - Chrome Web Store packaging (use Load unpacked or zip for now)
+
+---
+
+## Version history
+
+See [CHANGELOG.md](./CHANGELOG.md) for full release notes.
+
+| Version | Summary |
+|---------|---------|
+| **1.2.1** | About page, ⓘ info controls, semver version display, copyright footer, graphify diagrams, and Cursor agent skill |
+| **1.2.0** | Production extension release — Jira via MCP, bootstrap sync, draft persistence, keyboard shortcut, title polish |
+| **1.1.x** | Extension popup workflow, settings, health checks, and shared generation with web app |
+| **1.0.x** | Web dashboard, AI/rules ticket generation, voice input, and local API scaffold |
 
 ---
 

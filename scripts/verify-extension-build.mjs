@@ -19,6 +19,9 @@ const requiredFiles = [
   'icons/icon-48.png',
   'icons/icon-128.png',
   'icons/icon-512.png',
+  'about/about.html',
+  'about/about.css',
+  'about/about.js',
 ]
 
 const allowedPermissions = new Set(['storage', 'activeTab'])

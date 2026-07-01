@@ -308,12 +308,14 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
       <section className="popup__settings-section popup__settings-section--footer">
         <p className="popup__settings-version">Version {formatExtensionVersionLabel()}</p>
-        <LoadingButton
-          isLoading={saving}
-          loadingLabel="Saving…"
-          idleLabel="Save Settings"
-          onClick={() => void handleSave()}
-        />
+        <div className="popup__settings-actions popup__settings-actions--stack">
+          <LoadingButton
+            isLoading={saving}
+            loadingLabel="Saving…"
+            idleLabel="Save Settings"
+            onClick={() => void handleSave()}
+          />
+        </div>
         {saveMessage && (
           <p className="popup__settings-status popup__settings-status--neutral" role="status">
             {saveMessage}

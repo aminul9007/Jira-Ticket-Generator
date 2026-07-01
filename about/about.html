@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="app-version" content="{{APP_VERSION}}" />
+    <title>About — QA Bug Assistant</title>
+    <link rel="stylesheet" href="about.css" />
+  </head>
+  <body>
+    <header class="about-header">
+      <div class="about-header__brand">
+        <img
+          class="about-header__icon"
+          src="./assets/icon-48.png"
+          width="32"
+          height="32"
+          alt=""
+        />
+        <h1 class="about-header__title">QA Bug Assistant</h1>
+      </div>
+      <button type="button" id="backBtn" class="btn btn--primary">
+        ← Back
+      </button>
+    </header>
+
+    <main class="about-main">
+      <section class="card card--hero">
+        <h2 class="card__title">Project Overview</h2>
+        <p class="about-overview">
+          QA Bug Assistant (Jira Ticket Generator) is a QA toolkit for creating
+          <strong>Jira-ready bug tickets in under one minute</strong>. Describe a bug
+          by typing or voice, let AI structure the ticket, review and edit, then create
+          the issue in Jira Cloud via MCP.
+        </p>
+        <p class="about-overview">
+          The project ships two clients — a <strong>React web dashboard</strong> and a
+          <strong>Chrome extension (MV3)</strong> — that share the same Node API,
+          generation logic, and Jira integration.
+        </p>
+        <p class="about-version">
+          Version: <span id="appVersion">—</span>
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Project Structure</h2>
+        <pre class="structure-tree">jira-ticket-generator/
+│
+├── src/                          # React web application
+│   ├── ai/                       # Prompts, providers, JSON schemas
+│   ├── components/               # Forms, ticket preview, settings, history
+│   ├── hooks/                    # Voice, form state, Jira creation, theme
+│   ├── pages/                    # Dashboard, Settings
+│   ├── services/                 # Ticket generation, Jira client, memory
+│   ├── utils/                    # Context detection, voice, title polish
+│   └── extension/                # Chrome extension (MV3)
+│       ├── popup/                # React popup UI
+│       ├── background/           # Service worker (shortcuts)
+│       ├── components/           # Input, Review, Settings, Success
+│       ├── services/             # Bootstrap sync, Jira API, drafts, health
+│       ├── state/                # Extension state reducer
+│       ├── icons/                # Extension icons (16–512px)
+│       └── manifest/             # manifest.json template
+│
+├── server/                       # Node.js API backend
+│   └── src/
+│       ├── routes/
+│       │   ├── jira.ts           # POST /issues, POST /mcp/test
+│       │   └── config.ts         # GET /bootstrap (extension sync)
+│       ├── jira/                 # Payload validation, MCP issue creation
+│       ├── mcp/                  # MCP stdio client
+│       └── config.ts             # Environment config (server/.env)
+│
+├── shared/                       # Types shared by web, extension, API
+│   ├── jiraApi.ts                # Create issue + MCP contracts
+│   ├── generation/               # TicketContext, composeIssueDescription
+│   └── ticketTemplate.ts
+│
+├── about/                        # This about page
+├── docs/                         # Setup and extension guides
+├── scripts/                      # Dev automation, extension verify
+├── dist-extension/               # Extension build output (generated)
+└── vite.extension.config.ts      # Extension Vite config</pre>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Web App</h2>
+        <ul class="feature-list">
+          <li>Voice dictation with Web Speech API and environment detection</li>
+          <li>AI ticket generation via local <code>llama.cpp</code> or OpenAI</li>
+          <li>Editable preview, title suggestions, and confidence score</li>
+          <li>QA context detection — browser, OS, device, environment</li>
+          <li>Ticket history, templates, and QA standards engine</li>
+          <li>One-click Jira creation from the dashboard</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Chrome Extension</h2>
+        <ul class="feature-list">
+          <li>Popup on any page — captures URL, title, and timestamp</li>
+          <li>Optional include/exclude page title in tickets</li>
+          <li>Same AI generation and Jira creation as the web app</li>
+          <li>Draft persistence across popup closes</li>
+          <li><strong>New ticket</strong> control to start a fresh report</li>
+          <li>Keyboard shortcut — customizable in Chrome shortcut settings</li>
+          <li>Auto-syncs Jira domain and project from <code>server/.env</code></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">API Server &amp; Jira</h2>
+        <ul class="feature-list">
+          <li>Express API on port <code>3001</code> — credentials stay in <code>server/.env</code></li>
+          <li>MCP stdio bridge to <code>mcp-atlassian</code> for Jira Cloud</li>
+          <li><code>POST /api/jira/issues</code> — create issues from web or extension</li>
+          <li><code>GET /api/config/bootstrap</code> — extension settings sync</li>
+          <li>Shared payload builder and title polishing across clients</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Shared Code</h2>
+        <ul class="tech-list">
+          <li><code>shared/jiraApi.ts</code> — API contract (create issue, MCP test)</li>
+          <li><code>shared/generation/</code> — browser context, issue description</li>
+          <li><code>src/services/ticketGeneration/</code> — AI + rules-based generation</li>
+          <li><code>src/utils/buildJiraCreatePayload.ts</code> — Jira create payload</li>
+          <li><code>src/utils/polishIssueTitle.ts</code> — formal title grammar</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Technology Stack</h2>
+        <ul class="tech-list">
+          <li>React 19 + TypeScript 6 + Vite 8 (web app and extension popup)</li>
+          <li>Tailwind CSS v4 (web app)</li>
+          <li>Node.js + Express 5 + Zod (API server)</li>
+          <li>Chrome Extension Manifest V3</li>
+          <li>MCP stdio → mcp-atlassian → Jira Cloud</li>
+          <li>AI — llama.cpp (local) or OpenAI Chat Completions</li>
+          <li>Vitest for unit tests</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Architecture &amp; Documentation</h2>
+        <ul class="tech-list">
+          <li><code>graphify/project-structure.md</code> — Mermaid module graph (web + extension + server)</li>
+          <li><code>.cursor/skills/qa-bug-assistant/</code> — architecture sequences, API reference, dev workflows</li>
+          <li><code>docs/README.md</code> — setup guides (Jira MCP, extension install, troubleshooting)</li>
+          <li><code>README.md</code> — quick start, scripts, testing</li>
+        </ul>
+        <p class="about-overview" style="margin-top: 12px; margin-bottom: 0; font-size: 13px;">
+          <strong>Web app:</strong> open <code>/about/about.html</code> while running
+          <code>npm run dev:vite</code> (or after <code>npm run build</code>), or tap
+          <strong>ⓘ</strong> in the header.
+          <strong>Extension:</strong> tap <strong>ⓘ</strong> in the popup header.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Runtime Flow</h2>
+        <pre class="structure-tree">Web app:
+  Dashboard → generateTicket → review → POST /api/jira/issues → MCP → Jira
+
+Extension:
+  Popup → capture tab context → generateTicket → review → POST /api/jira/issues → Jira
+
+Shared:
+  generateTicket(), buildJiraCreatePayload(), shared/jiraApi.ts
+  API server :3001 (npm run api:dev) · credentials in server/.env</pre>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">Extension Permissions</h2>
+        <ul class="tech-list">
+          <li><code>storage</code> — Save drafts, settings, and resolved API URL</li>
+          <li><code>activeTab</code> — Read page URL and title for bug context</li>
+          <li><code>host_permissions</code> — <code>localhost:3001</code> / <code>127.0.0.1:3001</code> for API</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="about-footer">
+      <p class="about-footer__name">QA Bug Assistant</p>
+      <p class="about-footer__credit">
+        Designed, Developed &amp; Built by<br />
+        <strong>Md Aminul Islam</strong>
+      </p>
+      <p class="about-footer__copy">© 2026 Md Aminul Islam. All Rights Reserved.</p>
+    </footer>
+
+    <script src="about.js"></script>
+  </body>
+</html>

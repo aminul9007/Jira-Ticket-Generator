@@ -9,8 +9,17 @@ export function Footer() {
         <p className="type-helper">
           © {year} {APP_NAME}
         </p>
-        <p className="type-helper">
-          Local llama.cpp or optional OpenAI · Jira API coming soon
+        <p className="type-helper flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-end">
+          <a
+            href="/about/about.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            About &amp; project structure
+          </a>
+          <span aria-hidden="true">·</span>
+          <span>Local llama.cpp or OpenAI · Jira via MCP</span>
         </p>
       </div>
     </footer>

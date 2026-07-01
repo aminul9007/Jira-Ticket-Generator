@@ -96,6 +96,16 @@ export function Header({ activePage = 'dashboard', onNavigate }: HeaderProps) {
           )}
 
           <ThemeToggle />
+          <a
+            href="/about/about.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-subtle text-sm font-semibold text-text-secondary transition-colors hover:border-hover-border hover:bg-hover-surface hover:text-brand"
+            aria-label="About project"
+            title="About project"
+          >
+            ⓘ
+          </a>
           <span className="type-helper hidden rounded-full bg-brand-muted px-3 py-1 font-medium text-brand lg:inline-flex">
             Beta
           </span>

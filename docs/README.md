@@ -14,6 +14,7 @@ Central index for the **QA Bug Report Assistant** project.
 | Install the Chrome extension | [extension/installation.md](./extension/installation.md) |
 | Fix extension Jira errors | [extension/jira-setup.md](./extension/jira-setup.md) |
 | Build a release extension | [extension/RELEASE.md](./extension/RELEASE.md) |
+| See release notes | [../CHANGELOG.md](../CHANGELOG.md) |
 
 ---
 
@@ -53,6 +54,9 @@ Central index for the **QA Bug Report Assistant** project.
 | `server/` | API backend, MCP bridge |
 | `shared/` | Cross-package TypeScript contracts |
 | `scripts/` | Dev automation, extension verify |
+| `about/` | Extension about page — project structure and features |
+| `graphify/` | Mermaid module graphs (web + extension + server) |
+| `.cursor/skills/qa-bug-assistant/` | Agent skill — architecture, reference, workflows |
 | `dist-extension/` | Extension build output (generated) |
 
 ---

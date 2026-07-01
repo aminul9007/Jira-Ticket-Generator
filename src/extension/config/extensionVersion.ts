@@ -16,6 +16,7 @@ export const extensionVersion = {
   versionName: readVersionName(),
 } as const
 
+/** Semver label for UI (matches Chrome extensions page, e.g. 1.2.0). */
 export function formatExtensionVersionLabel(): string {
-  return `${extensionVersion.version} (${extensionVersion.versionName})`
+  return extensionVersion.version
 }
